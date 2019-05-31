@@ -22,7 +22,7 @@ namespace SaleControlBill
             //设置报表类型：简单报表
             this.ReportProperty.ReportType = Kingdee.BOS.Core.Report.ReportType.REPORTTYPE_NORMAL;
             //设置报表名称
-            this.ReportProperty.ReportName = new Kingdee.BOS.LocaleValue("商机预警总表", base.Context.UserLocale.LCID);
+            this.ReportProperty.ReportName = new Kingdee.BOS.LocaleValue("销售监控报表", base.Context.UserLocale.LCID);
             this.IsCreateTempTableByPlugin = true;
             this.ReportProperty.IsUIDesignerColumns = false;
             this.ReportProperty.IsGroupSummary = true;
