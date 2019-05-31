@@ -21,6 +21,17 @@ namespace KEEPER.K3.CRM.Contracts
     public interface ICommonService
     {
         /// <summary>
+        /// 暂存单据
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="dyObject"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [FaultContract(typeof(ServiceFault))]
+        IOperationResult DraftBill(Context ctx, string FormID, DynamicObject[] dyObject);
+
+        /// <summary>
         /// 保存单据
         /// </summary>
         /// <param name="ctx"></param>

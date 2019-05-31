@@ -31,6 +31,21 @@ namespace KEEPER.K3.App
     public class CommonService: ICommonService
     {
         /// <summary>
+        /// 暂存单据
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="dyObject"></param>
+        /// <returns></returns>
+        public IOperationResult DraftBill(Context ctx, string FormID, DynamicObject[] dyObject)
+        {
+            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
+            FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
+            OperateOption DraftOption = OperateOption.Create();
+            IOperationResult DraftResult = BusinessDataServiceHelper.Draft(ctx, Meta.BusinessInfo, dyObject, DraftOption, "Draft");
+            return DraftResult;
+        }
+        /// <summary>
         /// 保存
         /// </summary>
         /// <param name="ctx"></param>

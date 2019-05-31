@@ -16,6 +16,19 @@ namespace KEEPER.K3.CRM.CRMServiceHelper
     {
 
         /// <summary>
+        /// 暂存
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="dyObject"></param>
+        /// <returns></returns>
+        public static IOperationResult Draft(Context ctx, string FormID, DynamicObject[] dyObject)
+        {
+            ICommonService service = ServiceFactory.GetService<ICommonService>(ctx);
+            return service.DraftBill(ctx, FormID, dyObject);
+        }
+
+        /// <summary>
         /// 保存
         /// </summary>
         /// <param name="ctx"></param>
