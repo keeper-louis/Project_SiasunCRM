@@ -1,0 +1,315 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.ComponentModel;
+using Kingdee.BOS;
+using Kingdee.BOS.Util;
+using Kingdee.BOS.Core;
+using Kingdee.BOS.Core.Report;
+using Kingdee.BOS.Core.Report.PlugIn;
+using Kingdee.BOS.Core.Report.PlugIn.Args;
+using Kingdee.BOS.Core.List;
+using Kingdee.BOS.Contracts.Report;
+using Kingdee.BOS.App.Data;
+using Kingdee.BOS.Orm.DataEntity;
+using Kingdee.BOS.Contracts;
+using Kingdee.BOS.App;
+
+
+namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
+{
+    [Description("商机统计报表—业务员")]
+    public class xy_CRM_OppOperatorStatReport : SysReportBaseService
+    {
+        private string[] tmpTables;
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            this.ReportProperty.ReportType = ReportType.REPORTTYPE_NORMAL;
+            this.ReportProperty.ReportName = new LocaleValue("商机统计报表—业务员", base.Context.UserLocale.LCID);
+            this.IsCreateTempTableByPlugin = true;
+            this.ReportProperty.IsUIDesignerColumns = false;
+            this.ReportProperty.IdentityFieldName = "FIDENTITYID";
+            this.ReportProperty.IsGroupSummary = false;
+            this.ReportProperty.SimpleAllCols = false;
+        }
+
+        public override string GetTableName()
+        {
+            return base.GetTableName();
+        }
+
+        public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
+        {
+            base.BuilderReportSqlAndTempTable(filter, tableName);
+
+            IDBService dbservice = ServiceHelper.GetService<IDBService>();
+            tmpTables = dbservice.CreateTemporaryTableName(this.Context, 1);
+            string tempTable1 = tmpTables[0];
+
+            DynamicObject customFilter = filter.FilterParameter.CustomFilter;
+            string fromDate = String.Empty;
+            string toDate = String.Empty;
+            string deptID = String.Empty;
+            string salerID = String.Empty;
+            string billStatus = String.Empty;
+
+            if (customFilter["F_xy_FromDate"] != null) fromDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_FromDate"]);
+            if (customFilter["F_xy_ToDate"] != null) toDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_ToDate"]);
+            if (customFilter["F_xy_Dept"] != null) deptID = customFilter["F_xy_Dept_Id"].ToString();
+            if (customFilter["F_xy_Saler"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
+            if (customFilter["F_xy_BillStatus"] != null) billStatus = customFilter["F_xy_BillStatus"].ToString();
+
+            Boolean hasDept = !String.IsNullOrEmpty(deptID);
+            Boolean hasSaler = !String.IsNullOrEmpty(salerID);
+            Boolean hasBillStatus = !String.IsNullOrEmpty(billStatus);
+
+            StringBuilder sql = new StringBuilder();
+            sql.Append(" select ROW_NUMBER() OVER(ORDER BY deptNO,empName) FIDENTITYID, ");
+            sql.Append("	deptName,empName, ");
+            sql.Append("	ISNULL(oppTotalCount,0) oppTotalCount, ");
+            sql.Append("	ISNULL(oppRegCount,0) oppRegCount, ");
+            sql.Append("	ISNULL(oppWinBillCount,0) oppWinBillCount, ");
+            sql.Append("	ISNULL(oppLostBillCount,0) oppLostBillCount, ");
+            sql.Append("	ISNULL(oppWinBillIncome,0) oppWinBillIncome, ");
+            sql.Append("	ISNULL(oppLostBillIncome,0) oppLostBillIncome, ");
+            sql.Append("	ISNULL(oppTotalBillIncome,0) oppTotalBillIncome, ");
+            sql.Append("	ISNULL(oppQuota,0) oppQuota, ");
+            sql.Append("	ISNULL(oppUnfinishedCount,0) oppUnfinishedCount ");
+            sql.Append(" into " + tableName);
+            sql.Append(" from ( ");
+            sql.Append(" 	select empInfo.*,oppStat.*, ");
+            sql.Append(" 		   oppQuota.F_PEJK_OPPQUNTA oppQuota,oppQuota.F_PEJK_OPPQUNTA-oppStat.oppTotalCount oppUnfinishedCount  ");
+
+            //商机统计信息
+            sql.Append(" 	from ( ");
+            sql.Append(" 		select opp.FCREATORID, ");
+            sql.Append(" 		count(1) oppTotalCount, ");//需要确认
+            sql.Append(" 		count(1) oppRegCount, ");
+            sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='E' then 1 else 0 end) oppWinBillCount, ");
+            sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='F' then 1 else 0 end) oppLostBillCount, ");
+            sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='E' then opp.FESTIMATEINCOME else 0 end) oppWinBillIncome, ");
+            sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='F' then opp.FESTIMATEINCOME else 0 end) oppLostBillIncome, ");
+            sql.Append(" 		sum(opp.FESTIMATEINCOME) oppTotalBillIncome ");
+            sql.Append(" 		from T_CRM_OPPORTUNITY opp ");
+            if (hasBillStatus)
+            {
+                sql.Append("    where CHARINDEX(opp.FDOCUMENTSTATUS, '" + billStatus + "') > 0 ");
+            }
+            else
+            {
+                sql.Append(" 		where opp.FDOCUMENTSTATUS>='C' ");
+            }
+            if (hasDept)
+            {
+                sql.Append(" 		and opp.FSALEDEPTID='" + deptID + "' "); 
+            }
+            if (hasSaler)
+            {
+                sql.Append(" 		and opp.FCREATORID='" + salerID + "' "); 
+            }
+            sql.Append(" 		and opp.F_PEJK_AUDITDATE between '"+ fromDate +"' and '"+ toDate +"' ");
+            sql.Append(" 		group by opp.FCREATORID ");
+            sql.Append(" 	) oppStat  ");
+
+            //销售指标
+            sql.Append(" 	left join ( ");
+            sql.Append(" 		select quota_entry.F_PEJK_SALER,quota_entry.F_PEJK_OPPQUNTA from PEJK_SALERQUNTA quota  ");
+            sql.Append(" 		inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID ");
+            sql.Append(" 		where quota.FDOCUMENTSTATUS='C' ");
+            if (hasDept)
+            {
+                sql.Append(" 		and quota.F_PEJK_SALEDEPT='" + deptID + "' "); 
+            }
+            if (hasSaler)
+            {
+                sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' "); 
+            }
+            sql.Append(" 		and Year(quota.F_PEJK_YEAR)=Year('"+ fromDate +"') ");
+            sql.Append(" 	) oppQuota on oppStat.FCREATORID=oppQuota.F_PEJK_SALER ");
+
+            //人员信息
+            sql.Append(" 	right join ( ");
+            sql.Append(" 		select dept.FNUMBER deptNO,deptl.FNAME deptName,saler.fid salerID,empl.fname empName  ");
+            sql.Append(" 		from V_BD_SALESMAN saler ");
+            sql.Append(" 		inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
+            sql.Append(" 		inner join T_HR_EMPINFO_L empl on empl.FID=staff.FEMPINFOID and empl.FLOCALEID='2052' ");
+            sql.Append(" 		inner join T_BD_DEPARTMENT_L deptl on saler.FDEPTID=deptl.FDEPTID and deptl.FLOCALEID='2052' ");
+            sql.Append("        inner join T_BD_DEPARTMENT dept on deptl.FDEPTID=dept.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
+            sql.Append(" 		where saler.FDOCUMENTSTATUS='C'  ");
+            sql.Append(" 		and saler.FISUSE=1  ");
+            sql.Append(" 		and saler.FFORBIDSTATUS='A' ");
+            sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
+            if (hasDept)
+            {
+                sql.Append("    and saler.FDEPTID='" + deptID + "' ");
+            }
+            if (hasSaler)
+            {
+                sql.Append("    and saler.fid='" + salerID + "' ");
+            }
+            sql.Append(" 	) empInfo on oppStat.FCREATORID=empInfo.salerID ");
+            sql.Append(" ) tt ");
+
+            DBUtils.ExecuteDynamicObject(this.Context, sql.ToString());
+
+        }
+
+        public override ReportHeader GetReportHeaders(IRptParams filter)
+        {
+            ReportHeader header = new ReportHeader();
+            header.Mergeable = true;
+
+            header.AddChild("deptName", new LocaleValue("销售部门"));
+            header.AddChild("empName", new LocaleValue("销售员"));
+            header.AddChild("oppTotalCount", new LocaleValue("总商机数量"), SqlStorageType.SqlInt);
+            header.AddChild("oppRegCount", new LocaleValue("商机登录数量"), SqlStorageType.SqlInt);
+            header.AddChild("oppWinBillCount", new LocaleValue("赢单数量"), SqlStorageType.SqlInt);
+            header.AddChild("oppLostBillCount", new LocaleValue("输单数量"), SqlStorageType.SqlInt);
+            header.AddChild("oppQuota", new LocaleValue("商机指标"), SqlStorageType.SqlInt);
+            header.AddChild("oppUnfinishedCount", new LocaleValue("未完成数量"), SqlStorageType.SqlInt);
+            header.AddChild("oppWinBillIncome", new LocaleValue("赢单金额"), SqlStorageType.SqlDecimal);
+            header.AddChild("oppLostBillIncome", new LocaleValue("输单金额"), SqlStorageType.SqlDecimal);
+            header.AddChild("oppTotalBillIncome", new LocaleValue("预计收入"), SqlStorageType.SqlDecimal);
+
+            return header;
+        }
+
+        public override ReportTitles GetReportTitles(IRptParams filter)
+        {
+            var result = base.GetReportTitles(filter);
+            DynamicObject customFilter = filter.FilterParameter.CustomFilter;
+            if (customFilter != null)
+            {
+                if (result == null)
+                {
+                    result = new ReportTitles();
+                }
+
+                if (customFilter["F_xy_FromDate"] != null && customFilter["F_xy_ToDate"] != null)
+                {
+                    result.AddTitle("F_xy_titleDate", string.Format(@"      日期：{0:yyyy/MM/dd}", customFilter["F_xy_FromDate"]) + " - " + string.Format(@"{0:yyyy/MM/dd}", customFilter["F_xy_ToDate"]));
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 设置报表合计列
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public override List<SummaryField> GetSummaryColumnInfo(IRptParams filter)
+        {
+            var result = base.GetSummaryColumnInfo(filter);
+            DynamicObject customFilter = filter.FilterParameter.CustomFilter;
+            result.Add(new SummaryField("oppTotalCount", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppRegCount", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppWinBillCount", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppLostBillCount", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppQuota", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppUnfinishedCount", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppWinBillIncome", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppLostBillIncome", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            result.Add(new SummaryField("oppTotalBillIncome", Kingdee.BOS.Core.Enums.BOSEnums.Enu_SummaryType.SUM));
+            return result;
+        }
+
+        protected override string GetIdentityFieldIndexSQL(string tableName)
+        {
+            return base.GetIdentityFieldIndexSQL(tableName);
+        }
+
+        protected override void ExecuteBatch(List<string> listSql)
+        {
+            base.ExecuteBatch(listSql);
+        }
+
+        protected override string AnalyzeDspCloumn(IRptParams filter, string tablename)
+        {
+            return base.AnalyzeDspCloumn(filter, tablename);
+        }
+
+        protected override void AfterCreateTempTable(string tablename)
+        {
+            base.AfterCreateTempTable(tablename);
+        }
+
+        protected override string GetSummaryColumsSQL(List<SummaryField> summaryFields)
+        {
+            return base.GetSummaryColumsSQL(summaryFields);
+        }
+
+        protected override System.Data.DataTable GetListData(string sSQL)
+        {
+            return base.GetListData(sSQL);
+        }
+
+        protected override System.Data.DataTable GetReportData(IRptParams filter)
+        {
+            return base.GetReportData(filter);
+        }
+
+        protected override System.Data.DataTable GetReportData(string tablename, IRptParams filter)
+        {
+            return base.GetReportData(tablename, filter);
+        }
+
+        public override int GetRowsCount(IRptParams filter)
+        {
+            return base.GetRowsCount(filter);
+        }
+
+        protected override string BuilderFromWhereSQL(IRptParams filter)
+        {
+            return base.BuilderFromWhereSQL(filter);
+        }
+
+        protected override string BuilderSelectFieldSQL(IRptParams filter)
+        {
+            return base.BuilderSelectFieldSQL(filter);
+        }
+
+        protected override string BuilderTempTableOrderBySQL(IRptParams filter)
+        {
+            return base.BuilderTempTableOrderBySQL(filter);
+        }
+
+        public override void CloseReport()
+        {
+            base.CloseReport();
+        }
+
+        protected override string CreateGroupSummaryData(IRptParams filter, string tablename)
+        {
+            return base.CreateGroupSummaryData(filter, tablename);
+        }
+
+        protected override void CreateTempTable(string sSQL)
+        {
+            base.CreateTempTable(sSQL);
+        }
+
+        public override void DropTempTable()
+        {
+            base.DropTempTable();
+        }
+
+        public override System.Data.DataTable GetList(IRptParams filter)
+        {
+            return base.GetList(filter);
+        }
+
+        public override List<long> GetOrgIdList(IRptParams filter)
+        {
+            return base.GetOrgIdList(filter);
+        }
+
+        public override List<Kingdee.BOS.Core.Metadata.TreeNode> GetTreeNodes(IRptParams filter)
+        {
+            return base.GetTreeNodes(filter);
+        }
+    }
+}
