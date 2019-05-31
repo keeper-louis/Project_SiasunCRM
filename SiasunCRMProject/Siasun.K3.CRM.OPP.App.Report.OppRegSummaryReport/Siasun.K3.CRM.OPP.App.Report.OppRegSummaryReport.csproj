@@ -31,24 +31,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Kingdee.BOS">
-      <HintPath>..\..\..\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.App">
-      <HintPath>..\..\..\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.dll</HintPath>
+    </Reference>
+    <Reference Include="Kingdee.BOS.App.Core">
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Contracts">
-      <HintPath>..\..\..\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Contracts.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Core">
-      <HintPath>..\..\..\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Core.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.DataEntity">
-      <HintPath>..\..\..\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.DataEntity.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.DataEntity.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
