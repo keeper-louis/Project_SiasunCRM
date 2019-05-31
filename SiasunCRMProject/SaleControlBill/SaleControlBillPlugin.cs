@@ -14,7 +14,7 @@ namespace SaleControlBill
     [Description("销售监控报表")]
     public class SaleControlBillPlugin : SysReportBaseService
     {
-        //商机预警总表
+        //销售监控报表
         public override void Initialize()
         {
             base.Initialize();
