@@ -141,7 +141,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             sql.Append(" 		where saler.FDOCUMENTSTATUS='C'  ");
             sql.Append(" 		and saler.FISUSE=1  ");
             sql.Append(" 		and saler.FFORBIDSTATUS='A' ");
-            sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
+            //sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
             if (hasDept)
             {
                 sql.Append("    and saler.FDEPTID='" + deptID + "' ");

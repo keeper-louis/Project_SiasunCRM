@@ -75,7 +75,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	from T_HR_EMPINFO emp   ");
             s.Append(@" 	left join T_HR_EMPINFO_L empl on empl.FID=emp.FID and empl.FLOCALEID='2052'  ");
             s.Append(@" 	left join T_BD_STAFF staff on staff.FEMPINFOID=emp.FID  ");
-            s.Append(@" 	inner join T_BD_OPERATORENTRY oper on staff.FSTAFFID=oper.FSTAFFID and oper.FOPERATORTYPE='XSY' and oper.FISUSE=1 and oper.FBIZORGID='100041'  ");
+            s.Append(@" 	inner join T_BD_OPERATORENTRY oper on staff.FSTAFFID=oper.FSTAFFID and oper.FOPERATORTYPE='XSY' and oper.FISUSE=1 ");
+            //s.Append(@"                                        and oper.FBIZORGID='100041'  ");
             s.Append(@" 	left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID  ");
             s.Append(@" 	left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID and post_l.FLOCALEID='2052'  ");
             s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=post.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
@@ -122,7 +123,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	from T_HR_EMPINFO emp   ");
             s.Append(@" 	left join T_HR_EMPINFO_L empl on empl.FID=emp.FID and empl.FLOCALEID='2052'  ");
             s.Append(@" 	left join T_BD_STAFF staff on staff.FEMPINFOID=emp.FID  ");
-            s.Append(@" 	inner join T_BD_OPERATORENTRY oper on staff.FSTAFFID=oper.FSTAFFID and oper.FOPERATORTYPE='XSY' and oper.FISUSE=1 and oper.FBIZORGID='100041'  ");
+            s.Append(@" 	inner join T_BD_OPERATORENTRY oper on staff.FSTAFFID=oper.FSTAFFID and oper.FOPERATORTYPE='XSY' and oper.FISUSE=1 ");
+            //s.Append(@"                                        and oper.FBIZORGID='100041'  ");
             s.Append(@" 	left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID  ");
             s.Append(@" 	left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID and post_l.FLOCALEID='2052'  ");
             s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=post.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
