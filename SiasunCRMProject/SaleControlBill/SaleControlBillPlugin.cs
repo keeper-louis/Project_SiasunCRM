@@ -38,31 +38,31 @@ namespace SaleControlBill
             base.BuilderReportSqlAndTempTable(filter, tableName);
             DynamicObject customFilter = filter.FilterParameter.CustomFilter;
 
-            //销售员(负责人)
-            StringBuilder salerSql = new StringBuilder();
-            if (customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0)
+            //部门
+            StringBuilder deptSql = new StringBuilder();
+            if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
             {
                 //获取到多选基础资料中所有选中项
-                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"];
-                int salerNum = 0;
+                DynamicObjectCollection cols2 = (DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"];
+                int deptNum = 0;
 
-                if (cols.Count >= 1)
+                if (cols2.Count >= 1)
                 {
-                    salerSql.Append(" IN (");
+                    deptSql.Append(" IN (");
                 }
 
-                foreach (DynamicObject customer in cols)
+                foreach (DynamicObject dept in cols2)
                 {
-                    String salerName = Convert.ToString(((DynamicObject)customer["F_QSNC_SalerFilter"])["Number"]);
-                    salerNum++;
+                    String deptNumber = Convert.ToString(((DynamicObject)dept["F_QSNC_DeptFilter"])["Number"]);
+                    deptNum++;
 
-                    if (cols.Count == salerNum)
+                    if (cols2.Count == deptNum)
                     {
-                        salerSql.Append("'" + salerName + "')");
+                        deptSql.Append("'" + deptNumber + "')");
                     }
                     else
                     {
-                        salerSql.Append("'" + salerName + "', ");
+                        deptSql.Append("'" + deptNumber + "', ");
                     }
                 }
             }
@@ -119,11 +119,12 @@ namespace SaleControlBill
             sql.AppendLine(" ON  EMPL.FID = EMP.FID ");
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ");
             sql.AppendLine(" ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
+            sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
             sql.AppendLine(" where EMPL.FLOCALEID = 2052 AND DEPTL.FLOCALEID = 2052 AND PROJECTPRO.FLOCALEID = 2052 AND FINUSER.FLOCALEID = 2052 ");
-            //销售员（负责人）过滤条件
-            if (customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0)
+            //判断销售部门条件
+            if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
             {
-                sql.Append(" and SALESMAN.FNUMBER ").Append(salerSql);
+                sql.AppendLine(" AND DEPT.FNUMBER").Append(deptSql);
             }
 
             DBUtils.ExecuteDynamicObject(this.Context, sql.ToString());
@@ -243,22 +244,22 @@ namespace SaleControlBill
                     result = new ReportTitles();
                 }
 
-                //销售员（负责人）过滤
-                if (customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0)
+                //销售部门
+                if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
                 {
-                    StringBuilder salerName = new StringBuilder();
-                    DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"];
-                    foreach (DynamicObject customer in cols)
+                    StringBuilder deptName = new StringBuilder();
+                    DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"];
+                    foreach (DynamicObject dept in cols)
                     {
-                        String tmpName = Convert.ToString(((DynamicObject)customer["F_QSNC_SalerFilter"])["Name"]);
-                        salerName.Append(tmpName + "; ");
+                        String tmpName = Convert.ToString(((DynamicObject)dept["F_QSNC_DeptFilter"])["Name"]);
+                        deptName.Append(tmpName + "; ");
                     }
 
-                    result.AddTitle("F_QSNC_Saler", salerName.ToString());
+                    result.AddTitle("F_QSNC_Department", deptName.ToString());
                 }
                 else
                 {
-                    result.AddTitle("F_QSNC_Saler", "全部");
+                    result.AddTitle("F_QSNC_Department", "全部");
                 }
             }
 
