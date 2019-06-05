@@ -20,8 +20,14 @@ namespace KEEPER.K3.App
         /// <returns></returns>
         public List<long> getProjectIds(Context ctx, long personId)
         {
+            List<long> salerIds = getSalerPersonids(ctx, personId);
+            if (salerIds == null)
+            {
+                return null;
+            }
+            return null;
 
-            throw new NotImplementedException();
+            
         }
 
         /// <summary>
@@ -32,7 +38,7 @@ namespace KEEPER.K3.App
         /// <returns></returns>
         public List<long> getSalerPersonids(Context ctx, long personId)
         {
-            List<long> salerPersonids = new List<long>();
+            List<long> salerPersonIds = new List<long>();
             //判断personId是否在CRM汇报关系设置表中
             string strSql_1 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIP WHERE F_PEJK_MANAGER = {0}");
             DynamicObjectCollection  headCol = DBUtils.ExecuteDynamicObject(ctx, strSql_1);
@@ -100,14 +106,36 @@ SELECT BBBB.F_PEJK_TEAMMEMBER
  WHERE A.F_PEJK_MANAGER = {0}
 UNION ALL
 SELECT {0}", personId);
-            DynamicObjectCollection salerIds = DBUtils.ExecuteDynamicObject(ctx, sql);
-            if (salerIds!=null&&salerIds.Count()>0)
+            DynamicObjectCollection personIds = DBUtils.ExecuteDynamicObject(ctx, sql);
+            if (personIds != null&& personIds.Count()>0)
             {
-                foreach (var item in salerIds)
+                foreach (var item in personIds)
                 {
-                    salerPersonids.Add(Convert.ToInt64(item["F_PEJK_TEAMMEMBER"]));
+                    salerPersonIds.Add(Convert.ToInt64(item["F_PEJK_TEAMMEMBER"]));
                 }
-                return salerPersonids;
+                string Ids = string.Join(",", salerPersonIds);
+                string strSql = string.Format(@"/*dialect*/SELECT V.FID
+  FROM T_BD_PERSON A
+ INNER JOIN T_BD_STAFF B
+    ON A.FPERSONID = B.FPERSONID
+ INNER JOIN V_BD_SALESMAN V
+    ON B.FSTAFFID = V.FSTAFFID
+ WHERE A. FPERSONID IN ({0})
+");
+                DynamicObjectCollection salerIds = DBUtils.ExecuteDynamicObject(ctx, strSql);
+                if (salerIds != null && salerIds.Count() > 0)
+                {
+                    salerPersonIds.Clear();
+                    foreach (var item in personIds)
+                    {
+                        salerPersonIds.Add(Convert.ToInt64(item["FID"]));
+                    }
+                    return salerPersonIds;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
