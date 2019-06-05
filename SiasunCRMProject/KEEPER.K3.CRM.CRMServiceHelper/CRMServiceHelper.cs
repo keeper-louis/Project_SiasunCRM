@@ -128,5 +128,29 @@ namespace KEEPER.K3.CRM.CRMServiceHelper
             return model;
         }
 
+        /// <summary>
+        /// 根据数据规则获取销售员id集合
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="personId"></param>
+        /// <returns></returns>
+        public static List<long> getSalerPersonids(Context ctx, long personId)
+        {
+            ICRMService service = CRMFactory.GetService<ICRMService>(ctx);
+            return service.getSalerPersonids(ctx, personId);
+        }
+
+        /// <summary>
+        /// 根据数据规则获取项目信息id集合
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="personId"></param>
+        /// <returns></returns>
+        public static List<long> getProIds(Context ctx, long personId)
+        {
+            ICRMService service = CRMFactory.GetService<ICRMService>(ctx);
+            return service.getProjectIds(ctx, personId);
+        }
+
     }
 }

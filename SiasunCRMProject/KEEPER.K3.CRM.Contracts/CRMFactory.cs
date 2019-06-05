@@ -49,13 +49,12 @@ namespace KEEPER.K3.CRM.Contracts
             return instance;
         }
 
-        private static void RegisterService()
+        private static new void RegisterService()
         {
             if (!noRegistered) return;
+            ///增加对应的接口与实现类的对应关系
 
-            ////增加对应的接口与实现类的对应关系
-
-            _mapServer.Add(typeof(ICommonService), "KEEPER.K3.App.CRMService,KEEPER.K3.App");
+            _mapServer.Add(typeof(ICRMService), "KEEPER.K3.App.CRMService,KEEPER.K3.App");
 
             //这句话放到最后
             noRegistered = false;
@@ -71,9 +70,9 @@ namespace KEEPER.K3.CRM.Contracts
             }
         }
 
-        public static ICommonService GetCommonService(Context ctx)
+        public static ICRMService GetCommonService(Context ctx)
         {
-            return GetService<ICommonService>(ctx);
+            return GetService<ICRMService>(ctx);
         }
     }
 }

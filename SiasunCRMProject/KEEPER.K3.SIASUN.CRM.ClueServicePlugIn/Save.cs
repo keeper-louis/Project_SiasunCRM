@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Kingdee.BOS.Core.DynamicForm.PlugIn.Args;
 using Kingdee.BOS.Orm.DataEntity;
 using Kingdee.BOS;
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
 {
