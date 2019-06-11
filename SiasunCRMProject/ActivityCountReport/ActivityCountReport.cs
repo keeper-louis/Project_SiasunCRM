@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-
 using System.Linq;
 using System.Text;
 
@@ -26,6 +25,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+            
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
             materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 2);
 
@@ -132,6 +132,13 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
 
 
                 }
+
+                //销售数据隔离
+                if (flag)
+                {
+                    stringBuilder.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+                }
+
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 stringBuilder = new StringBuilder();

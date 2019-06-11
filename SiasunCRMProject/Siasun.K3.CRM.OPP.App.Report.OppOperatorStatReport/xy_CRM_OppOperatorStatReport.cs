@@ -15,7 +15,7 @@ using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Orm.DataEntity;
 using Kingdee.BOS.Contracts;
 using Kingdee.BOS.App;
-
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
 {
@@ -44,6 +44,47 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject)collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
 
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
             tmpTables = dbservice.CreateTemporaryTableName(this.Context, 1);
@@ -110,6 +151,12 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             {
                 sql.Append(" 		and opp.FCREATORID='" + salerID + "' "); 
             }
+            //销售数据隔离
+            if (flag)
+            {
+                sql.AppendLine(" and opp.FCREATORID ").Append(salerLimit);
+            }
+
             sql.Append(" 		and opp.F_PEJK_AUDITDATE between '"+ fromDate +"' and '"+ toDate +"' ");
             sql.Append(" 		group by opp.FCREATORID ");
             sql.Append(" 	) oppStat  ");
@@ -126,6 +173,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             if (hasSaler)
             {
                 sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' "); 
+            }
+            //销售数据隔离
+            if (flag)
+            {
+                sql.AppendLine(" and quota_entry.F_PEJK_SALER ").Append(salerLimit);
             }
             sql.Append(" 		and Year(quota.F_PEJK_YEAR)=Year('"+ fromDate +"') ");
             sql.Append(" 	) oppQuota on oppStat.FCREATORID=oppQuota.F_PEJK_SALER ");
@@ -149,6 +201,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             if (hasSaler)
             {
                 sql.Append("    and saler.fid='" + salerID + "' ");
+            }
+            //销售数据隔离
+            if (flag)
+            {
+                sql.AppendLine(" and saler.fid ").Append(salerLimit);
             }
             sql.Append(" 	) empInfo on oppStat.FCREATORID=empInfo.salerID ");
             sql.Append(" ) tt ");

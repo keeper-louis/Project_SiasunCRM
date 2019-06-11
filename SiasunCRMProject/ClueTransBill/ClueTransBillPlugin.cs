@@ -11,6 +11,7 @@ using Kingdee.BOS.Core.Metadata;
 using Kingdee.BOS.Contracts;
 using Kingdee.BOS.App;
 using System.ComponentModel;
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace ClueTransBill
 {
@@ -42,6 +43,48 @@ namespace ClueTransBill
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag0 = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject)collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
+
 
             //生成中间临时表
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
@@ -152,6 +195,11 @@ namespace ClueTransBill
             sql2.AppendLine(" left join T_BD_DEPARTMENT_L deptl ");
             sql2.AppendLine(" on deptl.FDEPTID = salesman.FDEPTID ");
             sql2.AppendFormat(" where deptl.FDEPTID in (select exedeptid from {0}) and deptl.FLOCALEID = 2052 ", tmpTable1);
+            if (flag0)
+            {
+                sql2.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+            }
+
             DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
 
             //查询出所有部门小计
@@ -174,6 +222,7 @@ namespace ClueTransBill
                 sql4.AppendLine(" and staff.FNUMBER").Append(salerSql);
                 flag = true;
             }
+            
             DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
 
             if (!flag)

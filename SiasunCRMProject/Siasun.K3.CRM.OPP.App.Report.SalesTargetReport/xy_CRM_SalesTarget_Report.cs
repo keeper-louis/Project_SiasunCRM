@@ -15,6 +15,7 @@ using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Orm.DataEntity;
 using Kingdee.BOS.Contracts;
 using Kingdee.BOS.App;
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 {
@@ -43,6 +44,48 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject)collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
+
 
             DynamicObject customFilter = filter.FilterParameter.CustomFilter;
             String year = string.Empty;
@@ -106,6 +149,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 			where YEAR(opp.F_PEJK_AUDITDATE)='" + year + "' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and opp.FSALEDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and opp.FBEMPID='" + salerID + "' "); }
+            if (flag)
+            {
+                s.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
+            }
             s.Append(@" 			group by opp.FBEMPID,MONTH(opp.F_PEJK_AUDITDATE) ");
             s.Append(@" 			) t1 ");
             s.Append(@" 		group by salerID ");
@@ -113,6 +160,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	where 1=1 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and oper.FENTRYID='" + salerID + "'"); }
+            if (flag)
+            {
+                s.AppendLine(" and oper.FENTRYID ").Append(salerLimit);
+            }
             s.Append(@"  ");
             s.Append(@" 	union all  ");
             s.Append(@"  ");
@@ -155,6 +206,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 			where YEAR(con.FAPPROVEDATE)='" + year + "' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and con.FSALEDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and con.FSALERID='" + salerID + "' "); }
+            if (flag)
+            {
+                s.AppendLine(" and con.FSALERID ").Append(salerLimit);
+            }
             s.Append(@" 			group by con.FSALERID,MONTH(con.FAPPROVEDATE) ");
             s.Append(@" 			) t3 ");
             s.Append(@" 		group by salerID ");
@@ -162,6 +217,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	where 1=1 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and dept.FDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and oper.FENTRYID='" + salerID + "'"); }
+            if (flag)
+            {
+                s.AppendLine(" and oper.FENTRYID ").Append(salerLimit);
+            }
             s.Append(@" ) t5 ");
             s.Append(@" order by deptNO,empName,rowType ");
 

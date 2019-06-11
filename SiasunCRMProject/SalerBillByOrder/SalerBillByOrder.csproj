@@ -91,6 +91,12 @@
     <Compile Include="SalerBillByOrderPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KEEPER.K3.CRM.CRMServiceHelper\KEEPER.K3.CRM.CRMServiceHelper.csproj">
+      <Project>{FFCC9DBB-DD17-4567-A405-1D02D97D816E}</Project>
+      <Name>KEEPER.K3.CRM.CRMServiceHelper</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

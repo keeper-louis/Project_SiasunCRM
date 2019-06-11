@@ -11,6 +11,7 @@ using Kingdee.BOS.Core.Metadata;
 using Kingdee.BOS.Contracts;
 using Kingdee.BOS.App;
 using System.ComponentModel;
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace SalerBillByTotal
 {
@@ -41,6 +42,48 @@ namespace SalerBillByTotal
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject)collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
+
 
             //生成中间临时表
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
@@ -145,6 +188,11 @@ namespace SalerBillByTotal
             if (dyFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_SalerFilter"]).Count > 0)
             {
                 sql1.AppendLine(" AND STAFF.FNUMBER ").Append(salerSql);
+            }
+
+            if (flag)
+            {
+                sql1.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
             }
 
             //判断销售部门条件

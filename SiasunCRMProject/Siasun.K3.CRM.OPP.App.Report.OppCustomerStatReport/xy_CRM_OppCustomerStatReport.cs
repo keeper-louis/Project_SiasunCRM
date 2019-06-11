@@ -15,6 +15,7 @@ using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Orm.DataEntity;
 using Kingdee.BOS.Contracts;
 using Kingdee.BOS.App;
+using KEEPER.K3.CRM.CRMServiceHelper;
 
 namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
 {

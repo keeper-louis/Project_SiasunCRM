@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-
 using System.Linq;
 using System.Text;
 
@@ -27,6 +26,7 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
+            
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
             materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 2);
 
