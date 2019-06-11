@@ -63,7 +63,7 @@ namespace ClueTransBill
                 {
                     List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
                     int len = 0;
-                    flag = true;
+                    flag0 = true;
 
                     if (salerList.Count >= 1)
                     {
