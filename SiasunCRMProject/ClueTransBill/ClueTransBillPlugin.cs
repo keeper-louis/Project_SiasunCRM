@@ -197,7 +197,7 @@ namespace ClueTransBill
             sql2.AppendFormat(" where deptl.FDEPTID in (select exedeptid from {0}) and deptl.FLOCALEID = 2052 ", tmpTable1);
             if (flag0)
             {
-                sql2.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+                sql2.AppendLine(" and salesman.fid ").Append(salerLimit);
             }
 
             DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
@@ -222,7 +222,11 @@ namespace ClueTransBill
                 sql4.AppendLine(" and staff.FNUMBER").Append(salerSql);
                 flag = true;
             }
-            
+            if (flag0)
+            {
+                sql4.AppendLine(" and salesman.fid ").Append(salerLimit);
+            }
+
             DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
 
             if (!flag)

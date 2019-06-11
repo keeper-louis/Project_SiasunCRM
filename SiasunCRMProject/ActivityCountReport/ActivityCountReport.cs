@@ -1,4 +1,5 @@
-﻿using Kingdee.BOS;
+﻿using KEEPER.K3.CRM.CRMServiceHelper;
+using Kingdee.BOS;
 using Kingdee.BOS.App;
 using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Contracts;
@@ -25,7 +26,48 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
-            
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject)collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
+
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
             materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 2);
 
@@ -49,7 +91,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                     String deptnumber = Convert.ToString(((DynamicObject)dept["F_PAEZ_DEPT"])["Number"]);
                     deptsize = deptsize + 1;
                     if (deptsize == cols.Count)
-                        deptnumbersql.Append("'" + deptnumber + "')");
+                        deptnumbersql.Append("'" + deptnumber + "') ");
                     else
                         deptnumbersql.Append("'" + deptnumber + "',");
 
@@ -68,7 +110,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                     String salenumber = Convert.ToString(((DynamicObject)onesale["F_PAEZ_MulBaseSaler"])["Number"]);
                     salesize = salesize + 1;
                     if (salesize == cols.Count)
-                        salenumbersql.Append("'" + salenumber + "')");
+                        salenumbersql.Append("'" + salenumber + "') ");
                     else
                         salenumbersql.Append("'" + salenumber + "',");
 
@@ -136,7 +178,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 //销售数据隔离
                 if (flag)
                 {
-                    stringBuilder.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+                    stringBuilder.AppendLine(" and  saleman.fid ").Append(salerLimit);
                 }
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());

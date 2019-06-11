@@ -1,4 +1,5 @@
-﻿using Kingdee.BOS;
+﻿using KEEPER.K3.CRM.CRMServiceHelper;
+using Kingdee.BOS;
 using Kingdee.BOS.App;
 using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Contracts;
@@ -26,7 +27,48 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
         public override void BuilderReportSqlAndTempTable(IRptParams filter, string tableName)
         {
             base.BuilderReportSqlAndTempTable(filter, tableName);
-            
+
+            // 根据当前用户的UserId  查询出其personId
+            StringBuilder sql0 = new StringBuilder();
+            sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
+            DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
+
+            StringBuilder salerLimit = new StringBuilder();
+            Boolean flag = false;
+
+            if (collection.Count > 0)
+            {
+                //获取当前用户personId
+                DynamicObject personIdObj = (DynamicObject) collection[0];
+                int personId = Convert.ToInt32(personIdObj["FLINKOBJECT"]);
+
+                //销售员数据隔离
+                if (CRMServiceHelper.getSalerPersonids(this.Context, personId) != null)
+                {
+                    List<long> salerList = CRMServiceHelper.getSalerPersonids(this.Context, personId);
+                    int len = 0;
+                    flag = true;
+
+                    if (salerList.Count >= 1)
+                    {
+                        salerLimit.Append(" IN ( ");
+                    }
+
+                    foreach (long salerId in salerList)
+                    {
+                        len++;
+                        if (len == salerList.Count)
+                        {
+                            salerLimit.Append(" " + salerId + " ) ");
+                        }
+                        else
+                        {
+                            salerLimit.Append(" " + salerId + ", ");
+                        }
+                    }
+                }
+            }
+
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
             materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 2);
 
@@ -127,9 +169,13 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
                 if (salenumbersql != null && salenumbersql.Length > 0)
                 {
                     stringBuilder.AppendLine(" and  emp.fnumber ").Append(salenumbersql);
-
-
                 }
+                //销售员数据隔离
+                if (flag)
+                {
+                    stringBuilder.AppendLine(" and OPP.FBEMPID ").Append(salerLimit);
+                }
+
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 stringBuilder = new StringBuilder();
