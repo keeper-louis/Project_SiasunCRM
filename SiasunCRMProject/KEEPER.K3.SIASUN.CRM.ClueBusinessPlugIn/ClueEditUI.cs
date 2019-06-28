@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kingdee.BOS.Core.DynamicForm.PlugIn.Args;
 using Kingdee.BOS.Orm.DataEntity;
+using Kingdee.BOS.App.Data;
 
 namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
 {
@@ -14,7 +15,7 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
     public class ClueEditUI:AbstractBillPlugIn
     {
         
-
+        //项目进展过滤
         public override void BeforeF7Select(BeforeF7SelectEventArgs e)
         {
             base.BeforeF7Select(e);
@@ -49,6 +50,22 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                 }
             }
             
+        }
+
+        //值更新
+        public override void DataChanged(DataChangedEventArgs e)
+        {
+            base.DataChanged(e);
+            if (e.Field.Key.Equals("F_PEJK_Province"))
+            {
+                string strSql = string.Format(@"/*dialect*/select FPARENTID from T_BAS_ASSISTANTDATAENTRY  where FMASTERID = '{0}'", e.NewValue);
+                string parentid = DBUtils.ExecuteScalar<string>(this.Context, strSql, "", null);
+                if (parentid.Equals(""))
+                {
+                    return;
+                }
+                this.Model.SetItemValueByID("F_PEJK_Region", parentid, 0);
+            }
         }
     }
 }

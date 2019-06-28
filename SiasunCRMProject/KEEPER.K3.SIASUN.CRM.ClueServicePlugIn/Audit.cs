@@ -164,26 +164,26 @@ namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
                     // 对下游单据数据包，进行适当的修订，以避免关键字段为空，自动保存失败
                     // 示例代码略
                     //var saveResult = CRMServiceHelper.Save(base.Context, "CRM_OPP_Opportunity", targetBillObjs);
-                    var draftOppResult = CRMServiceHelper.Draft(base.Context, "CRM_OPP_Opportunity", targetOppBillObjs);
-                    //var saveOppResult = CRMServiceHelper.Save(base.Context, "CRM_OPP_Opportunity", targetOppBillObjs);
+                    //var draftOppResult = CRMServiceHelper.Draft(base.Context, "CRM_OPP_Opportunity", targetOppBillObjs);
+                    var saveOppResult = CRMServiceHelper.Save(base.Context, "CRM_OPP_Opportunity", targetOppBillObjs);
                     // 判断自动保存结果：只有操作成功，才会继续
-                    if (this.CheckOpResult(draftOppResult, OperateOption.Create()))
-                    {
-
-                    }
-                    //if (this.CheckOpResult(saveOppResult, OperateOption.Create()))
+                    //if (this.CheckOpResult(draftOppResult, OperateOption.Create()))
                     //{
-                    //    object[] ids = (from c in saveOppResult.SuccessDataEnity
-                    //                    select c[0]).ToArray();//保存成功的结果
-                    //    if (ids.Count() > 0)
-                    //    {
-                    //        IOperationResult submitOppResult = CRMServiceHelper.Submit(base.Context, "CRM_OPP_Opportunity", ids);
-                    //        if (this.CheckOpResult(submitOppResult, OperateOption.Create()))
-                    //        {
-                                
-                    //        }
-                    //    }
+
                     //}
+                    if (this.CheckOpResult(saveOppResult, OperateOption.Create()))
+                    {
+                        object[] ids = (from c in saveOppResult.SuccessDataEnity
+                                        select c[0]).ToArray();//保存成功的结果
+                        if (ids.Count() > 0)
+                        {
+                            IOperationResult submitOppResult = CRMServiceHelper.Submit(base.Context, "CRM_OPP_Opportunity", ids);
+                            if (this.CheckOpResult(submitOppResult, OperateOption.Create()))
+                            {
+
+                            }
+                        }
+                    }
                 }
 
 
