@@ -67,5 +67,25 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                 this.Model.SetItemValueByID("F_PEJK_Region", parentid, 0);
             }
         }
+
+        public override void AfterCreateNewData(EventArgs e)
+        {
+            base.AfterCreateNewData(e);
+            DynamicObject  deptObject = this.Model.GetValue("FSALEDEPTID") as DynamicObject;
+            int dtpth = Convert.ToInt32(deptObject["Depth"]);//深度
+            if ((DynamicObject)deptObject["ParentID"]!=null&& dtpth==4)
+            {
+                long parentId = Convert.ToInt64(deptObject["ParentID_Id"]);
+                this.Model.SetItemValueByID("FSALEDEPTID", parentId, 0);
+            }
+        }
+
+        
+        public override void AuthPermissionBeforeF7Select(AuthPermissionBeforeF7SelectEventArgs e)
+        {
+            base.AuthPermissionBeforeF7Select(e);
+            e.IsIsolationOrg = false;
+        }
+        
     }
 }
