@@ -141,13 +141,13 @@ namespace OppWarningBill
             sql.AppendLine(" (SELECT FBILLNO ");
             sql.AppendLine(" FROM T_CRM_Opportunity OPP	");
             sql.AppendLine(" WHERE OPP.FBILLNO NOT IN (SELECT ACT.FSOURCEBILLNO FROM T_CRM_Activity ACT) ");
-            sql.AppendLine(" AND DATEDIFF(MONTH, OPP.FCREATEDATE, GETDATE()) > 3 ");
+            sql.AppendLine(" AND DATEDIFF(MONTH, OPP.FCREATEDATE, GETDATE()) >= 3 ");
             sql.AppendLine(" UNION ");
             sql.AppendLine(" SELECT OPP.FBILLNO	");
             sql.AppendLine(" FROM T_CRM_Opportunity OPP ");
             sql.AppendLine(" LEFT JOIN T_CRM_Activity ACT ");
             sql.AppendLine(" ON OPP.FBILLNO = ACT.FSOURCEBILLNO ");
-            sql.AppendLine(" where DATEDIFF(MONTH, OPP.FCREATEDATE, ACT.FCREATEDATE) > 3) ");
+            sql.AppendLine(" where DATEDIFF(MONTH, OPP.FCREATEDATE, ACT.FCREATEDATE) >= 3) ");
             //商机编码
             if (oppBillNo != null && !oppBillNo.Equals(""))
             {

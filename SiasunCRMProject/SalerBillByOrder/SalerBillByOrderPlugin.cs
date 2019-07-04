@@ -154,37 +154,52 @@ namespace SalerBillByTotal
             }
 
             //报表sql
+            //StringBuilder sql1 = new StringBuilder();
+            //sql1.AppendFormat(@"/*dialect*/ SELECT DEPTNAME, SALERNAME, QUOTA, CONTRACTNUM, COMPLETEAMOUNT INTO {0}", tmpTable1);
+            //sql1.AppendLine(" FROM ");
+            //sql1.AppendLine(" (SELECT DEPTL.FNAME AS DEPTNAME, ");
+            //sql1.AppendLine(" EMPL.FNAME AS SALERNAME, ");
+            //sql1.AppendLine(" (SELECT F_PEJK_CONTRACTQUNTA FROM PEJK_SALERQUNTAENTRY WHERE F_PEJK_SALER = RESOLVESALER.F_QSNC_SALER) AS QUOTA,");
+            //sql1.AppendLine(" F_QSNC_CONTRACTNUM AS CONTRACTNUM,");
+            //sql1.AppendLine(" F_QSNC_DISTAMOUNT AS COMPLETEAMOUNT");
+            //sql1.AppendLine(" FROM QSNC_SaleResolve_Saler RESOLVESALER");
+            //sql1.AppendLine(" LEFT JOIN QSNC_SaleResolve_Basic RESOLVEBASIC ON RESOLVEBASIC.FID = RESOLVESALER.FID");
+            //sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = RESOLVESALER.F_QSNC_SALER");
+            //sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID");
+            //sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
+            //sql1.AppendLine(" LEFT JOIN T_BD_STAFF STAFF ON STAFF.FSTAFFID = SALESMAN.FSTAFFID");
+            //sql1.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = STAFF.FEMPINFOID");
+            //sql1.AppendLine(" WHERE DEPTL.FLOCALEID = 2052 AND EMPL.FLOCALEID = 2052 ");
+
+
+            // 百分号 CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar) + ' %'
+            //报表sql
             StringBuilder sql1 = new StringBuilder();
-            sql1.AppendFormat(@"/*dialect*/ SELECT DEPTNAME, SALERNAME, QUOTA, CONTRACTNUM, COMPLETEAMOUNT INTO {0}", tmpTable1);
-            sql1.AppendLine(" FROM ");
-            sql1.AppendLine(" (SELECT DEPTL.FNAME AS DEPTNAME, ");
-            sql1.AppendLine(" EMPL.FNAME AS SALERNAME, ");
-            sql1.AppendLine(" (SELECT F_PEJK_CONTRACTQUNTA FROM PEJK_SALERQUNTAENTRY WHERE F_PEJK_SALER = RESOLVESALER.F_QSNC_SALER) AS QUOTA,");
-            sql1.AppendLine(" F_QSNC_CONTRACTNUM AS CONTRACTNUM,");
-            sql1.AppendLine(" F_QSNC_DISTAMOUNT AS COMPLETEAMOUNT");
-            sql1.AppendLine(" FROM QSNC_SaleResolve_Saler RESOLVESALER");
-            sql1.AppendLine(" LEFT JOIN QSNC_SaleResolve_Basic RESOLVEBASIC ON RESOLVEBASIC.FID = RESOLVESALER.FID");
-            sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = RESOLVESALER.F_QSNC_SALER");
-            sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID");
-            sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
-            sql1.AppendLine(" LEFT JOIN T_BD_STAFF STAFF ON STAFF.FSTAFFID = SALESMAN.FSTAFFID");
-            sql1.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = STAFF.FEMPINFOID");
+
+            sql1.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTL.FNAME) AS FSeq, DEPTL.FNAME AS DEPTNAME, EMPL.FNAME AS SALERNAME, FBILLNO, CONVERT(FLOAT, ROUND(F_PEJK_SUMAMOUNT, 2)) AS SUMAMOUNT, F_PEJK_PRONO, CONVERT(FLOAT, ROUND(F_PEJK_FPAmount, 2)) AS FPAMOUNT, CAST(CONVERT(FLOAT, ROUND(F_PEJK_SumRatio * 100, 3)) as varchar) + ' %' AS RATIO INTO {0} ", tableName);
+            sql1.AppendLine(" FROM PEJK_PRODETAIL DETAIL ");
+            sql1.AppendLine(" LEFT JOIN T_CRM_CONTRACT CONTRACT ON DETAIL.FID = CONTRACT.FID ");
+            sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = CONTRACT.FSALERID ");
+            sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
+            sql1.AppendLine(" LEFT JOIN T_BD_STAFF STAFF ON STAFF.FSTAFFID = SALESMAN.FSTAFFID ");
+            sql1.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = STAFF.FEMPINFOID ");
             sql1.AppendLine(" WHERE DEPTL.FLOCALEID = 2052 AND EMPL.FLOCALEID = 2052 ");
 
             //判断起始日期是否有效
             if (dyFilter["F_QSNC_StartDateFilter"] != null)
             {
                 startDate = Convert.ToDateTime(dyFilter["F_QSNC_StartDateFilter"]).ToString("yyyy-MM-dd 00:00:00");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_QSNC_DATE >= '{0}' ", startDate);
+                sql1.AppendFormat(" AND CONTRACT.FDATE >= '{0}' ", startDate);
             }
             //判断截止日期是否有效
             if (dyFilter["F_QSNC_EndDateFilter"] != null)
             {
                 endDate = Convert.ToDateTime(dyFilter["F_QSNC_EndDateFilter"]).ToString("yyyy-MM-dd 23:59:59");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_QSNC_DATE <= '{0}' ", endDate);
+                sql1.AppendFormat(" AND CONTRACT.FDATE <= '{0}' ", endDate);
             }
 
-            //判断销售员条件
+
+            // --------------------- 销售员过滤条件
             if (dyFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_SalerFilter"]).Count > 0)
             {
                 sql1.AppendLine(" AND STAFF.FNUMBER ").Append(salerSql);
@@ -195,26 +210,25 @@ namespace SalerBillByTotal
                 sql1.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
             }
 
-            //判断销售部门条件
+            // --------------------- 销售部门过滤条件
             if (dyFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_DeptFilter"]).Count > 0)
             {
                 sql1.AppendLine(" AND DEPT.FNUMBER ").Append(deptSql);
             }
-            sql1.AppendLine(" ) TMP ");
 
             DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
             // tmpTable1 : DEPTNAME  SALERNAME  QUOTA  COMPLETEAMOUNT  COMPLETERATE
 
-            StringBuilder sql2 = new StringBuilder();
-            sql2.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '合计' , '', TOTALQUOTA, '', TOTALAMOUNT ", tmpTable1);
-            sql2.AppendLine(" FROM ");
-            sql2.AppendFormat(" (SELECT SUM(QUOTA) AS TOTALQUOTA, SUM(COMPLETEAMOUNT) AS TOTALAMOUNT FROM {0}) TMP ", tmpTable1);
-            DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
+            //StringBuilder sql2 = new StringBuilder();
+            //sql2.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '合计' , '', TOTALQUOTA, '', TOTALAMOUNT ", tmpTable1);
+            //sql2.AppendLine(" FROM ");
+            //sql2.AppendFormat(" (SELECT SUM(QUOTA) AS TOTALQUOTA, SUM(COMPLETEAMOUNT) AS TOTALAMOUNT FROM {0}) TMP ", tmpTable1);
+            //DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
 
-            StringBuilder sql3 = new StringBuilder();
-            sql3.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME) AS FSeq, DEPTNAME, SALERNAME, CONVERT(FLOAT, ROUND(QUOTA, 2)) AS TOTALQUOTA, CONTRACTNUM, CONVERT(FLOAT, ROUND(COMPLETEAMOUNT, 2)) AS TOTALAMOUNT, CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar) + ' %' AS COMPLETERATE INTO {0} ", tableName);
-            sql3.AppendFormat(" FROM {0} ", tmpTable1);
-            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
+            //StringBuilder sql3 = new StringBuilder();
+            //sql3.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME) AS FSeq, DEPTNAME, SALERNAME, CONVERT(FLOAT, ROUND(QUOTA, 2)) AS TOTALQUOTA, CONTRACTNUM, CONVERT(FLOAT, ROUND(COMPLETEAMOUNT, 2)) AS TOTALAMOUNT, CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar) + ' %' AS COMPLETERATE INTO {0} ", tableName);
+            //sql3.AppendFormat(" FROM {0} ", tmpTable1);
+            //DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
         }
 
         //构建报表列
@@ -230,21 +244,25 @@ namespace SalerBillByTotal
             var salesman = header.AddChild("SALERNAME", new Kingdee.BOS.LocaleValue("销售员"));
             salesman.ColIndex = 1;
 
-            //指标
-            var quota = header.AddChild("TOTALQUOTA", new Kingdee.BOS.LocaleValue("指标"));
-            quota.ColIndex = 2;
+            //合同编号
+            var billNo = header.AddChild("FBILLNO", new Kingdee.BOS.LocaleValue("合同编号"));
+            billNo.ColIndex = 2;
 
-            //销售合同编号
-            var contractNumber = header.AddChild("CONTRACTNUM", new Kingdee.BOS.LocaleValue("销售合同编号"));
-            contractNumber.ColIndex = 3;
+            //合同金额
+            var totalAmount = header.AddChild("SUMAMOUNT", new Kingdee.BOS.LocaleValue("合同金额"));
+            totalAmount.ColIndex = 3;
 
-            //完成金额
-            var amount = header.AddChild("TOTALAMOUNT", new Kingdee.BOS.LocaleValue("完成金额"));
-            amount.ColIndex = 4;
+            //项目号
+            var proNo = header.AddChild("F_PEJK_PRONO", new Kingdee.BOS.LocaleValue("项目号"));
+            proNo.ColIndex = 4;
 
-            //完成占比
-            var rate = header.AddChild("COMPLETERATE", new Kingdee.BOS.LocaleValue("完成占比"));
-            rate.ColIndex = 5;
+            //分配金额
+            var amount = header.AddChild("FPAMOUNT", new Kingdee.BOS.LocaleValue("分配金额"));
+            amount.ColIndex = 5;
+
+            //分配比例
+            var rate = header.AddChild("RATIO", new Kingdee.BOS.LocaleValue("分配比例"));
+            rate.ColIndex = 6;
 
             return header;
         }
