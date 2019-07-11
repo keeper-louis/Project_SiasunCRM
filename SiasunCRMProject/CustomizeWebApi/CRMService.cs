@@ -21,11 +21,11 @@ namespace CustomizeWebApi
         public string APPtest(string parameter)
         {
             JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = Jo["ServerUrl"].ToString();
+            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
             string DBID = Jo["DBID"].ToString();
             string UserName = Jo["UserName"].ToString();
             string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32(Jo["ICID"].ToString());
+            int ICID = Convert.ToInt32("2052");
             string SearchType = Jo["SearchType"].ToString();
             string PersonId = Jo["PersonId"].ToString();
 
