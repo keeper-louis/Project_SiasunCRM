@@ -70,6 +70,9 @@ namespace KEEPER.K3.App
             // 调用保存服务，自动保存
             ISaveService saveService = ServiceHelper.GetService<ISaveService>();
             IOperationResult saveResult = saveService.Save(ctx, targetBillMeta.BusinessInfo, dyObject, saveOption, "Save");
+            ISubmitService save1Service = ServiceHelper.GetService<ISubmitService>();
+            
+
             return saveResult;
         }
 
@@ -98,10 +101,28 @@ namespace KEEPER.K3.App
         /// <returns></returns>
         public IOperationResult SubmitBill(Context ctx, string FormID, object[] ids)
         {
-            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
-            FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
+            //IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
+            //FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
+            //OperateOption submitOption = OperateOption.Create();
+            //IOperationResult submitResult = BusinessDataServiceHelper.Submit(ctx, Meta.BusinessInfo, ids, "Submit", submitOption);
+            //return submitResult;
+
+            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();
+            FormMetadata targetBillMeta = metaService.Load(ctx, FormID) as FormMetadata;
+            // 构建保存操作参数：设置操作选项值，忽略交互提示
             OperateOption submitOption = OperateOption.Create();
-            IOperationResult submitResult = BusinessDataServiceHelper.Submit(ctx, Meta.BusinessInfo, ids, "Submit", submitOption);
+            // 忽略全部需要交互性质的提示，直接保存；
+            //saveOption.SetIgnoreWarning(true);              // 忽略交互提示
+            //saveOption.SetInteractionFlag(this.Option.GetInteractionFlag());        // 如果有交互，传入用户选择的交互结果
+            // using Kingdee.BOS.Core.Interaction;
+            //saveOption.SetIgnoreInteractionFlag(this.Option.GetIgnoreInteractionFlag());
+            //// 如下代码，强制要求忽略交互提示(演示案例不需要，注释掉)
+            submitOption.SetIgnoreWarning(true);
+            //// using Kingdee.BOS.Core.Interaction;
+            submitOption.SetIgnoreInteractionFlag(true);
+            // 调用保存服务，自动保存
+            ISubmitService submitService = ServiceHelper.GetService<ISubmitService>();
+            IOperationResult submitResult = submitService.Submit(ctx, targetBillMeta.BusinessInfo, ids, "Submit", submitOption);
             return submitResult;
         }
 
