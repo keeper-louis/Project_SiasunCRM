@@ -20,6 +20,9 @@ using Kingdee.BOS.Orm;
 using Kingdee.BOS.Orm.DataEntity;
 using Kingdee.BOS.ServiceHelper;
 using Kingdee.BOS.Util;
+using Kingdee.BOS.Workflow.Contracts;
+using Kingdee.BOS.Workflow.Models.EnumStatus;
+using Kingdee.BOS.Workflow.Models.Template;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,28 +104,80 @@ namespace KEEPER.K3.App
         /// <returns></returns>
         public IOperationResult SubmitBill(Context ctx, string FormID, object[] ids)
         {
-            //IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
-            //FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
-            //OperateOption submitOption = OperateOption.Create();
-            //IOperationResult submitResult = BusinessDataServiceHelper.Submit(ctx, Meta.BusinessInfo, ids, "Submit", submitOption);
-            //return submitResult;
-
-            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();
-            FormMetadata targetBillMeta = metaService.Load(ctx, FormID) as FormMetadata;
-            // 构建保存操作参数：设置操作选项值，忽略交互提示
+            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
+            FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
             OperateOption submitOption = OperateOption.Create();
-            // 忽略全部需要交互性质的提示，直接保存；
-            //saveOption.SetIgnoreWarning(true);              // 忽略交互提示
-            //saveOption.SetInteractionFlag(this.Option.GetInteractionFlag());        // 如果有交互，传入用户选择的交互结果
-            // using Kingdee.BOS.Core.Interaction;
-            //saveOption.SetIgnoreInteractionFlag(this.Option.GetIgnoreInteractionFlag());
-            //// 如下代码，强制要求忽略交互提示(演示案例不需要，注释掉)
-            submitOption.SetIgnoreWarning(true);
+            IOperationResult submitResult = BusinessDataServiceHelper.Submit(ctx, Meta.BusinessInfo, ids, "Submit", submitOption);
+            return submitResult;
+
+            //IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();
+            //FormMetadata targetBillMeta = metaService.Load(ctx, FormID) as FormMetadata;
+            //// 构建保存操作参数：设置操作选项值，忽略交互提示
+            //OperateOption submitOption = OperateOption.Create();
+            //// 忽略全部需要交互性质的提示，直接保存；
+            ////saveOption.SetIgnoreWarning(true);              // 忽略交互提示
+            ////saveOption.SetInteractionFlag(this.Option.GetInteractionFlag());        // 如果有交互，传入用户选择的交互结果
             //// using Kingdee.BOS.Core.Interaction;
-            submitOption.SetIgnoreInteractionFlag(true);
-            // 调用保存服务，自动保存
-            ISubmitService submitService = ServiceHelper.GetService<ISubmitService>();
-            IOperationResult submitResult = submitService.Submit(ctx, targetBillMeta.BusinessInfo, ids, "Submit", submitOption);
+            ////saveOption.SetIgnoreInteractionFlag(this.Option.GetIgnoreInteractionFlag());
+            ////// 如下代码，强制要求忽略交互提示(演示案例不需要，注释掉)
+            //submitOption.SetIgnoreWarning(true);
+            ////// using Kingdee.BOS.Core.Interaction;
+            //submitOption.SetIgnoreInteractionFlag(true);
+            //// 调用保存服务，自动保存
+            //ISubmitService submitService = ServiceHelper.GetService<ISubmitService>();
+            //IOperationResult submitResult = submitService.Submit(ctx, targetBillMeta.BusinessInfo, ids, "Submit", submitOption);
+            //return submitResult;
+        }
+
+        /// <summary>
+        /// 提交进入工作流
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public IOperationResult SubmitWorkFlowBill(Context ctx, string FormID, string billId)
+        {
+            IMetaDataService metaService = ServiceHelper.GetService<IMetaDataService>();//元数据服务
+            FormMetadata Meta = metaService.Load(ctx, FormID) as FormMetadata;//获取元数据
+            // 首先判断单据是否已经有未完成的工作流
+            IProcInstService procInstService = Kingdee.BOS.Workflow.Contracts.ServiceFactory.GetProcInstService(ctx);
+                bool isExist = procInstService.CheckUnCompletePrcInstExsit(ctx, FormID, billId);
+                if (isExist)
+                {
+                    throw new KDBusinessException("AutoSubmit-001", "该单据已经启动了流程，不允许重复提交！");
+                }
+                // 读取单据的工作流配置模板
+                IWorkflowTemplateService wfTemplateService = Kingdee.BOS.Workflow.Contracts.ServiceFactory.GetWorkflowTemplateService(ctx);
+                List<FindPrcResult> findProcResultList = wfTemplateService.GetPrcListByFormID(
+                                FormID, new string[] { billId }, ctx);
+                if (findProcResultList == null || findProcResultList.Count == 0)
+                {
+                    throw new KDBusinessException("AutoSubmit-002", "查找单据适用的流程模板失败，不允许提交工作流！");
+                }
+
+                // 设置提交参数：忽略操作过程中的警告，避免与用户交互
+                OperateOption submitOption = OperateOption.Create();
+                submitOption.SetIgnoreWarning(true);
+                IOperationResult submitResult = null;
+
+                FindPrcResult findProcResult = findProcResultList[0];
+                if (findProcResult.Result == TemplateResultType.Error)
+                {
+                    throw new KDBusinessException("AutoSubmit-003", "单据不符合流程启动条件，不允许提交工作流！");
+                }
+                else if (findProcResult.Result != TemplateResultType.Normal)
+                {// 本单无适用的流程图，直接走传统审批
+                    ISubmitService submitService = ServiceHelper.GetService<ISubmitService>();
+                    submitResult = submitService.Submit(ctx, Meta.BusinessInfo,
+                        new object[] { billId }, "Submit", submitOption);
+                }
+                else
+                {// 走工作流
+                    IBOSWorkflowService wfService = Kingdee.BOS.Workflow.Contracts.ServiceFactory.GetBOSWorkflowService(ctx);
+                    submitResult = wfService.ListSubmit(ctx, Meta.BusinessInfo,
+                        0, new object[] { billId }, findProcResultList, submitOption);
+                }
             return submitResult;
         }
 

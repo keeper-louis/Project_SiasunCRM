@@ -177,10 +177,33 @@ namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
                                         select c[0]).ToArray();//保存成功的结果
                         if (ids.Count() > 0)
                         {
-                            IOperationResult submitOppResult = CRMServiceHelper.Submit(base.Context, "CRM_OPP_Opportunity", ids);
-                            if (this.CheckOpResult(submitOppResult, OperateOption.Create()))
+                            foreach (object item in ids)
                             {
-
+                                string id = Convert.ToString(item);
+                                IOperationResult submitOppResult = CRMServiceHelper.SubmitWorkFlow(base.Context, "CRM_OPP_Opportunity", id);
+                                // 判断提交结果
+                                if (submitOppResult.IsSuccess == true)
+                                {
+                                    // 自动提交成功，显示空操作本身的成功提示即可
+                                }
+                                else
+                                {
+                                    submitOppResult.MergeValidateErrors();
+                                    if (submitOppResult.OperateResult == null)
+                                    {// 未知原因导致提交失败
+                                        throw new KDBusinessException("AutoSubmit-004", "未知原因导致自动提交失败！");
+                                    }
+                                    else
+                                    {
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.AppendLine("自动提交失败，失败原因：");
+                                        foreach (var operateResult in submitOppResult.OperateResult)
+                                        {
+                                            sb.AppendLine(operateResult.Message);
+                                        }
+                                        throw new KDBusinessException("AutoSubmit-005", sb.ToString());
+                                    }
+                                }
                             }
                         }
                     }
