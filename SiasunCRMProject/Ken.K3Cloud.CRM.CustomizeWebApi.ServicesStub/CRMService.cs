@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using KEEPER.K3.App;
 using System.Collections.Generic;
 
-namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
+namespace Ken.K3Cloud.CRM.CustomizeWebApi.ServicesStub
 {
     public class CRMService : AbstractWebApiBusinessService
     {
@@ -20,12 +20,11 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
         }
         public string APPtest(string parameter)
         {
-            JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
+            string s = System.Web.HttpContext.Current.Request.Form["Data"];
+            JObject Jo = (JObject)JsonConvert.DeserializeObject(s);
             string DBID = Jo["DBID"].ToString();
             string UserName = Jo["UserName"].ToString();
             string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32("2052");
             string SearchType = Jo["SearchType"].ToString();
             string PersonId = Jo["PersonId"].ToString();
 
@@ -37,11 +36,13 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             KEEPER.K3.App.CRMService crm = new KEEPER.K3.App.CRMService();
             List<long> ids = new List<long>();
 
-            Context ctx = getContext(UserName, PassWord, ICID, DBID, ServerUrl);
+            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
 
-            ApiClient client = new ApiClient(ServerUrl);
-            bool bLogin = client.Login(DBID, UserName, PassWord, ICID);
-            if (bLogin)//登录成功
+            K3CloudApiClient client = new K3CloudApiClient("http://localhost/K3Cloud/");
+            var ret = client.ValidateLogin(DBID, UserName, PassWord, 2052);
+            var result = JObject.Parse(ret)["LoginResultType"].Value<int>();
+
+            if (result == 1)//登录成功
             {
                 if (SearchType.Equals("0"))
                 {
@@ -66,7 +67,11 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
                 jsonRoot.Add("IsSuccess", "false");
                 jsonRoot.Add("Reason", "登录失败");
             }
-            Arr.Add(ids.ToArray());
+            if (ids!=null)
+            {
+                Arr.Add(ids.ToArray());
+            }
+
             jsonRoot.Add("Ids", Arr);
 
             sContent = JsonConvert.SerializeObject(jsonRoot);

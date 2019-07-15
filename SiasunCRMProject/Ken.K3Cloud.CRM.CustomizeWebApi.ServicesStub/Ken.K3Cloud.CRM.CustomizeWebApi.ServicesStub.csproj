@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{697BBC7C-5401-475B-8419-1BB676E7ED2B}</ProjectGuid>
+    <ProjectGuid>{A2B6F849-C5F6-4F6D-ADD5-FE974ACDBBE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CustomizeWebApi</RootNamespace>
-    <AssemblyName>CustomizeWebApi</AssemblyName>
+    <RootNamespace>Ken.K3Cloud.CRM.CustomizeWebApi.ServicesStub</RootNamespace>
+    <AssemblyName>Ken.K3Cloud.CRM.CustomizeWebApi.ServicesStub</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\Program Files %28x86%29\Kingdee\K3Cloud\WebSite\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,82 +31,86 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="KEEPER.K3.App">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\KEEPER.K3.App.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\KEEPER.K3.App.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.App">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Contracts">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Contracts.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Core">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.DataEntity">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.DataEntity.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.DataEntity.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.OrmEngine">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.OrmEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.OrmEngine.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.ServiceFacade.KDServiceClient">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceClient.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceClient.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.ServiceFacade.KDServiceClientFx">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceClientFx.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceClientFx.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.ServiceFacade.KDServiceFx">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceFx.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceFacade.KDServiceFx.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.ServiceHelper">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceHelper.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ServiceHelper.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.WebApi.Client">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.Client.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.Client.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.WebApi.ServicesStub">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.ServicesStub.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.ServicesStub.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow.App.Core">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.App.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.App.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow.Contracts">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.Contracts.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow.Models">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.Models.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.Models.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow.PlugIns">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.PlugIns.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.PlugIns.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.Workflow.ServiceHelper">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.ServiceHelper.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.ServiceHelper.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.K3.Core">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.K3.CRM.Contracts">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Contracts.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.K3.CRM.Core">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Core.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.K3.CRM.Entity">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Entity.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Entity.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.K3.MFG.App">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.MFG.App.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.MFG.App.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -119,8 +123,8 @@
     <Compile Include="ModifyOppLostReason.cs" />
     <Compile Include="WaitingTaskOrMessageSearch.cs" />
     <Compile Include="WinOrLose.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Workflow.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

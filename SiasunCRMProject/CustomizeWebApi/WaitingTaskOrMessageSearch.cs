@@ -25,7 +25,7 @@ using Kingdee.BOS.Authentication;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-namespace CustomizeWebApi
+namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
     public class WaitingTaskOrMessageSearch : AbstractWebApiBusinessService
     {
