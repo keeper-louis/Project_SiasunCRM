@@ -65,6 +65,22 @@ namespace KEEPER.K3.CRM.Contracts
         IOperationResult SubmitBill(Context ctx, string FormID, object[] ids);
 
 
+        /// <summary>
+        /// 提交单据到工作流
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [FaultContract(typeof(ServiceFault))]
+        IOperationResult SubmitWorkFlowBill(Context ctx, string FormID, string id);
+
+
+
+
+
+
 
         /// <summary>
         /// 审核单据

@@ -73,6 +73,22 @@ namespace KEEPER.K3.CRM.CRMServiceHelper
         }
 
 
+
+        /// <summary>
+        /// 业务对象提交
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID">业务对象标识</param>
+        /// <param name="id">业务对象ID集合</param>
+        /// <returns></returns>
+        public static IOperationResult SubmitWorkFlow(Context ctx, string formID, string ids)
+        {
+            ICommonService service = ServiceFactory.GetService<ICommonService>(ctx);
+            IOperationResult submitResult = service.SubmitWorkFlowBill(ctx, formID, ids);
+            return submitResult;
+        }
+
+
         /// <summary>
         /// 审核业务对象
         /// </summary>
