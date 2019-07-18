@@ -9,12 +9,11 @@ using Kingdee.BOS.Core.List.PlugIn.Args;
 using Kingdee.BOS.App.Data;
 using KEEPER.K3.CRM.CRMServiceHelper;
 using Kingdee.BOS.Util;
-using Kingdee.BOS.Orm.DataEntity;
 
-namespace KEEPER.K3.SIASUN.CRM.SaleContractBussinessPlugIn
+namespace KEEPER.K3.SIASUN.CRM.ActivityBusinessPlugIn
 {
-    [Description("销售合同列表插件")]
-    public class SaleContractListUI:AbstractListPlugIn
+    [Description("活动列表插件")]
+    public class ActivityListUI: AbstractListPlugIn
     {
         public override void PrepareFilterParameter(FilterArgs e)
         {
@@ -25,11 +24,7 @@ namespace KEEPER.K3.SIASUN.CRM.SaleContractBussinessPlugIn
             List<long> salePersonIds = CRMServiceHelper.getSalerPersonids(this.Context, personId);
             var a = from Id in salePersonIds select Id;
             string ids = string.Join(",", a.ToArray());
-            string billNoQuery = string.Format(@"/*dialect*/select a.fid from T_CRM_CONTRACT a inner join PEJK_PRODETAIL b on a.FID = b.FID where a.FSALERID in ({0}) or b.F_PEJK_MANAGER IN ({0})", ids);
-            DynamicObjectCollection doo =  DBUtils.ExecuteDynamicObject(this.View.Context, billNoQuery);
-            object[] fid = (from c in doo select c[0]).ToArray();
-            string billIds = string.Join(",", fid);
-            string filter = string.Format(@"fid in ({0})", billIds);
+            string filter = string.Format(@"F_PEJK_LEADER in ({0})", ids);
             e.FilterString = e.FilterString.IsNullOrEmpty() ? filter : e.FilterString + " and " + filter;
         }
     }
