@@ -25,7 +25,7 @@ namespace KEEPER.K3.SIASUN.CRM.SaleContractDeComposeBusinessPlugIn
             List<long> salePersonIds = CRMServiceHelper.getSalerPersonids(this.Context, personId);
             var a = from Id in salePersonIds select Id;
             string ids = string.Join(",", a.ToArray());
-            string billNoQuery = string.Format(@"/*dialect*/select a.FID from PEJK_SALECONTRACTS a inner join PEJK_SALECONTRACTENTRY b on a.FID = b.FID where a.F_PEJK_MANAGER in ({0}) or b.F_PEJK_SALER IN ({0})", ids);
+            string billNoQuery = string.Format(@"/*dialect*/select a.FID from PEJK_SALECONTRACTS a left join PEJK_SALECONTRACTENTRY b on a.FID = b.FID where a.F_PEJK_MANAGER in ({0}) or b.F_PEJK_SALER IN ({0})", ids);
             DynamicObjectCollection doo = DBUtils.ExecuteDynamicObject(this.View.Context, billNoQuery);
             object[] fid = (from c in doo select c[0]).ToArray();
             string billIds = string.Join(",", fid);
