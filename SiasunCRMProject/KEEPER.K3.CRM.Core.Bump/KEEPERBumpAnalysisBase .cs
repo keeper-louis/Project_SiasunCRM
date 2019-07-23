@@ -172,7 +172,8 @@ namespace KEEPER.K3.CRM.Core.Bump
                 string str4 = field.matching;
                 if (!string.IsNullOrEmpty(str3))
                 {
-                    str = str + "or " + key + ((str4 == "100") ? ("='" + str3.ToString() + "' ") : (" LIKE '%" + str3.ToString() + "%' "));
+                    //str = str + "or " + key + ((str4 == "100") ? ("='" + str3.ToString() + "' ") : (" LIKE '%" + str3.ToString() + "%' "));
+                    str = string.Format(@"{0}or {1}", str, (str4 == "100")?string.Format(@"{1} = '{0}' ",str3.ToString(),key):string.Format(@"((CHARINDEX({0},'{1}') > 0 or {2} LIKE '%{3}%') and {4} <> '') ",key,str3.ToString(),key,str3.ToString(),key));
                 }
             }
             if (str != "")
@@ -310,7 +311,16 @@ namespace KEEPER.K3.CRM.Core.Bump
                         DynamicObject obj4 = ((DynamicObjectCollection)obj2[field.field.Entity.DynamicProperty.Name])[0];
                         fieldData = this.GetFieldData(obj4[field.field.PropertyName]);
                     }
-                    double num3 = ((fieldData.Length == 0) || (fieldData.IndexOf(str3) < 0)) ? 0.0 : (((double)str3.Length) / ((double)fieldData.Length));
+                    //double num3 = ((fieldData.Length == 0) || (fieldData.IndexOf(str3) < 0)) ? 0.0 : (((double)str3.Length) / ((double)fieldData.Length));
+                    double num3 = 0.0;
+                    if (fieldData.Length>str3.Length)
+                    {
+                        num3 = ((fieldData.Length == 0) || (fieldData.IndexOf(str3) < 0)) ? 0.0 : (((double)str3.Length) / ((double)fieldData.Length));
+                    }
+                    else
+                    {
+                        num3 = ((fieldData.Length == 0) || (str3.IndexOf(fieldData) < 0)) ? 0.0 : (((double)fieldData.Length) / ((double)str3.Length));
+                    }
                     double num4 = Math.Round(num3, 4) * 100.0;
                     num += num4;
                     string str5 = num4.ToString() + "%";
