@@ -23,7 +23,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
+namespace Ken.K3Cloud.CRM.CustomizeWebApi.ServicesStub
 {
     public class ModifyOppLostReason : AbstractWebApiBusinessService
     {
@@ -33,23 +33,24 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 
         public string APPtest(string parameter)
         {
-            JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
+            string s = System.Web.HttpContext.Current.Request.Form["Data"];
+            JObject Jo = (JObject)JsonConvert.DeserializeObject(s);
             string DBID = Jo["DBID"].ToString();
             string UserName = Jo["UserName"].ToString();
             string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32("2052");
             int BillId = Convert.ToInt32(Jo["BillId"].ToString());
             string LostReason = Jo["LostReason"].ToString();
 
             string reason = "";
             string sContent = "";
 
-            Context ctx = getContext(UserName, PassWord, ICID, DBID, ServerUrl);
+            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
 
-            ApiClient client = new ApiClient(ServerUrl);
-            bool bLogin = client.Login(DBID, UserName, PassWord, ICID);
-            if (bLogin)//登录成功
+            K3CloudApiClient client = new K3CloudApiClient("http://localhost/K3Cloud/");
+            var ret = client.ValidateLogin(DBID, UserName, PassWord, 2052);
+            var result = JObject.Parse(ret)["LoginResultType"].Value<int>();
+
+            if (result == 1)//登录成功
             {
                 string strSql = string.Format(@"/*dialect*/update T_CRM_Opportunity set FWinReason={1}  where FID='{0}'", BillId, LostReason);
                 DBUtils.Execute(ctx, strSql);
