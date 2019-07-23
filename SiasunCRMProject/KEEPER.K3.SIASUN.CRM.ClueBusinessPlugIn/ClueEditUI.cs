@@ -70,7 +70,7 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
 
         public override void AfterCreateNewData(EventArgs e)
         {
-            base.AfterCreateNewData(e);
+           base.AfterCreateNewData(e);
             DynamicObject  deptObject = this.Model.GetValue("FSALEDEPTID") as DynamicObject;
             int dtpth = Convert.ToInt32(deptObject["Depth"]);//深度
             if ((DynamicObject)deptObject["ParentID"]!=null&& dtpth==4)
