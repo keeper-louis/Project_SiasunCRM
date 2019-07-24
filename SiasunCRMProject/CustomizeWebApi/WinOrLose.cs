@@ -2,11 +2,7 @@
 using Kingdee.BOS.Authentication;
 using Kingdee.BOS.Core.DynamicForm;
 using Kingdee.BOS.Core.Metadata;
-using Kingdee.BOS.Core.SqlBuilder;
-using Kingdee.BOS.JSON;
-using Kingdee.BOS.Log;
 using Kingdee.BOS.Orm.DataEntity;
-using Kingdee.BOS.Orm.Metadata.DataEntity;
 using Kingdee.BOS.Resource;
 using Kingdee.BOS.ServiceFacade.KDServiceClient.User;
 using Kingdee.BOS.ServiceFacade.KDServiceFx;
@@ -20,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Web;
 
 namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
@@ -33,23 +30,22 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 
         public string APPtest(string parameter)
         {
-            JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
-            string DBID = Jo["DBID"].ToString();
-            string UserName = Jo["UserName"].ToString();
-            string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32("2052");
-            string BillId = Jo["BillId"].ToString();
-            string WinOrLose = Jo["WinOrLose"].ToString();
+            string value = HttpContext.Current.Request.Form["Data"];
+            JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
+            string DBID = jObject["DBID"].ToString();
+            string UserName = jObject["UserName"].ToString();
+            string PassWord = jObject["PassWord"].ToString();
+            string BillId = jObject["BillId"].ToString();
+            string WinOrLose = jObject["WinOrLose"].ToString();
+
 
             string reason = "";
             string sContent = "";
             IOperationResult operationResult = new OperationResult();
 
-            Context ctx = getContext(UserName, PassWord, ICID, DBID, ServerUrl);
-
-            ApiClient client = new ApiClient(ServerUrl);
-            bool bLogin = client.Login(DBID, UserName, PassWord, ICID);
+            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
+            ApiClient client = new ApiClient("http://localhost/K3Cloud/");
+            bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
             if (bLogin)//登录成功
             {
 
@@ -70,7 +66,7 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
                 }
                 else if (WinOrLose.Equals("3"))
                 {
-                    operationResult = WinOPP(ctx, BillId);
+                    operationResult = UnLoseOPP(ctx, BillId);
                     reason = operationResult.OperateResult[0].Message;
                 }
             }

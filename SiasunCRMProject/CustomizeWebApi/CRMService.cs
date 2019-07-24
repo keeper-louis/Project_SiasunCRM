@@ -1,15 +1,14 @@
-﻿
-using System;
+﻿using Kingdee.BOS;
+using Kingdee.BOS.Authentication;
+using Kingdee.BOS.ServiceFacade.KDServiceClient.User;
+using Kingdee.BOS.ServiceFacade.KDServiceFx;
 using Kingdee.BOS.WebApi.Client;
 using Kingdee.BOS.WebApi.ServicesStub;
-using Kingdee.BOS.ServiceFacade.KDServiceFx;
-using Kingdee.BOS;
-using Kingdee.BOS.ServiceFacade.KDServiceClient.User;
-using Kingdee.BOS.Authentication;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using KEEPER.K3.App;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Web;
 
 namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
@@ -20,27 +19,26 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
         }
         public string APPtest(string parameter)
         {
-            JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
-            string DBID = Jo["DBID"].ToString();
-            string UserName = Jo["UserName"].ToString();
-            string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32("2052");
-            string SearchType = Jo["SearchType"].ToString();
-            string PersonId = Jo["PersonId"].ToString();
+            string value = HttpContext.Current.Request.Form["Data"];
+            JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
+            string DBID = jObject["DBID"].ToString();
+            string UserName = jObject["UserName"].ToString();
+            string PassWord = jObject["PassWord"].ToString();
+            string SearchType = jObject["SearchType"].ToString();
+            string PersonId = jObject["PersonId"].ToString();
 
-            string sContent = "";
 
             JObject jsonRoot = new JObject();
             JArray Arr = new JArray();
             JObject basedata = new JObject();
             KEEPER.K3.App.CRMService crm = new KEEPER.K3.App.CRMService();
             List<long> ids = new List<long>();
+            string sContent = "";
 
-            Context ctx = getContext(UserName, PassWord, ICID, DBID, ServerUrl);
 
-            ApiClient client = new ApiClient(ServerUrl);
-            bool bLogin = client.Login(DBID, UserName, PassWord, ICID);
+            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
+            ApiClient client = new ApiClient("http://localhost/K3Cloud/");
+            bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
             if (bLogin)//登录成功
             {
                 if (SearchType.Equals("0"))
@@ -66,9 +64,11 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
                 jsonRoot.Add("IsSuccess", "false");
                 jsonRoot.Add("Reason", "登录失败");
             }
-            Arr.Add(ids.ToArray());
+            if (ids != null)
+            {
+                Arr.Add(ids.ToArray());
+            }
             jsonRoot.Add("Ids", Arr);
-
             sContent = JsonConvert.SerializeObject(jsonRoot);
 
             return sContent;

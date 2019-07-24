@@ -1,5 +1,4 @@
 ﻿using Kingdee.BOS.App.Data;
-using Kingdee.BOS.Core.DynamicForm.PlugIn;
 using Kingdee.BOS.Core.Metadata;
 using Kingdee.BOS.Orm;
 using Kingdee.BOS.Orm.DataEntity;
@@ -15,15 +14,13 @@ using System.Data;
 using System.Linq;
 using Kingdee.BOS.WebApi.Client;
 using Kingdee.BOS.WebApi.ServicesStub;
-using Kingdee.K3.CRM.Contracts;
-using Kingdee.K3.CRM.Core;
-using Kingdee.K3.CRM.Entity;
 using Kingdee.BOS.ServiceFacade.KDServiceFx;
 using Kingdee.BOS;
 using Kingdee.BOS.ServiceFacade.KDServiceClient.User;
 using Kingdee.BOS.Authentication;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
@@ -35,25 +32,25 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 
         public string APPtest(string parameter)
         {
-            JObject Jo = (JObject)JsonConvert.DeserializeObject(parameter);
-            string ServerUrl = "http://localhost/K3Cloud/";//服务地址
-            string DBID = Jo["DBID"].ToString();
-            string UserName = Jo["UserName"].ToString();
-            string PassWord = Jo["PassWord"].ToString();
-            int ICID = Convert.ToInt32("2052");
-            string Fobjecttypeid = Jo["Fobjecttypeid"].ToString();
-            string Fkeyvalue = Jo["Fkeyvalue"].ToString();
-            string isApprove = Jo["isApprove"].ToString();
-            string disposition = Jo["disposition"].ToString();
+            string value = HttpContext.Current.Request.Form["Data"];
+            JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
+            string DBID = jObject["DBID"].ToString();
+            string UserName = jObject["UserName"].ToString();
+            string PassWord = jObject["PassWord"].ToString();
+            string Fobjecttypeid = jObject["Fobjecttypeid"].ToString();
+            string Fkeyvalue = jObject["Fkeyvalue"].ToString();
+            string isApprove = jObject["isApprove"].ToString();
+            string disposition = jObject["disposition"].ToString();
             string actionName = "打回发起人";
+
+
 
             string reason = "";
             string sContent = "";
 
-            Context ctx = getContext(UserName, PassWord, ICID, DBID, ServerUrl);
-
-            ApiClient client = new ApiClient(ServerUrl);
-            bool bLogin = client.Login(DBID, UserName, PassWord, ICID);
+            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
+            ApiClient client = new ApiClient("http://localhost/K3Cloud/");
+            bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
             if (bLogin)//登录成功
             {
                 if (isApprove.Equals("0"))
