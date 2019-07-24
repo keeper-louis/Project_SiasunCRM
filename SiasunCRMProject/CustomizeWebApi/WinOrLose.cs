@@ -38,7 +38,6 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             string BillId = jObject["BillId"].ToString();
             string WinOrLose = jObject["WinOrLose"].ToString();
 
-
             string reason = "";
             string sContent = "";
             IOperationResult operationResult = new OperationResult();

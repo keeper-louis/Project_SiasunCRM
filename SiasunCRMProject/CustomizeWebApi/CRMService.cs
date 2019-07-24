@@ -19,6 +19,7 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
         }
         public string APPtest(string parameter)
         {
+
             string value = HttpContext.Current.Request.Form["Data"];
             JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
             string DBID = jObject["DBID"].ToString();

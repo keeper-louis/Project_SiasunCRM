@@ -28,6 +28,7 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             string SearchType = jObject["SearchType"].ToString();
             string FRECEIVERID = jObject["FRECEIVERID"].ToString();
 
+
             string sContent = "";
 
             JObject jsonRoot = new JObject();

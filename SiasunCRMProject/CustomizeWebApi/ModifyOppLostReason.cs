@@ -45,7 +45,6 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             string LostReason = jObject["LostReason"].ToString();
 
 
-
             string reason = "";
             string sContent = "";
 
