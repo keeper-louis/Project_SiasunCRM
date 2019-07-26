@@ -16,7 +16,7 @@ using Kingdee.K3.MFG.App;
 using Kingdee.BOS.Orm.DataEntity;
 using System.IO;
 
-namespace CustomizeWebApi
+namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
     public class PhotoUpload : AbstractWebApiBusinessService
     {

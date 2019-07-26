@@ -15,7 +15,7 @@ using Kingdee.BOS.App.Data;
 using Kingdee.K3.MFG.App;
 using Kingdee.BOS.Orm.DataEntity;
 
-namespace CustomizeWebApi
+namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
     public class SalerBillByOrderPlugin : AbstractWebApiBusinessService
     {
