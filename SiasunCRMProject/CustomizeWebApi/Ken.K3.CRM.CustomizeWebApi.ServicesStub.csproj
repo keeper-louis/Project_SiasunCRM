@@ -118,6 +118,8 @@
   <ItemGroup>
     <Compile Include="CRMService.cs" />
     <Compile Include="ModifyOppLostReason.cs" />
+    <Compile Include="SalerBillByOrderPlugin.cs" />
+    <Compile Include="SalerBillByTotalPlugin.cs" />
     <Compile Include="WaitingTaskOrMessageSearch.cs" />
     <Compile Include="WinOrLose.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
