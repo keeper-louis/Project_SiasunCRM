@@ -123,6 +123,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KEEPER.K3.CRM.Entity", "KEE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ken.K3.CRM.CustomizeWebApi.ServicesStub", "CustomizeWebApi\Ken.K3.CRM.CustomizeWebApi.ServicesStub.csproj", "{697BBC7C-5401-475B-8419-1BB676E7ED2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ken.CRM.CustomizeWebApi.ServicesStub", "Ken.CRM.CustomizeWebApi.ServicesStub\Ken.CRM.CustomizeWebApi.ServicesStub.csproj", "{34EE8550-B394-4399-82F5-6C0BA55AD9EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +251,10 @@ Global
 		{697BBC7C-5401-475B-8419-1BB676E7ED2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{697BBC7C-5401-475B-8419-1BB676E7ED2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{697BBC7C-5401-475B-8419-1BB676E7ED2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34EE8550-B394-4399-82F5-6C0BA55AD9EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34EE8550-B394-4399-82F5-6C0BA55AD9EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34EE8550-B394-4399-82F5-6C0BA55AD9EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34EE8550-B394-4399-82F5-6C0BA55AD9EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -307,6 +313,7 @@ Global
 		{C7B2D93F-160D-428A-9C9D-A80B5D1CD863} = {B1786210-6316-4E77-BBF4-E89ECE22A7B9}
 		{B29DE5B5-C5A3-4075-BAE5-3B390E85ADA8} = {B1786210-6316-4E77-BBF4-E89ECE22A7B9}
 		{697BBC7C-5401-475B-8419-1BB676E7ED2B} = {20233E31-7F1B-4110-ADB0-2F8DDAB3DDD0}
+		{34EE8550-B394-4399-82F5-6C0BA55AD9EB} = {20233E31-7F1B-4110-ADB0-2F8DDAB3DDD0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B23F84D4-8588-4E25-9210-BFEAE0C396B8}
