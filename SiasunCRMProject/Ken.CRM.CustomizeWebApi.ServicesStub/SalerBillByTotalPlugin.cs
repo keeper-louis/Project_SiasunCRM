@@ -12,7 +12,6 @@ using System.Web;
 using System.Text;
 using System.Linq;
 using Kingdee.BOS.App.Data;
-using Kingdee.K3.MFG.App;
 using Kingdee.BOS.Orm.DataEntity;
 
 namespace Ken.CRM.CustomizeWebApi.ServicesStub
@@ -50,7 +49,8 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
             if (bLogin)//登录成功
             {
                 //生成中间临时表
-                String tmpTable1 = AppServiceContext.DBService.CreateTemporaryTableName(ctx);
+                System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
+                string timeStamp = (DateTime.Now - startTime).TotalMilliseconds.ToString();
 
                 string salerLimit = "";
                 Boolean flag = false;
@@ -71,7 +71,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
                 //报表sql
                 StringBuilder sql1 = new StringBuilder();
                 sql1.AppendLine(@"/*dialect*/ SELECT DEPTNAME, SALERNAME, QUOTA, COMPLETEAMOUNT, ");
-                sql1.AppendFormat(" CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar)+' %' AS COMPLETERATE INTO {0} ", tmpTable1);
+                sql1.AppendFormat(" CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar)+' %' AS COMPLETERATE INTO {0} ", timeStamp);
                 sql1.AppendLine(" FROM ");
                 sql1.AppendLine(" (SELECT DEPTL.FNAME AS DEPTNAME, ");
                 sql1.AppendLine(" EMPL.FNAME AS SALERNAME, ");
@@ -110,15 +110,15 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 
 
                 StringBuilder sql2 = new StringBuilder();
-                sql2.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '合计' , '', QUOTA, COMPLETEAMOUNT, ", tmpTable1);
+                sql2.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '合计' , '', QUOTA, COMPLETEAMOUNT, ", timeStamp);
                 sql2.AppendLine(" CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar) + ' %' AS COMPLETERATE ");
                 sql2.AppendLine(" FROM ");
-                sql2.AppendFormat(" (SELECT SUM(QUOTA) AS QUOTA, SUM(COMPLETEAMOUNT) AS COMPLETEAMOUNT FROM {0}) TMP ", tmpTable1);
+                sql2.AppendFormat(" (SELECT SUM(QUOTA) AS QUOTA, SUM(COMPLETEAMOUNT) AS COMPLETEAMOUNT FROM {0}) TMP ", timeStamp);
                 DBUtils.ExecuteDynamicObject(ctx, sql2.ToString());
 
                 StringBuilder sql3 = new StringBuilder();
                 sql3.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME) AS FSeq, DEPTNAME, SALERNAME, CONVERT(FLOAT, ROUND(QUOTA, 2)) AS TOTALQUOTA, CONVERT(FLOAT, ROUND(COMPLETEAMOUNT, 2)) AS TOTALAMOUNT, COMPLETERATE ");
-                sql3.AppendFormat(" FROM {0} ", tmpTable1);
+                sql3.AppendFormat(" FROM {0} ", timeStamp);
                 DynamicObjectCollection periodColl = DBUtils.ExecuteDynamicObject(ctx, sql3.ToString());
 
                 foreach (DynamicObject item in periodColl)
@@ -133,7 +133,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
                     jsonRoot.Add("Result", basedata);
                 }
 
-                string dropSql2 = string.Format(@"/*dialect*/ drop table {0}", tmpTable1);
+                string dropSql2 = string.Format(@"/*dialect*/ drop table {0}", timeStamp);
                 DBUtils.Execute(ctx, dropSql2);
 
             }
