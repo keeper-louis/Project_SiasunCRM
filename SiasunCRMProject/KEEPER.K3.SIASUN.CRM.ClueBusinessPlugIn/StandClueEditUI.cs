@@ -385,7 +385,8 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
             };
             FormMetadata metadata = (FormMetadata)MetaDataServiceHelper.Load(base.Context, strFormId, true);
             BusinessInfo businessInfo = metadata.BusinessInfo;
-            string str = CRMAllocationServiceHelper.GetFilter(base.Context, businessInfo, param.SqlParams);
+            //string str = CRMAllocationServiceHelper.GetFilter(base.Context, businessInfo, param.SqlParams);
+            string str = CRMAllocationServiceHelper.GetFilter(base.Context, businessInfo);
             if (str.Length > 0)
             {
                 if (strFilter.Length > 0)
