@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIASUN.K3.Report.ActivityCo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "商机登录明细表", "商机登录明细表", "{BBC4E24D-57C2-4C92-BB0F-8D16DA056544}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIASUN.K3.Report.OpportunityCountReportPlugIn", "SIASUN.K3.Report.OpportunityCountReportPlugIn\SIASUN.K3.Report.OpportunityCountReportPlugIn.csproj", "{B26FDA65-2564-44C5-89E1-CE058283DC18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIASUN.K3.CRM.APP.Report", "SIASUN.K3.Report.OpportunityCountReportPlugIn\SIASUN.K3.CRM.APP.Report.csproj", "{B26FDA65-2564-44C5-89E1-CE058283DC18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "商机统计报表-客户", "商机统计报表-客户", "{3A98695B-DD3F-4F32-B053-BF5CF5971E72}"
 EndProject

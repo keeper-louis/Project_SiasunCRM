@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SIASUN.K3.Report.OpportunityCountReportPlugIn</RootNamespace>
-    <AssemblyName>SIASUN.K3.Report.OpportunityCountReportPlugIn</AssemblyName>
+    <AssemblyName>SIASUN.K3.CRM.APP.Report</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
