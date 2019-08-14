@@ -72,11 +72,14 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
         {
            base.AfterCreateNewData(e);
             DynamicObject  deptObject = this.Model.GetValue("FSALEDEPTID") as DynamicObject;
-            int dtpth = Convert.ToInt32(deptObject["Depth"]);//深度
-            if ((DynamicObject)deptObject["ParentID"]!=null&& dtpth==4)
+            if (deptObject!=null)
             {
-                long parentId = Convert.ToInt64(deptObject["ParentID_Id"]);
-                this.Model.SetItemValueByID("FSALEDEPTID", parentId, 0);
+                int dtpth = Convert.ToInt32(deptObject["Depth"]);//深度
+                if ((DynamicObject)deptObject["ParentID"] != null && dtpth == 4)
+                {
+                    long parentId = Convert.ToInt64(deptObject["ParentID_Id"]);
+                    this.Model.SetItemValueByID("FSALEDEPTID", parentId, 0);
+                }
             }
         }
 
