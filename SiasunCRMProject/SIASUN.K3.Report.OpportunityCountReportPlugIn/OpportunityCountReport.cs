@@ -14,7 +14,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
+namespace SIASUN.K3.CRM.APP.Report
 {
 
     [Description("商机登录明细表")]
@@ -154,7 +154,7 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
                 stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID=post.FDEPTID  -----部门  \n");
                 stringBuilder.AppendLine("left join  t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID \n");
                 stringBuilder.AppendLine("where secuser.FTYPE=1 ");
-                if (year != null)
+                if (year != null && !year.Equals("0"))
                 {
                     stringBuilder.AppendLine(" and  year(opp.FCREATEDATE)= ");
                     stringBuilder.AppendLine(year);
@@ -294,7 +294,7 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
                 stringBuilder.AppendLine("where secuser.FTYPE=1 ");
 
 
-                if (year != null)
+                if (year != null && !year.Equals("0"))
                 {
                     stringBuilder.AppendLine(" and  year(opp.FCREATEDATE)= ");
                     stringBuilder.AppendLine(year);

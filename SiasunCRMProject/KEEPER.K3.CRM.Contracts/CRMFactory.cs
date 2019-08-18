@@ -49,7 +49,7 @@ namespace KEEPER.K3.CRM.Contracts
             return instance;
         }
 
-        private static new void RegisterService()
+        private static void RegisterService()
         {
             if (!noRegistered) return;
             ///增加对应的接口与实现类的对应关系

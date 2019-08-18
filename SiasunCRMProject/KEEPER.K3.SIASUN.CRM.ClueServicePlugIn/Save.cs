@@ -20,6 +20,8 @@ namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
             base.OnPreparePropertys(e);
             e.FieldKeys.Add("F_PEJK_ProProcess");//项目进展
             e.FieldKeys.Add("F_PEJK_DDRESON");//丢单原因
+            e.FieldKeys.Add("F_PEJK_ClubType");//线索类型
+            e.FieldKeys.Add("F_PEJK_EstimateIncome");//预计收入
         }
         public override void EndOperationTransaction(EndOperationTransactionArgs e)
         {
@@ -42,6 +44,13 @@ namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
                                 }
                             }
                                     
+                        }
+                    }
+                    if (Convert.ToString(item["F_PEJK_ClubType"]).Equals("1"))
+                    {
+                        if (Convert.ToDouble(item["F_PEJK_EstimateIncome"])<=0)
+                        {
+                            throw new KDBusinessException("", "转商机类型线索，预计收入必须大于0");
                         }
                     }
                 }

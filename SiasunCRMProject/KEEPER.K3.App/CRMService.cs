@@ -56,7 +56,7 @@ namespace KEEPER.K3.App
             if (headCol == null || headCol.Count==0)
             {
                 string strSql_2 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIPENTRY WHERE F_PEJK_TEAMMEMBER = {0}",personId);
-                DynamicObjectCollection entryCol = DBUtils.ExecuteDynamicObject(ctx, strSql_1);
+                DynamicObjectCollection entryCol = DBUtils.ExecuteDynamicObject(ctx, strSql_2);
                 if (entryCol == null || entryCol.Count ==0)
                 {
                     return null;

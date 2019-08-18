@@ -160,11 +160,11 @@ namespace SalerBillByTotal
             sql1.AppendLine(" FROM ");
             sql1.AppendLine(" (SELECT DEPTL.FNAME AS DEPTNAME, ");
             sql1.AppendLine(" EMPL.FNAME AS SALERNAME, ");
-            sql1.AppendLine(" (SELECT F_PEJK_CONTRACTQUNTA FROM PEJK_SALERQUNTAENTRY WHERE F_PEJK_SALER = RESOLVESALER.F_QSNC_SALER) AS QUOTA, ");
-            sql1.AppendLine(" SUM(F_QSNC_DISTAMOUNT) AS COMPLETEAMOUNT ");
-            sql1.AppendLine(" FROM QSNC_SaleResolve_Saler RESOLVESALER ");
-            sql1.AppendLine(" LEFT JOIN QSNC_SaleResolve_Basic RESOLVEBASIC ON RESOLVESALER.FID = RESOLVEBASIC.FID ");
-            sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = RESOLVESALER.F_QSNC_SALER ");
+            sql1.AppendLine(" (SELECT F_PEJK_CONTRACTQUNTA FROM PEJK_SALERQUNTAENTRY WHERE F_PEJK_SALER = RESOLVESALER.F_PEJK_SALER) AS QUOTA, ");
+            sql1.AppendLine(" SUM(F_PEJK_DETAILLAMOUNT) AS COMPLETEAMOUNT ");
+            sql1.AppendLine(" FROM PEJK_SALECONTRACTENTRY RESOLVESALER ");
+            sql1.AppendLine(" LEFT JOIN PEJK_SALECONTRACTS RESOLVEBASIC ON RESOLVESALER.FID = RESOLVEBASIC.FID ");
+            sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = RESOLVESALER.F_PEJK_SALER ");
             sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
             sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
             sql1.AppendLine(" LEFT JOIN T_BD_STAFF STAFF ON STAFF.FSTAFFID = SALESMAN.FSTAFFID ");
@@ -174,13 +174,13 @@ namespace SalerBillByTotal
             if (dyFilter["F_QSNC_StartDateFilter"] != null)
             {
                 startDate = Convert.ToDateTime(dyFilter["F_QSNC_StartDateFilter"]).ToString("yyyy-MM-dd 00:00:00");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_QSNC_DATE >= '{0}' ", startDate);
+                sql1.AppendFormat(" AND RESOLVEBASIC.F_PEJK_DATE >= '{0}' ", startDate);
             }
             //判断截止日期是否有效
             if (dyFilter["F_QSNC_EndDateFilter"] != null)
             {
                 endDate = Convert.ToDateTime(dyFilter["F_QSNC_EndDateFilter"]).ToString("yyyy-MM-dd 23:59:59");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_QSNC_DATE <= '{0}' ", endDate);
+                sql1.AppendFormat(" AND RESOLVEBASIC.F_PEJK_DATE <= '{0}' ", endDate);
             }
 
             //判断销售员条件
@@ -200,7 +200,7 @@ namespace SalerBillByTotal
             {
                 sql1.AppendLine(" AND DEPT.FNUMBER").Append(deptSql);
             }
-            sql1.AppendLine(" GROUP BY F_QSNC_SALER, EMPL.FNAME, DEPTL.FNAME) TMP ");
+            sql1.AppendLine(" GROUP BY F_PEJK_SALER, EMPL.FNAME, DEPTL.FNAME) TMP ");
 
             DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
             // tmpTable1 : DEPTNAME  SALERNAME  QUOTA  COMPLETEAMOUNT  COMPLETERATE

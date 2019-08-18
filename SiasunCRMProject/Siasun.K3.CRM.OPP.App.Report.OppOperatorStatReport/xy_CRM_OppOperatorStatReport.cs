@@ -126,7 +126,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
 
             //商机统计信息
             sql.Append(" 	from ( ");
-            sql.Append(" 		select opp.FCREATORID, ");
+            sql.Append(" 		select opp.FBEMPID, ");
             sql.Append(" 		count(1) oppTotalCount, ");//需要确认
             sql.Append(" 		count(1) oppRegCount, ");
             sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='E' then 1 else 0 end) oppWinBillCount, ");
@@ -149,16 +149,16 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             }
             if (hasSaler)
             {
-                sql.Append(" 		and opp.FCREATORID='" + salerID + "' "); 
+                sql.Append(" 		and opp.FBEMPID='" + salerID + "' "); 
             }
             //销售数据隔离
             if (flag)
             {
-                sql.AppendLine(" and opp.FCREATORID ").Append(salerLimit);
+                sql.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
             }
 
             sql.Append(" 		and opp.F_PEJK_AUDITDATE between '"+ fromDate +"' and '"+ toDate +"' ");
-            sql.Append(" 		group by opp.FCREATORID ");
+            sql.Append(" 		group by opp.FBEMPID ");
             sql.Append(" 	) oppStat  ");
 
             //销售指标
@@ -180,7 +180,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
                 sql.AppendLine(" and quota_entry.F_PEJK_SALER ").Append(salerLimit);
             }
             sql.Append(" 		and Year(quota.F_PEJK_YEAR)=Year('"+ fromDate +"') ");
-            sql.Append(" 	) oppQuota on oppStat.FCREATORID=oppQuota.F_PEJK_SALER ");
+            sql.Append(" 	) oppQuota on oppStat.FBEMPID=oppQuota.F_PEJK_SALER ");
 
             //人员信息
             sql.Append(" 	right join ( ");
@@ -195,7 +195,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             sql.Append(" 		and saler.FFORBIDSTATUS='A' ");
             //sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
             if (hasDept)
-            {
+            { 
                 sql.Append("    and saler.FDEPTID='" + deptID + "' ");
             }
             if (hasSaler)
@@ -207,7 +207,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             {
                 sql.AppendLine(" and saler.fid ").Append(salerLimit);
             }
-            sql.Append(" 	) empInfo on oppStat.FCREATORID=empInfo.salerID ");
+            sql.Append(" 	) empInfo on oppStat.FBEMPID=empInfo.salerID ");
             sql.Append(" ) tt ");
 
             DBUtils.ExecuteDynamicObject(this.Context, sql.ToString());
