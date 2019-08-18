@@ -83,6 +83,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Appendix.cs" />
+    <Compile Include="FileBinaryConvertHelper.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
