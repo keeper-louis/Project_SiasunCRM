@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 using Kingdee.BOS;
 using Kingdee.BOS.App.Data;
 using Kingdee.BOS.Orm.DataEntity;
+using Kingdee.BOS.Core.Bill;
+using Kingdee.BOS.Core.DynamicForm;
+using Kingdee.BOS.Core.Metadata;
+using Kingdee.BOS.ServiceHelper;
+using Kingdee.BOS.Core.Metadata.FormElement;
+using Kingdee.BOS.Core.DynamicForm.PlugIn;
+using Kingdee.BOS.Core;
+using Kingdee.BOS.Core.DynamicForm.PlugIn.Args;
 
 namespace KEEPER.K3.App
 {
@@ -152,6 +160,63 @@ SELECT {0}", personId);
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 构建移动端撞单分析单据对象
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="fillBillPropertys"></param>
+        /// <param name="BillTypeId"></param>
+        /// <returns></returns>
+        public IBillModel installBillPackage(Context ctx, string FormID, Action<IDynamicFormViewService> fillBillPropertys, string BillTypeId = "")
+        {
+            FormMetadata Meta = MetaDataServiceHelper.Load(ctx, FormID) as FormMetadata;//获取元数据
+            Form form = Meta.BusinessInfo.GetForm();
+            IDynamicFormViewService dynamicFormViewService = (IDynamicFormViewService)Activator.CreateInstance(Type.GetType("Kingdee.BOS.Web.Import.ImportBillView,Kingdee.BOS.Web"));
+            // 创建视图加载参数对象，指定各种参数，如FormId, 视图(LayoutId)等
+            BillOpenParameter openParam = new BillOpenParameter(form.Id, Meta.GetLayoutInfo().Id);
+            openParam.Context = ctx;
+            openParam.ServiceName = form.FormServiceName;
+            openParam.PageId = Guid.NewGuid().ToString();
+            openParam.FormMetaData = Meta;
+            openParam.Status = OperationStatus.ADDNEW;
+            openParam.CreateFrom = CreateFrom.Default;
+            // 单据类型
+            openParam.DefaultBillTypeId = BillTypeId;
+            openParam.SetCustomParameter("ShowConfirmDialogWhenChangeOrg", false);
+            // 插件
+            List<AbstractDynamicFormPlugIn> plugs = form.CreateFormPlugIns();
+            openParam.SetCustomParameter(FormConst.PlugIns, plugs);
+            PreOpenFormEventArgs args = new PreOpenFormEventArgs(ctx, openParam);
+            foreach (var plug in plugs)
+            {
+                plug.PreOpenForm(args);
+            }
+            // 动态领域模型服务提供类，通过此类，构建MVC实例
+            IResourceServiceProvider provider = form.GetFormServiceProvider(false);
+
+            dynamicFormViewService.Initialize(openParam, provider);
+            IBillView billView = dynamicFormViewService as IBillView;
+            ((IBillViewService)billView).LoadData();
+
+            // 触发插件的OnLoad事件：
+            // 组织控制基类插件，在OnLoad事件中，对主业务组织改变是否提示选项进行初始化。
+            // 如果不触发OnLoad事件，会导致主业务组织赋值不成功
+            DynamicFormViewPlugInProxy eventProxy = billView.GetService<DynamicFormViewPlugInProxy>();
+            eventProxy.FireOnLoad();
+            if (fillBillPropertys != null)
+            {
+                fillBillPropertys(dynamicFormViewService);
+            }
+            // 设置FormId
+            form = billView.BillBusinessInfo.GetForm();
+            if (form.FormIdDynamicProperty != null)
+            {
+                form.FormIdDynamicProperty.SetValue(billView.Model.DataObject, form.Id);
+            }
+            return billView.Model;
         }
     }
 }

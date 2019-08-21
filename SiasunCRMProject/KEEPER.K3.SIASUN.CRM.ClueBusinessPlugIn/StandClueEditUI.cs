@@ -193,7 +193,7 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                     return;
                 }
             }
-            if (!this.is_bumped)
+            if (!this.is_bumped&&!Convert.ToBoolean(this.Model.GetValue("F_PEJK_IsMobile")))
             {
                 this.bump(e);
             }

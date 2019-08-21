@@ -1,6 +1,7 @@
 ﻿using KEEPER.K3.CRM.Contracts;
 using KEEPER.K3.CRM.Core.Entity;
 using Kingdee.BOS;
+using Kingdee.BOS.Core.Bill;
 using Kingdee.BOS.Core.DynamicForm;
 using Kingdee.BOS.Core.DynamicForm.Operation;
 using Kingdee.BOS.Orm.DataEntity;
@@ -166,6 +167,20 @@ namespace KEEPER.K3.CRM.CRMServiceHelper
         {
             ICRMService service = CRMFactory.GetService<ICRMService>(ctx);
             return service.getProjectIds(ctx, personId);
+        }
+
+        /// <summary>
+        /// 构建移动端撞单分析单据对象
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="FormID"></param>
+        /// <param name="fillBillPropertys"></param>
+        /// <param name="BillTypeId"></param>
+        /// <returns></returns>
+        public static IBillModel installBumpBillData(Context ctx, string FormID, Action<IDynamicFormViewService> fillBillPropertys)
+        {
+            ICRMService service = CRMFactory.GetService<ICRMService>(ctx);
+            return service.installBillPackage(ctx, FormID, fillBillPropertys,"");
         }
 
     }
