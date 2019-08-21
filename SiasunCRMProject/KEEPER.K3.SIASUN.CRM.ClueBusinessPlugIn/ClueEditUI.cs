@@ -66,6 +66,23 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                 }
                 this.Model.SetItemValueByID("F_PEJK_Region", parentid, 0);
             }
+            if (e.Field.Key.Equals("FSalerId"))
+            {
+                DynamicObject salerObject = this.Model.GetValue("FSalerId") as DynamicObject;
+                long depId = Convert.ToInt64(salerObject["DeptId_Id"]);
+                string strSql = string.Format(@"/*dialect*/SELECT FDEPTH FROM T_BD_DEPARTMENT WHERE FDEPTID = {0}",depId);
+                int depth = DBUtils.ExecuteScalar<int>(base.Context, strSql, 0, null);
+                if (depth == 4)
+                 {
+                    string parentSql = string.Format(@"/*dialect*/select FPARENTID from T_BD_DEPARTMENT where fdeptid = {0}", depId);
+                    long parentID = DBUtils.ExecuteScalar<long>(base.Context, parentSql, 0, null);
+                    if (parentID>0)
+                    {
+                        this.Model.SetItemValueByID("FSALEDEPTID", parentID, 0);
+                    }
+                  }
+                
+            }
         }
 
         public override void AfterCreateNewData(EventArgs e)
@@ -81,6 +98,7 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                     this.Model.SetItemValueByID("FSALEDEPTID", parentId, 0);
                 }
             }
+            this.Model.SetValue("F_PAEZ_CheckBox", true);
         }
 
         
