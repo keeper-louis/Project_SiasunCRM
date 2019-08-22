@@ -98,7 +98,7 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                     this.Model.SetItemValueByID("FSALEDEPTID", parentId, 0);
                 }
             }
-            this.Model.SetValue("F_PAEZ_CheckBox", true);
+            this.Model.SetValue("F_PEJK_CheckBox", true);
         }
 
         
