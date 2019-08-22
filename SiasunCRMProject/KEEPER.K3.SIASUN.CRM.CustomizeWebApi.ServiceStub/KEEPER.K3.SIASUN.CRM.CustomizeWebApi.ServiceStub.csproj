@@ -66,6 +66,10 @@
     <Reference Include="Kingdee.BOS.WebApi.ServicesStub">
       <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.ServicesStub.dll</HintPath>
     </Reference>
+    <Reference Include="Kingdee.K3.CRM.Entity, Version=7.3.1116.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Entity.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
