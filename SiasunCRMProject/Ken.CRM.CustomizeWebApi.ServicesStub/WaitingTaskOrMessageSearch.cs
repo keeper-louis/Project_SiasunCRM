@@ -33,7 +33,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 
             JObject jsonRoot = new JObject();
             JObject basedata = new JObject();
-
+            JArray entrys = new JArray();//单个model中存储多行分录体集合，存储mBentry
             Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
             ApiClient client = new ApiClient("http://localhost/K3Cloud/");
             bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
@@ -62,15 +62,16 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
                     foreach (DynamicObject item in items)
                     {
                         basedata = new JObject();
-                        basedata.Add("FPROCINSTID", Convert.ToInt64(item["FPROCINSTID"]));
-                        basedata.Add("FKEYVALUE", Convert.ToInt64(item["FKEYVALUE"]));
-                        basedata.Add("FOBJECTTYPEID", Convert.ToInt64(item["FOBJECTTYPEID"]));
-                        basedata.Add("FNAME", Convert.ToInt64(item["FNAME"]));
-                        basedata.Add("FTITLE", Convert.ToInt64(item["FTITLE"]));
-                        basedata.Add("FDEALTIME", Convert.ToInt64(item["FDEALTIME"]));
-                        basedata.Add("FDISPLAYNAME", Convert.ToInt64(item["FDISPLAYNAME"]));
-                        jsonRoot.Add("Result", basedata);
+                        basedata.Add("FPROCINSTID", Convert.ToString(item["FPROCINSTID"]));
+                        basedata.Add("FKEYVALUE", Convert.ToString(item["FKEYVALUE"]));
+                        basedata.Add("FOBJECTTYPEID", Convert.ToString(item["FOBJECTTYPEID"]));
+                        basedata.Add("FNAME", Convert.ToString(item["FNAME"]));
+                        basedata.Add("FTITLE", Convert.ToString(item["FTITLE"]));
+                        basedata.Add("FDEALTIME", Convert.ToString(item["FDEALTIME"]));
+                        basedata.Add("FDISPLAYNAME", Convert.ToString(item["FDISPLAYNAME"]));
+                        entrys.Add(basedata);
                     }
+                    jsonRoot.Add("Result", entrys);
                 }
                 if (SearchType.Equals("1"))
                 {
@@ -83,12 +84,13 @@ left join t_SEC_User ON t_SEC_User.FUserId = T_BAS_WARNMERGEMESSAGE.FSENDERID
                     foreach (DynamicObject item in items)
                     {
                         basedata = new JObject();
-                        basedata.Add("FSTATUS", Convert.ToInt64(item["FSTATUS"]));
-                        basedata.Add("FNAME", Convert.ToInt64(item["FNAME"]));
-                        basedata.Add("FMERGETITLE", Convert.ToInt64(item["FMERGETITLE"]));
-                        basedata.Add("FCREATETIME", Convert.ToInt64(item["FCREATETIME"]));
-                        jsonRoot.Add("Result", basedata);
+                        basedata.Add("FSTATUS", Convert.ToString(item["FSTATUS"]));
+                        basedata.Add("FNAME", Convert.ToString(item["FNAME"]));
+                        basedata.Add("FMERGETITLE", Convert.ToString(item["FMERGETITLE"]));
+                        basedata.Add("FCREATETIME", Convert.ToString(item["FCREATETIME"]));
+                        entrys.Add(basedata);
                     }
+                    jsonRoot.Add("Result", entrys);
                 }
                 if (SearchType.Equals("2"))
                 {
@@ -103,13 +105,14 @@ where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}'
                     foreach (DynamicObject item in items)
                     {
                         basedata = new JObject();
-                        basedata.Add("FSTATUS", Convert.ToInt64(item["FSTATUS"]));
-                        basedata.Add("FNAME", Convert.ToInt64(item["FNAME"]));
-                        basedata.Add("OBJECTNAME", Convert.ToInt64(item["OBJECTNAME"]));
-                        basedata.Add("FTITLE", Convert.ToInt64(item["FTITLE"]));
-                        basedata.Add("FCREATETIME", Convert.ToInt64(item["FCREATETIME"]));
-                        jsonRoot.Add("Result", basedata);
+                        basedata.Add("FSTATUS", Convert.ToString(item["FSTATUS"]));
+                        basedata.Add("FNAME", Convert.ToString(item["FNAME"]));
+                        basedata.Add("OBJECTNAME", Convert.ToString(item["OBJECTNAME"]));
+                        basedata.Add("FTITLE", Convert.ToString(item["FTITLE"]));
+                        basedata.Add("FCREATETIME", Convert.ToString(item["FCREATETIME"]));
+                        entrys.Add(basedata);
                     }
+                    jsonRoot.Add("Result", entrys);
                 }
                 if (SearchType.Equals("3"))
                 {
