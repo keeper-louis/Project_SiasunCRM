@@ -144,18 +144,18 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
-                stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
-                stringBuilder.AppendLine(" left join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
-                stringBuilder.AppendLine(" left join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
+                stringBuilder.AppendLine("inner join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
+                stringBuilder.AppendLine(" inner join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
+                stringBuilder.AppendLine(" inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
                 stringBuilder.AppendLine("inner  join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID \n");
-                stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID  \n");
-                stringBuilder.AppendLine("left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID \n");
-                stringBuilder.AppendLine("left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID  ");
-                stringBuilder.AppendLine(" left join  t_sec_user secuser on secuser.FLINKOBJECT=emp.FPERSONID ");
+                stringBuilder.AppendLine("inner join T_HR_EMPINFO_L empl on empl.FID=emp.FID  \n");
+                stringBuilder.AppendLine("inner join T_ORG_POST post on post.FPOSTID=staff.FPOSTID \n");
+                stringBuilder.AppendLine("inner join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID  ");
+                stringBuilder.AppendLine(" inner join  t_sec_user secuser on secuser.FLINKOBJECT=emp.FPERSONID ");
 
                 // 商机中的销售部门
-                stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID=opp.FSALEDEPTID  -----部门  \n");
-                stringBuilder.AppendLine("left join  t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID \n");
+                stringBuilder.AppendLine("inner join t_bd_department dept on dept.FDEPTID=opp.FSALEDEPTID  -----部门  \n");
+                stringBuilder.AppendLine("inner join  t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID \n");
                 stringBuilder.AppendLine("where secuser.FTYPE=1 AND empl.FLOCALEID = 2052 AND post_l.FLOCALEID = 2052 AND deptl.FLOCALEID = 2052 ");
                 if (year != null && !year.Equals("0"))
                 {
@@ -218,16 +218,16 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendLine(" \n");
                 stringBuilder.AppendLine("left join \n");
                 stringBuilder.AppendLine("  (\n");
-                stringBuilder.AppendLine("select emp.fnumber empnumber,F_PEJK_OPPQUNTA,F_PEJK_OPPTRACKQUNTA \n");
+                stringBuilder.AppendLine("select distinct emp.fnumber empnumber,F_PEJK_OPPQUNTA,F_PEJK_OPPTRACKQUNTA \n");
                 stringBuilder.AppendLine("from PEJK_SALERQUNTAENTRY SALERQUNTAENTRY \n");
                 stringBuilder.AppendLine("left join PEJK_SALERQUNTA SALERQUNTA on SALERQUNTA.fid=SALERQUNTAENTRY.fid \n");
-                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fstaffid=SALERQUNTAENTRY.F_PEJK_SALER \n");
+                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fid=SALERQUNTAENTRY.F_PEJK_SALER \n");
                 stringBuilder.AppendLine("left join T_BD_STAFF staff on staff.FSTAFFID= salesman.fstaffid \n");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID \n");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID  --员工 \n");
                 stringBuilder.AppendLine(") zbdj on zbdj.empnumber=toji2.empnumber\n");
                 stringBuilder.AppendLine("\n");
-                stringBuilder.AppendLine("left join \n");
+                stringBuilder.AppendLine("inner join \n");
                 stringBuilder.AppendLine("(\n");
                 stringBuilder.AppendLine("select deptnumber, deptname,empnumber, empname, sum(gzzj) gzzj,sum(activitycount ) activitycount \n");
                 stringBuilder.AppendLine("from (\n");
@@ -249,7 +249,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendLine(") zjtongji\n");
                 stringBuilder.AppendLine("group by deptnumber, deptname,empnumber,empname  \n");
                 stringBuilder.AppendLine("\n");
-                stringBuilder.AppendLine(") zitongji2  on zitongji2.empnumber=toji2.empnumber \n");
+                stringBuilder.AppendLine(") zitongji2  on zitongji2.empnumber=toji2.empnumber where zitongji2.deptnumber = toji2.deptnumber \n");
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
                 //插入部门小计
@@ -266,7 +266,6 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendLine("\n select '总计','','','',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji,sum(dlzb) dlzb,sum(dlwqqk) dlwqqk,sum(gzzj) gzzj,sum(gzzb) gzzb,sum(gzzbwqqk) gzzbwqqk,sum(gzhud) gzhud ");
                 stringBuilder.AppendFormat("from {0} ", temTable2);
                 stringBuilder.AppendLine(" where empnumber<>'部门小计' ");
-                stringBuilder.AppendLine(" group by deptnumber, deptname ");
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
@@ -285,18 +284,18 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno,opp.FCloseStatus  \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
-                stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
-                stringBuilder.AppendLine(" left join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
-                stringBuilder.AppendLine(" left join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
+                stringBuilder.AppendLine("inner join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
+                stringBuilder.AppendLine(" inner join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
+                stringBuilder.AppendLine(" inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
                 stringBuilder.AppendLine("inner  join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID \n");
-                stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID  \n");
-                stringBuilder.AppendLine("left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID \n");
-                stringBuilder.AppendLine("left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID  ");
-                stringBuilder.AppendLine(" left join  t_sec_user secuser on secuser.FLINKOBJECT=emp.FPERSONID ");
+                stringBuilder.AppendLine("inner join T_HR_EMPINFO_L empl on empl.FID=emp.FID  \n");
+                stringBuilder.AppendLine("inner join T_ORG_POST post on post.FPOSTID=staff.FPOSTID \n");
+                stringBuilder.AppendLine("inner join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID  ");
+                stringBuilder.AppendLine(" inner join  t_sec_user secuser on secuser.FLINKOBJECT=emp.FPERSONID ");
 
                 // 商机中的销售部门
-                stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID=opp.FSALEDEPTID  -----部门  \n");
-                stringBuilder.AppendLine("left join  t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID \n");
+                stringBuilder.AppendLine("inner join t_bd_department dept on dept.FDEPTID=opp.FSALEDEPTID  -----部门  \n");
+                stringBuilder.AppendLine("inner join  t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID \n");
                 stringBuilder.AppendLine("where secuser.FTYPE=1 AND empl.FLOCALEID = 2052 AND post_l.FLOCALEID = 2052 AND deptl.FLOCALEID = 2052  ");
 
                 if (year != null && !year.Equals("0"))
@@ -364,7 +363,6 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendFormat("insert into {0}", temTable2);
                 stringBuilder.AppendLine("\n select '总计','',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji ");
                 stringBuilder.AppendFormat("from {0} ", temTable2);
-                stringBuilder.AppendLine(" group by deptnumber, deptname ");
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 stringBuilder = new StringBuilder();

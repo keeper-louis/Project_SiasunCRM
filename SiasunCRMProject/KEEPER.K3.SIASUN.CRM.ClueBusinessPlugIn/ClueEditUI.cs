@@ -81,6 +81,10 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
                         this.Model.SetItemValueByID("FSALEDEPTID", parentID, 0);
                     }
                   }
+                if (depth>=3)
+                {
+                    this.Model.SetItemValueByID("FSALEDEPTID", depId, 0);
+                }
                 
             }
         }

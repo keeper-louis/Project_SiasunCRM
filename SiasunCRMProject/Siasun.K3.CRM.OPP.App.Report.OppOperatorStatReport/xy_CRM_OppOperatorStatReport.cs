@@ -145,11 +145,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             }
             if (hasDept)
             {
-                sql.Append(" 		and opp.FSALEDEPTID='" + deptID + "' "); 
+                sql.Append(" 		and opp.FSALEDEPTID='" + deptID + "' ");
             }
             if (hasSaler)
             {
-                sql.Append(" 		and opp.FBEMPID='" + salerID + "' "); 
+                sql.Append(" 		and opp.FBEMPID='" + salerID + "' ");
             }
             //销售数据隔离
             if (flag)
@@ -157,7 +157,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
                 sql.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
             }
 
-            sql.Append(" 		and opp.F_PEJK_AUDITDATE between '"+ fromDate +"' and '"+ toDate +"' ");
+            sql.Append(" 		and opp.F_PEJK_AUDITDATE between '" + fromDate + "' and '" + toDate + "' ");
             sql.Append(" 		group by opp.FBEMPID ");
             sql.Append(" 	) oppStat  ");
 
@@ -168,34 +168,36 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             sql.Append(" 		where quota.FDOCUMENTSTATUS='C' ");
             if (hasDept)
             {
-                sql.Append(" 		and quota.F_PEJK_SALEDEPT='" + deptID + "' "); 
+                sql.Append(" 		and quota.F_PEJK_SALEDEPT='" + deptID + "' ");
             }
             if (hasSaler)
             {
-                sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' "); 
+                sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' ");
             }
             //销售数据隔离
             if (flag)
             {
                 sql.AppendLine(" and quota_entry.F_PEJK_SALER ").Append(salerLimit);
             }
-            sql.Append(" 		and Year(quota.F_PEJK_YEAR)=Year('"+ fromDate +"') ");
+            sql.Append(" 		and Year(quota.F_PEJK_YEAR)=Year('" + fromDate + "') ");
             sql.Append(" 	) oppQuota on oppStat.FBEMPID=oppQuota.F_PEJK_SALER ");
 
             //人员信息
             sql.Append(" 	right join ( ");
-            sql.Append(" 		select dept.FNUMBER deptNO,deptl.FNAME deptName,saler.fid salerID,empl.fname empName  ");
-            sql.Append(" 		from V_BD_SALESMAN saler ");
+            sql.Append(" 		select distinct dept.FNUMBER deptNO,deptl.FNAME deptName,saler.fid salerID,empl.fname empName  ");
+            sql.Append(" 		from T_CRM_Opportunity opp ");
+            sql.Append(" 		inner join  V_BD_SALESMAN saler ");
+            sql.Append(" 		on opp.FBEMPID = saler.fid ");
             sql.Append(" 		inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
             sql.Append(" 		inner join T_HR_EMPINFO_L empl on empl.FID=staff.FEMPINFOID and empl.FLOCALEID='2052' ");
-            sql.Append(" 		inner join T_BD_DEPARTMENT_L deptl on saler.FDEPTID=deptl.FDEPTID and deptl.FLOCALEID='2052' ");
+            sql.Append(" 		inner join T_BD_DEPARTMENT_L deptl on opp.FSALEDEPTID=deptl.FDEPTID and deptl.FLOCALEID='2052' ");
             sql.Append("        inner join T_BD_DEPARTMENT dept on deptl.FDEPTID=dept.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
             sql.Append(" 		where saler.FDOCUMENTSTATUS='C'  ");
             sql.Append(" 		and saler.FISUSE=1  ");
             sql.Append(" 		and saler.FFORBIDSTATUS='A' ");
             //sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
             if (hasDept)
-            { 
+            {
                 sql.Append("    and saler.FDEPTID='" + deptID + "' ");
             }
             if (hasSaler)
