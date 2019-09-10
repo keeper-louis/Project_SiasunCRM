@@ -43,9 +43,10 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 
                 System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
                 long timeStamp = (long)(DateTime.Now - startTime).TotalMilliseconds;
-                string UploadName = FileName + timeStamp + ".dat";
+                //string UploadName = FileName + timeStamp + ".dat";
+                string UploadName = FileName;
 
-                Bytes2File(buff, "D:\\" + UploadName);
+                Bytes2File(buff, "C:\\Program Files (x86)\\Kingdee\\" + UploadName);
 
                 reason = "上传成功";
             }

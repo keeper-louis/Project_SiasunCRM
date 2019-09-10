@@ -57,7 +57,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
 											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
 											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}'", FRECEIVERID);
+ where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
                     foreach (DynamicObject item in items)
                     {
@@ -79,7 +79,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 T_BAS_WARNMERGEMESSAGE.FMERGETITLE,T_BAS_WARNMERGEMESSAGE.FCREATETIME  
 from T_BAS_WARNMERGEMESSAGE  
 left join t_SEC_User ON t_SEC_User.FUserId = T_BAS_WARNMERGEMESSAGE.FSENDERID 
- where FRECEIVERID='{0}'", FRECEIVERID);
+ where FRECEIVERID='{0}' order by T_BAS_WARNMERGEMESSAGE.FCREATETIME desc", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
                     foreach (DynamicObject item in items)
                     {
@@ -99,7 +99,7 @@ T_META_OBJECTTYPE_L.FNAME OBJECTNAME,T_WF_MESSAGE.FTITLE,T_WF_MESSAGE.FCREATETIM
 from T_WF_MESSAGE  
 left join t_SEC_User ON t_SEC_User.FUserId = T_WF_MESSAGE.FSENDERID  
 left join T_META_OBJECTTYPE_L on T_WF_MESSAGE.FOBJECTTYPEID=T_META_OBJECTTYPE_L.FID and T_META_OBJECTTYPE_L.FLOCALEID='2052'  
-where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}'
+where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}' order by T_WF_MESSAGE.FCREATETIME desc
 					", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
                     foreach (DynamicObject item in items)
@@ -131,14 +131,14 @@ where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}'
 		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
 											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
 											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}'", FRECEIVERID);
+ where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
 
                     strSql = string.Format(@"/*dialect*/select T_BAS_WARNMERGEMESSAGE.FSTATUS,t_SEC_User.FNAME, 
 T_BAS_WARNMERGEMESSAGE.FMERGETITLE,T_BAS_WARNMERGEMESSAGE.FCREATETIME  
 from T_BAS_WARNMERGEMESSAGE  
 left join t_SEC_User ON t_SEC_User.FUserId = T_BAS_WARNMERGEMESSAGE.FSENDERID 
- where FRECEIVERID='{0}'", FRECEIVERID);
+ where FRECEIVERID='{0}' order by T_BAS_WARNMERGEMESSAGE.FCREATETIME desc", FRECEIVERID);
                     DynamicObjectCollection items1 = DBUtils.ExecuteDynamicObject(ctx, strSql);
 
                     strSql = string.Format(@"/*dialect*/select T_WF_MESSAGE.FSTATUS,t_SEC_User.FNAME, 
@@ -146,7 +146,7 @@ T_META_OBJECTTYPE_L.FNAME OBJECTNAME,T_WF_MESSAGE.FTITLE,T_WF_MESSAGE.FCREATETIM
 from T_WF_MESSAGE  
 left join t_SEC_User ON t_SEC_User.FUserId = T_WF_MESSAGE.FSENDERID  
 left join T_META_OBJECTTYPE_L on T_WF_MESSAGE.FOBJECTTYPEID=T_META_OBJECTTYPE_L.FID and T_META_OBJECTTYPE_L.FLOCALEID='2052'  
-where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}'
+where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}' order by T_WF_MESSAGE.FCREATETIME desc
 					", FRECEIVERID);
                     DynamicObjectCollection items2 = DBUtils.ExecuteDynamicObject(ctx, strSql);
 
