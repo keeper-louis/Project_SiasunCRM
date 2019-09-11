@@ -22,6 +22,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Web;
 
+
 namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 {
     public class Workflow : AbstractWebApiBusinessService
@@ -58,7 +59,8 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
                 }
                 else if (isApprove.Equals("1"))
                 {
-                    reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition, false, actionName);
+                    //reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition, false, actionName);
+                    reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition);
                 }
             }
             else
@@ -159,13 +161,11 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
         {
             string reason = "";
             List<AssignResult> assignResults = GetApproveActions(ctx, formId, pKValue, receiverName);
-            assignResults = assignResults.Where(r => r.Name.Any(p => p.Value == actionName)).ToList();
             if (!string.IsNullOrEmpty(actionName))
                 assignResults = assignResults.Where(r => r.Name.Any(p => p.Value == actionName)).ToList();
             else
                 assignResults = assignResults.OrderBy(r => r.Name.Any(p => p.Value == "打回发起人")).ToList();
             AssignResult rejectAssignResults = assignResults.FirstOrDefault(r => r.ApprovalType == AssignResultApprovalType.Reject);
-
             if (rejectAssignResults == null)
             {
                 reason = "未找到驳回审批项";
@@ -174,14 +174,32 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             reason = SubmitWorkflow(ctx, formId, pKValue, receiverName, rejectAssignResults.Id, disposition, isApprovalFlow);
             return reason;
 
+
+            //string reason = "";
+            //List<AssignResult> assignResults = GetApproveActions(ctx, formId, pKValue, receiverName);
+            //assignResults = assignResults.Where(r => r.Name.Any(p => p.Value == actionName)).ToList();
+            //if (!string.IsNullOrEmpty(actionName))
+            //    assignResults = assignResults.Where(r => r.Name.Any(p => p.Value == actionName)).ToList();
+            //else
+            //    assignResults = assignResults.OrderBy(r => r.Name.Any(p => p.Value == "打回发起人")).ToList();
+            //AssignResult rejectAssignResults = assignResults.FirstOrDefault(r => r.ApprovalType == AssignResultApprovalType.Reject);
+
+            //if (rejectAssignResults == null)
+            //{
+            //    reason = "未找到驳回审批项";
+            //    return reason;
+            //}
+            //reason = SubmitWorkflow(ctx, formId, pKValue, receiverName, rejectAssignResults.Id, disposition, isApprovalFlow);
+            //return reason;
+
         }
 
         private List<AssignResult> GetApproveActions(Context ctx, string formId, string pKValue, string receiverName)
         {
             DataSet ds = DBUtils.ExecuteDataSet(ctx, @"select b.FASSIGNID,b.FAPPROVALASSIGNID,a.FRECEIVERNAMES
-                                from t_wf_assign a 
-                                join T_WF_APPROVALASSIGN b on a.fassignid=b.fassignid 
-                                where b.Fobjecttypeid=@FormID 
+                                from t_wf_assign a
+                                join T_WF_APPROVALASSIGN b on a.fassignid=b.fassignid
+                                where b.Fobjecttypeid=@FormID
                                 and b.Fkeyvalue=@pKValue and a.FSTATUS=0",
                         new List<SqlParam>
                         {
@@ -196,6 +214,25 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
             string _approvalItemId = AssignmentServiceHelper.OpenApprovalItem(ctx, ctx.UserId, assignId, false);
             var _approvalItem = AssignmentServiceHelper.GetApprovalItemById(ctx, _approvalItemId);
             return _approvalItem.Actions.ToList();
+            
+            //DataSet ds = DBUtils.ExecuteDataSet(ctx, @"select b.FASSIGNID,b.FAPPROVALASSIGNID,a.FRECEIVERNAMES
+            //                    from t_wf_assign a 
+            //                    join T_WF_APPROVALASSIGN b on a.fassignid=b.fassignid 
+            //                    where b.Fobjecttypeid=@FormID 
+            //                    and b.Fkeyvalue=@pKValue and a.FSTATUS=0",
+            //            new List<SqlParam>
+            //            {
+            //                new SqlParam("@FormID", DbType.String, formId),
+            //                new SqlParam("@pKValue", DbType.String, pKValue)
+            //            });
+            //DataRow row = ds.Tables[0].Rows.Cast<DataRow>().FirstOrDefault(dr => dr["FRECEIVERNAMES"].ToString().Split(',').Any(r => r == receiverName));
+            //if (row == null) return new List<AssignResult> { };
+
+            //string assignId = row["FASSIGNID"].ToString();
+            //string approvalAssignId = row["FAPPROVALASSIGNID"].ToString();
+            //string _approvalItemId = AssignmentServiceHelper.OpenApprovalItem(ctx, ctx.UserId, assignId, false);
+            //var _approvalItem = AssignmentServiceHelper.GetApprovalItemById(ctx, _approvalItemId);
+            //return _approvalItem.Actions.ToList();
         }
 
 
@@ -250,36 +287,61 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 
             var option = OperateOption.Create();
 
-
-            ApprovalAssignmentContext assignCtx = new ApprovalAssignmentContext()
+            if (isApprovalFlow)
             {
-                ApprovalItems = new List<ApprovalItem>() { _approvalItem },
-                Info = businessInfo,
-                Option = option
-            };
-            assignCtx.NextActHandler = null;
-            assignCtx.RejectReturn = false;
-            assignCtx.ActivityInstance = _activityInstance;
-            if (actionResult == AssignResultApprovalType.Reject.ToString())
-            {
-                string actInstId = row["FACTINSTID"].ToString();
-                Kingdee.BOS.Workflow.App.Core.ProcInstService procInstService = new Kingdee.BOS.Workflow.App.Core.ProcInstService();
-                var rejectActivityIds = procInstService.GetBackActInstList(ctx, actInstId, true).Select(r => r.ActivityId);
-                if (!rejectActivityIds.Any())
+                ApprovalAssignmentContext assignCtx = new ApprovalAssignmentContext()
                 {
-
-                    reason = "无驳回节点";
-                    return reason;
+                    ApprovalItems = new List<ApprovalItem>() { _approvalItem },
+                    Info = businessInfo,
+                    Option = option
+                };
+                assignCtx.NextActHandler = null;
+                assignCtx.RejectReturn = false;
+                assignCtx.ActivityInstance = _activityInstance;
+                if (actionResult == AssignResultApprovalType.Reject.ToString())
+                {
+                    var _policy = AssignmentServiceHelper.GetApprovalAssignByAssignId(ctx, assignId);
+                    var nextHandleWrapper = new Kingdee.BOS.ApprovalFlow.PlugIns.Mobile.MobNextHandleWrapper(assignId, ctx, _policy);
+                    assignCtx.Target = nextHandleWrapper.RejectActivityModel.ActivityId;
                 }
-                assignCtx.Target = rejectActivityIds.FirstOrDefault();
+                ApprovalAssignmentServiceHelper.SubmitApprovalItem(ctx, assignCtx);
+                reason = "";
+                return reason;
             }
-            ApprovalAssignmentServiceHelper.SubmitApprovalItem(ctx, assignCtx);
-            reason = "";
-            return reason;
+            else
+            {
+                ApprovalAssignmentContext assignCtx = new ApprovalAssignmentContext()
+                {
+                    ApprovalItems = new List<ApprovalItem>() { _approvalItem },
+                    Info = businessInfo,
+                    Option = option
+                };
+                assignCtx.NextActHandler = null;
+                assignCtx.RejectReturn = false;
+                assignCtx.ActivityInstance = _activityInstance;
+                ApprovalAssignmentServiceHelper.SubmitApprovalItem(ctx, assignCtx);
+                reason = "";
+                return reason;
+            }
+            
+            //if (actionResult == AssignResultApprovalType.Reject.ToString())
+            //{
+            //    string actInstId = row["FACTINSTID"].ToString();
+            //    Kingdee.BOS.Workflow.App.Core.ProcInstService procInstService = new Kingdee.BOS.Workflow.App.Core.ProcInstService();
+            //    var rejectActivityIds = procInstService.GetBackActInstList(ctx, actInstId, true).Select(r => r.ActivityId);
+            //    if (!rejectActivityIds.Any())
+            //    {
+
+            //        reason = "无驳回节点";
+            //        return reason;
+            //    }
+            //    assignCtx.Target = rejectActivityIds.FirstOrDefault();
+            //}
+
 
 
         }
-        public static Context getContext(string UserName, string PassWord, int ICID, string DBID, string ServerUrl)
+        private Context getContext(string UserName, string PassWord, int ICID, string DBID, string ServerUrl)
         {
 
 
