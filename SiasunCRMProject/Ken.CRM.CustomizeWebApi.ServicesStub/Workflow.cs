@@ -29,6 +29,13 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
         public Workflow(KDServiceContext context) : base(context)
         {
         }
+        public Context ctx
+        {
+            get
+            {
+                return this.KDContext.Session.AppContext;
+            }
+        }
 
         public string APPtest(string parameter)
         {
@@ -47,7 +54,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
             string reason = "";
             string sContent = "";
 
-            Context ctx = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
+            Context ctx1 = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
             ApiClient client = new ApiClient("http://localhost/K3Cloud/");
             bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
             if (bLogin)//登录成功
