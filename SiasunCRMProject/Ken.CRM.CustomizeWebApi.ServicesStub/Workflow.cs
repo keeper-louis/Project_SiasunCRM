@@ -26,8 +26,10 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 {
     public class Workflow : AbstractWebApiBusinessService
     {
+        
         public Workflow(KDServiceContext context) : base(context)
         {
+           
         }
         public Context ctx
         {
@@ -326,7 +328,7 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
                 assignCtx.NextActHandler = null;
                 assignCtx.RejectReturn = false;
                 assignCtx.ActivityInstance = _activityInstance;
-                ApprovalAssignmentServiceHelper.SubmitApprovalItem(ctx, assignCtx);
+                AssignmentServiceHelper.SubmitApprovalItem(ctx, assignCtx);
                 reason = "";
                 return reason;
             }
