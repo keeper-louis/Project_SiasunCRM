@@ -59,11 +59,11 @@ namespace KEEPER.K3.App
         {
             List<long> salerPersonIds = new List<long>();
             //判断personId是否在CRM汇报关系设置表中
-            string strSql_1 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIP WHERE F_PEJK_MANAGER = {0}",personId);
+            string strSql_1 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIP WHERE F_PEJK_MANAGER = {0} and FDOCUMENTSTATUS = 'C'", personId);
             DynamicObjectCollection  headCol = DBUtils.ExecuteDynamicObject(ctx, strSql_1);
             if (headCol == null || headCol.Count==0)
             {
-                string strSql_2 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIPENTRY WHERE F_PEJK_TEAMMEMBER = {0}",personId);
+                string strSql_2 = string.Format(@"/*dialect*/SELECT * FROM PEJK_RPTSHIPENTRY INNER JOIN PEJK_RPTSHIP ON PEJK_RPTSHIPENTRY.FID = PEJK_RPTSHIP.FID WHERE F_PEJK_TEAMMEMBER = {0} AND PEJK_RPTSHIP.FDOCUMENTSTATUS = 'C'", personId);
                 DynamicObjectCollection entryCol = DBUtils.ExecuteDynamicObject(ctx, strSql_2);
                 if (entryCol == null || entryCol.Count ==0)
                 {

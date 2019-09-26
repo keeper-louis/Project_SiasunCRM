@@ -157,7 +157,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
                 sql.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
             }
 
-            sql.Append(" 		and opp.F_PEJK_AUDITDATE between '" + fromDate + "' and '" + toDate + "' ");
+            sql.Append(" 		and opp.FSTARTDATE between '" + fromDate + "' and '" + toDate + "' ");
             sql.Append(" 		group by opp.FBEMPID ");
             sql.Append(" 	) oppStat  ");
 

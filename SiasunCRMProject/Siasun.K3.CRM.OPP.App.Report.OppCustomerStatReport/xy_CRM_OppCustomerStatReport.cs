@@ -97,7 +97,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             }
 
             sql.Append(" 	where opp.FDOCUMENTSTATUS >='C' ");
-            sql.Append(" 	and opp.F_PEJK_AUDITDATE between '"+ fromDate +"' and '"+ toDate +"' ");
+            sql.Append(" 	and opp.FSTARTDATE between '" + fromDate +"' and '"+ toDate +"' ");
 
             if (hasCustomerIndustry)
             {

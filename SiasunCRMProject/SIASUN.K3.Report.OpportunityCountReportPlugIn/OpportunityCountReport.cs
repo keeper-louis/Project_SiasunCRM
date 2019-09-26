@@ -159,7 +159,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendLine("where secuser.FTYPE=1 AND empl.FLOCALEID = 2052 AND post_l.FLOCALEID = 2052 AND deptl.FLOCALEID = 2052 ");
                 if (year != null && !year.Equals("0"))
                 {
-                    stringBuilder.AppendLine(" and  year(opp.FCREATEDATE)= ");
+                    stringBuilder.AppendLine(" and  year(opp.FSTARTDATE)= ");
                     stringBuilder.AppendLine(year);
 
                 }
@@ -300,7 +300,7 @@ namespace SIASUN.K3.CRM.APP.Report
 
                 if (year != null && !year.Equals("0"))
                 {
-                    stringBuilder.AppendLine(" and  year(opp.FCREATEDATE)= ");
+                    stringBuilder.AppendLine(" and  year(opp.FSTARTDATE)= ");
                     stringBuilder.AppendLine(year);
 
                 }

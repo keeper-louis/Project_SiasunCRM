@@ -41,7 +41,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppRegSummaryReport
             sql.Append("    	select cust.F_PEJK_CUSTINDUSTRY,count(1) oppCount  ");
             sql.Append("    	from T_CRM_OPPORTUNITY opp ");
             sql.Append("    	inner join T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and CHARINDEX(opp.FDOCUMENTSTATUS,'" + billStatus + "') > 0 ");
-            sql.Append("       and YEAR(opp.F_PEJK_AUDITDATE)='" + year + "' ");
+            sql.Append("       and YEAR(opp.FSTARTDATE)='" + year + "' ");
             sql.Append("    	inner join T_CRM_CLUE_CUST cust on cust.FID=clue.FID ");
             sql.Append("    	group by cust.F_PEJK_CUSTINDUSTRY) custIndData ");
             sql.Append("    on custInd.FID=custIndData.F_PEJK_CUSTINDUSTRY ");
@@ -62,9 +62,9 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppRegSummaryReport
             sql.Append("           ISNULL([1],0) m1,ISNULL([2],0) m2,ISNULL([3],0) m3,ISNULL([4],0) m4,ISNULL([5],0) m5,ISNULL([6],0) m6, ");
             sql.Append(" 		   ISNULL([7],0) m7,ISNULL([8],0) m8,ISNULL([9],0) m9,ISNULL([10],0) m10,ISNULL([11],0) m11,ISNULL([12],0) m12  ");
             sql.Append(" 	from ( ");
-            sql.Append(" 		select MONTH(opp.F_PEJK_AUDITDATE) curmonth,count(1) opp_count from T_CRM_OPPORTUNITY opp ");
-            sql.Append(" 		where YEAR(opp.F_PEJK_AUDITDATE)='"+ year + "' and CHARINDEX(opp.FDOCUMENTSTATUS,'" + billStatus + "') > 0 ");
-            sql.Append(" 		group by MONTH(opp.F_PEJK_AUDITDATE) ");
+            sql.Append(" 		select MONTH(opp.FSTARTDATE) curmonth,count(1) opp_count from T_CRM_OPPORTUNITY opp ");
+            sql.Append(" 		where YEAR(opp.FSTARTDATE)='" + year + "' and CHARINDEX(opp.FDOCUMENTSTATUS,'" + billStatus + "') > 0 ");
+            sql.Append(" 		group by MONTH(opp.FSTARTDATE) ");
             sql.Append(" 	) a ");
             sql.Append(" 	pivot ( ");
             sql.Append(" 		sum(opp_count) for a.curmonth in ([1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12]) ");
@@ -87,7 +87,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppRegSummaryReport
             sql.Append("    	select sf.FDATAVALUE sf,count(1) oppCount  ");
             sql.Append("    	from T_CRM_OPPORTUNITY opp ");
             sql.Append("    	inner join T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and CHARINDEX(opp.FDOCUMENTSTATUS,'" + billStatus + "') > 0 ");
-            sql.Append("       and YEAR(opp.F_PEJK_AUDITDATE)='" + year + "' ");
+            sql.Append("       and YEAR(opp.FSTARTDATE)='" + year + "' ");
             sql.Append("    	inner join T_BAS_ASSISTANTDATAENTRY_L sf on sf.FLOCALEID='2052' and sf.FENTRYID=clue.F_PEJK_PROVINCE ");
             sql.Append("    	group by sf.FDATAVALUE) realData  ");
             sql.Append("    on c.FDATAVALUE=realData.sf ");
@@ -110,7 +110,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppRegSummaryReport
             sql.Append("    	select sf.FDATAVALUE sf,count(1) oppCount  ");
             sql.Append("    	from T_CRM_OPPORTUNITY opp ");
             sql.Append("    	inner join T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and CHARINDEX(opp.FDOCUMENTSTATUS,'" + billStatus + "') > 0 ");
-            sql.Append("    	and YEAR(opp.F_PEJK_AUDITDATE)='" + year + "' ");
+            sql.Append("    	and YEAR(opp.FSTARTDATE)='" + year + "' ");
             sql.Append("    	inner join T_BAS_ASSISTANTDATAENTRY_L sf on sf.FLOCALEID='2052' and sf.FENTRYID=clue.F_PEJK_REGION ");
             sql.Append("    	group by sf.FDATAVALUE) realData  ");
             sql.Append("    on c.FDATAVALUE=realData.sf  ");
