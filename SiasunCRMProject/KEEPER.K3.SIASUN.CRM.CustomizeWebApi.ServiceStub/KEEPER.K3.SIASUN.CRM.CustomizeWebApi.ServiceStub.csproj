@@ -66,6 +66,14 @@
     <Reference Include="Kingdee.BOS.WebApi.ServicesStub">
       <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.WebApi.ServicesStub.dll</HintPath>
     </Reference>
+    <Reference Include="Kingdee.BOS.Workflow.Models, Version=7.1.703.7, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="Kingdee.BOS.Workflow.ServiceHelper, Version=7.1.703.7, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.Workflow.ServiceHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Kingdee.K3.CRM.Entity, Version=7.3.1116.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.K3.CRM.Entity.dll</HintPath>
@@ -85,6 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BumpWebApiService.cs" />
+    <Compile Include="GetApprovalItems.cs" />
+    <Compile Include="GetApprovalStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
