@@ -35,8 +35,8 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
         {
             string value = HttpContext.Current.Request.Form["Data"];
             JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
-            string pKValue = jObject["pKValue"].ToString();
-            string FormId = jObject["FormId"].ToString();
+            string pKValue = jObject["Fkeyvalue"].ToString();
+            string FormId = jObject["Fobjecttypeid"].ToString();
             return Judge(ctx, FormId, pKValue);
         }
         /// <summary>
@@ -68,14 +68,21 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
  WHERE t_WF_PiBiMap.FObjectTypeId = '{0}'
    AND t_WF_PiBiMap.FKeyValue = '{1}'", FormId, pKValue);
             DynamicObjectCollection doc = DBUtils.ExecuteDynamicObject(ctx, strSql);
+            
             foreach (DynamicObject item in doc)
             {
+                JObject mBEntry = new JObject();
                 if (item["FResult"]==null)
                 {
-                    return "当前单据在工作流程中，操作失败";
+                    mBEntry.Add("ResultStatus", 0);
+                    mBEntry.Add("ResultMessage", "当前单据在工作流程中，操作失败");
+                    return JsonConvert.SerializeObject(mBEntry);
                 }
             }
-            return null;
+            JObject mB = new JObject();
+            mB.Add("ResultStatus", 1);
+            mB.Add("ResultMessage", "当前单据不在工作流程中，操作成功");
+            return JsonConvert.SerializeObject(mB); ;
             //DataSet ds = DBUtils.ExecuteDataSet(ctx, @"select b.FASSIGNID,b.FAPPROVALASSIGNID,a.FACTINSTID,a.FRECEIVERNAMES
             //                    from t_wf_assign a
             //                    join T_WF_APPROVALASSIGN b on a.fassignid=b.fassignid

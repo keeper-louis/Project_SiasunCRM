@@ -48,33 +48,33 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
             string PassWord = jObject["PassWord"].ToString();
             string Fobjecttypeid = jObject["Fobjecttypeid"].ToString();
             string Fkeyvalue = jObject["Fkeyvalue"].ToString();
-            string isApprove = jObject["isApprove"].ToString();
+            //string isApprove = jObject["isApprove"].ToString();
             string disposition = jObject["disposition"].ToString();
-            string actionName = "打回发起人";
+            string actionName = jObject["actionName"].ToString();
 
 
             string reason = "";
             string sContent = "";
 
-            Context ctx1 = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
-            ApiClient client = new ApiClient("http://localhost/K3Cloud/");
-            bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
-            if (bLogin)//登录成功
-            {
-                if (isApprove.Equals("0"))
-                {
-                    reason = ApproveBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition);
-                }
-                else if (isApprove.Equals("1"))
-                {
+            //Context ctx1 = getContext(UserName, PassWord, 2052, DBID, "http://localhost/K3Cloud/");
+            //ApiClient client = new ApiClient("http://localhost/K3Cloud/");
+            //bool bLogin = client.Login(DBID, UserName, PassWord, 2052);
+            //if (bLogin)//登录成功
+            //{
+                //if (isApprove.Equals("0"))
+                //{
+                    reason = ApproveBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, actionName,disposition);
+                //}
+                //else if (isApprove.Equals("1"))
+                //{
                     //reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition, false, actionName);
-                    reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition);
-                }
-            }
-            else
-            {
-                reason = "登录失败";
-            }
+                   // reason = RejectBill(ctx, Fobjecttypeid, Fkeyvalue, UserName, disposition);
+                //}
+            //}
+            //else
+            //{
+            //    reason = "登录失败";
+            //}
             if (reason.Equals(""))
             {
 
@@ -147,11 +147,16 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
         /// <param name="receiverName">处理人</param>
         /// <param name="disposition">审批意见</param>
         /// <param name="isApprovalFlow">是否为审批流</param>
-        public string ApproveBill(Context ctx, string formId, string pKValue, string receiverName, string disposition, bool isApprovalFlow = false, string actionName = null)
+        public string ApproveBill(Context ctx, string formId, string pKValue, string receiverName, string actionName,string disposition, bool isApprovalFlow = false)
         {
             string reason = "";
             List<AssignResult> assignResults = GetApproveActions(ctx, formId, pKValue, receiverName);
-            AssignResult approvalAssignResults = assignResults.FirstOrDefault(r => r.ApprovalType == AssignResultApprovalType.Forward);
+            if (!string.IsNullOrEmpty(actionName))
+            {
+                assignResults = assignResults.Where(r => r.Name.Any(p => p.Value == actionName)).ToList();
+            }
+            AssignResult approvalAssignResults = assignResults[0];
+            //AssignResult approvalAssignResults = assignResults.FirstOrDefault(r => r.ApprovalType == AssignResultApprovalType.Forward);
             if (approvalAssignResults == null)
             {
                 reason = "未找到审批项";

@@ -144,7 +144,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
-                stringBuilder.AppendLine("inner join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
+                stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
                 stringBuilder.AppendLine(" inner join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
                 stringBuilder.AppendLine(" inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
                 stringBuilder.AppendLine("inner  join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID \n");
@@ -284,7 +284,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno,opp.FCloseStatus  \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
-                stringBuilder.AppendLine("inner join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
+                stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
                 stringBuilder.AppendLine(" inner join V_BD_SALESMAN saler on opp.FBEMPID = saler.FID ");
                 stringBuilder.AppendLine(" inner join T_BD_STAFF staff on saler.FSTAFFID=staff.FSTAFFID ");
                 stringBuilder.AppendLine("inner  join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID \n");

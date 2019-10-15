@@ -34,8 +34,8 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
         {
             string value = HttpContext.Current.Request.Form["Data"];
             JObject jObject = (JObject)JsonConvert.DeserializeObject(value);
-            string pKValue = jObject["pKValue"].ToString();
-            string FormId = jObject["FormId"].ToString();
+            string pKValue = jObject["Fkeyvalue"].ToString();
+            string FormId = jObject["Fobjecttypeid"].ToString();
             string receiverName = jObject["UserName"].ToString();
             return items(ctx, FormId, pKValue,receiverName);
         }

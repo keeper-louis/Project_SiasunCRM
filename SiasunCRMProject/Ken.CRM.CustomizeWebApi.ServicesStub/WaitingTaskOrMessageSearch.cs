@@ -40,12 +40,12 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
             if (bLogin)//登录成功
             {
 
-                if (SearchType.Equals("0"))
+                if (SearchType.Equals("0"))//代办事项
                 {
                     string strSql = string.Format(@"/*dialect*/SELECT t_WF_PiBiMap.FPROCINSTID,
  t_WF_PiBiMap.FKEYVALUE,t_WF_PiBiMap.FOBJECTTYPEID,
    T_SEC_USER1.FNAME,t_WF_Receiver.FTITLE,
-      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME   
+      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME,t_WF_ApprovalItem.FDisposition   
 	    FROM t_WF_PiBiMap 
 		INNER JOIN t_WF_ProcInst ON (t_WF_ProcInst.FProcInstId = t_WF_PiBiMap.FProcInstId) 
 		INNER JOIN t_WF_ActInst on (t_WF_ActInst.FProcInstId = t_WF_ProcInst.FProcInstId) 
@@ -69,11 +69,12 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
                         basedata.Add("FTITLE", Convert.ToString(item["FTITLE"]));
                         basedata.Add("FDEALTIME", Convert.ToString(item["FDEALTIME"]));
                         basedata.Add("FDISPLAYNAME", Convert.ToString(item["FDISPLAYNAME"]));
+                        basedata.Add("FDisposition", Convert.ToString(item["FDisposition"]));
                         entrys.Add(basedata);
                     }
                     jsonRoot.Add("Result", entrys);
                 }
-                if (SearchType.Equals("1"))
+                if (SearchType.Equals("1"))//监控消息
                 {
                     string strSql = string.Format(@"/*dialect*/select T_BAS_WARNMERGEMESSAGE.FSTATUS,t_SEC_User.FNAME, 
 T_BAS_WARNMERGEMESSAGE.FMERGETITLE,T_BAS_WARNMERGEMESSAGE.FCREATETIME  
@@ -92,7 +93,7 @@ left join t_SEC_User ON t_SEC_User.FUserId = T_BAS_WARNMERGEMESSAGE.FSENDERID
                     }
                     jsonRoot.Add("Result", entrys);
                 }
-                if (SearchType.Equals("2"))
+                if (SearchType.Equals("2"))//流程消息
                 {
                     string strSql = string.Format(@"/*dialect*/select T_WF_MESSAGE.FSTATUS,t_SEC_User.FNAME, 
 T_META_OBJECTTYPE_L.FNAME OBJECTNAME,T_WF_MESSAGE.FTITLE,T_WF_MESSAGE.FCREATETIME  
@@ -114,12 +115,12 @@ where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}' order by T_WF_MESSAGE.FCREATETI
                     }
                     jsonRoot.Add("Result", entrys);
                 }
-                if (SearchType.Equals("3"))
+                if (SearchType.Equals("3"))//总数
                 {
                     string strSql = string.Format(@"/*dialect*/SELECT t_WF_PiBiMap.FPROCINSTID,
  t_WF_PiBiMap.FKEYVALUE,t_WF_PiBiMap.FOBJECTTYPEID,
    T_SEC_USER1.FNAME,t_WF_Receiver.FTITLE,
-      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME   
+      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME  
 	    FROM t_WF_PiBiMap 
 		INNER JOIN t_WF_ProcInst ON (t_WF_ProcInst.FProcInstId = t_WF_PiBiMap.FProcInstId) 
 		INNER JOIN t_WF_ActInst on (t_WF_ActInst.FProcInstId = t_WF_ProcInst.FProcInstId) 
