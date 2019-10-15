@@ -91,24 +91,48 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
             if (e.Field.Key.Equals("F_PEJK_ClueName"))
             {
                 DynamicObject ClueName = this.Model.GetValue("F_PEJK_ClueName") as DynamicObject;
-                DynamicObject CustomerID = this.Model.GetValue("FCustomerID") as DynamicObject;
-                DynamicObject ContactID = this.Model.GetValue("FContactID") as DynamicObject;
-                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Id"]) : "0";
-                string CustId = CustomerID != null ? Convert.ToString(CustomerID["Id"]) : "0";
-                string ContID = ContactID != null ? Convert.ToString(ContactID["Id"]) : "0";
+                string CustomerID = Convert.ToString(this.Model.GetValue("FCustomerName"));
+                string ContactID = Convert.ToString(this.Model.GetValue("FContactName"));
+                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Name"]) : "0";
+                string CustId = CustomerID != null && !CustomerID.Equals("") && !CustomerID.Equals(" ") ? CustomerID : "0";
+                string ContID = ContactID != null && !ContactID.Equals("") && !ContactID.Equals(" ") ? ContactID : "0";
                 string resultStr = ClueNameId + CustId + ContID;
                 this.Model.SetValue("F_PEJK_BoundResultStr", resultStr);
 
+            }
+            //客户名称
+            if (e.Field.Key.Equals("FCustomerName"))
+            {
+                DynamicObject ClueName = this.Model.GetValue("F_PEJK_ClueName") as DynamicObject;
+                string CustomerID = Convert.ToString(this.Model.GetValue("FCustomerName"));
+                string ContactID = Convert.ToString(this.Model.GetValue("FContactName"));
+                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Name"]) : "0";
+                string CustId = CustomerID != null && !CustomerID.Equals("") && !CustomerID.Equals(" ") ? CustomerID : "0";
+                string ContID = ContactID != null && !ContactID.Equals("") && !ContactID.Equals(" ") ? ContactID : "0";
+                string resultStr = ClueNameId + CustId + ContID;
+                this.Model.SetValue("F_PEJK_BoundResultStr", resultStr);
             }
             //客户内码
             if (e.Field.Key.Equals("FCustomerID"))
             {
                 DynamicObject ClueName = this.Model.GetValue("F_PEJK_ClueName") as DynamicObject;
                 DynamicObject CustomerID = this.Model.GetValue("FCustomerID") as DynamicObject;
-                DynamicObject ContactID = this.Model.GetValue("FContactID") as DynamicObject;
-                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Id"]) : "0";
-                string CustId = CustomerID != null ? Convert.ToString(CustomerID["Id"]) : "0";
-                string ContID = ContactID != null ? Convert.ToString(ContactID["Id"]) : "0";
+                string ContactID = Convert.ToString(this.Model.GetValue("FContactName"));
+                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Name"]) : "0";
+                string CustId = CustomerID != null ? Convert.ToString(CustomerID["Name"]) : "0";
+                string ContID = ContactID != null && !ContactID.Equals("") && !ContactID.Equals(" ") ? ContactID : "0";
+                string resultStr = ClueNameId + CustId + ContID;
+                this.Model.SetValue("F_PEJK_BoundResultStr", resultStr);
+            }
+            //联系人名称
+            if (e.Field.Key.Equals("FContactName"))
+            {
+                DynamicObject ClueName = this.Model.GetValue("F_PEJK_ClueName") as DynamicObject;
+                string CustomerID = Convert.ToString(this.Model.GetValue("FCustomerName"));
+                string ContactID = Convert.ToString(this.Model.GetValue("FContactName"));
+                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Name"]) : "0";
+                string CustId = CustomerID != null && !CustomerID.Equals("") && !CustomerID.Equals(" ") ? CustomerID : "0";
+                string ContID = ContactID != null && !ContactID.Equals("") && !ContactID.Equals(" ") ? ContactID : "0";
                 string resultStr = ClueNameId + CustId + ContID;
                 this.Model.SetValue("F_PEJK_BoundResultStr", resultStr);
             }
@@ -116,11 +140,11 @@ namespace KEEPER.K3.SIASUN.CRM.ClueBusinessPlugIn
             if (e.Field.Key.Equals("FContactID"))
             {
                 DynamicObject ClueName = this.Model.GetValue("F_PEJK_ClueName") as DynamicObject;
-                DynamicObject CustomerID = this.Model.GetValue("FCustomerID") as DynamicObject;
+                string CustomerID = Convert.ToString(this.Model.GetValue("FCustomerName"));
                 DynamicObject ContactID = this.Model.GetValue("FContactID") as DynamicObject;
-                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Id"]) : "0";
-                string CustId = CustomerID != null ? Convert.ToString(CustomerID["Id"]) : "0";
-                string ContID = ContactID != null ? Convert.ToString(ContactID["Id"]) : "0";
+                string ClueNameId = ClueName != null ? Convert.ToString(ClueName["Name"]) : "0";
+                string CustId = CustomerID != null && !CustomerID.Equals("") && !CustomerID.Equals(" ") ? CustomerID : "0";
+                string ContID = ContactID != null ? Convert.ToString(ContactID["Name"]) : "0";
                 string resultStr = ClueNameId + CustId + ContID;
                 this.Model.SetValue("F_PEJK_BoundResultStr", resultStr);
             }
