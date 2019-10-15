@@ -36,13 +36,23 @@ namespace KEEPER.K3.SIASUN.CRM.ClueServicePlugIn
                     {
                         foreach (DynamicObject ProductDetail in ProductDetails)
                         {
-                            if (Convert.ToString(((DynamicObject)ProductDetail["F_PEJK_ProProcess"])["Name"]).Equals("丢单"))
+                            if (((DynamicObject)ProductDetail["F_PEJK_ProProcess"]) != null)
                             {
-                                if (ProductDetail["F_PEJK_DDRESON"] == null || ProductDetail["F_PEJK_DDRESON"].ToString().Equals("") || ProductDetail["F_PEJK_DDRESON"].ToString().Equals(" "))
+                                if (Convert.ToString(((DynamicObject)ProductDetail["F_PEJK_ProProcess"])["Name"]).Equals("丢单"))
                                 {
-                                    throw new KDBusinessException("", string.Format("单据第{0}行，项目进展为丢单，丢单原因未填写！", ProductDetail["Seq"]));
+                                    if (ProductDetail["F_PEJK_DDRESON"] == null || ProductDetail["F_PEJK_DDRESON"].ToString().Equals("") || ProductDetail["F_PEJK_DDRESON"].ToString().Equals(" "))
+                                    {
+                                        throw new KDBusinessException("", string.Format("单据第{0}行，项目进展为丢单，丢单原因未填写！", ProductDetail["Seq"]));
+                                    }
                                 }
                             }
+                            //if (Convert.ToString(((DynamicObject)ProductDetail["F_PEJK_ProProcess"])["Name"]).Equals("丢单"))
+                            //{
+                            //    if (ProductDetail["F_PEJK_DDRESON"] == null || ProductDetail["F_PEJK_DDRESON"].ToString().Equals("") || ProductDetail["F_PEJK_DDRESON"].ToString().Equals(" "))
+                            //    {
+                            //        throw new KDBusinessException("", string.Format("单据第{0}行，项目进展为丢单，丢单原因未填写！", ProductDetail["Seq"]));
+                            //    }
+                            //}
                                     
                         }
                     }
