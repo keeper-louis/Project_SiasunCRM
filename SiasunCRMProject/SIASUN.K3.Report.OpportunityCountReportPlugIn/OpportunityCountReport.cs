@@ -141,7 +141,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 StringBuilder stringBuilder = new StringBuilder();
 
                 stringBuilder.AppendLine("select distinct   secuser.fname username ,emp.fnumber empnumber,empl.fname empname,post.fnumber postnumber,post_l.fname postname,dept.fnumber deptnumber,deptl.FNAME deptname ");
-                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus \n");
+                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FSTARTDATE,year(opp.FSTARTDATE) rtyear ,month(opp.FSTARTDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
                 stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
@@ -281,7 +281,8 @@ namespace SIASUN.K3.CRM.APP.Report
                 StringBuilder stringBuilder = new StringBuilder();
 
                 stringBuilder.AppendLine("select distinct   secuser.fname username ,emp.fnumber empnumber,empl.fname empname,post.fnumber postnumber,post_l.fname postname,dept.fnumber deptnumber,deptl.FNAME deptname ");
-                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno,opp.FCloseStatus  \n");
+                // stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno,opp.FCloseStatus  \n");
+                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FSTARTDATE,year(opp.FSTARTDATE) rtyear ,month(opp.FSTARTDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno,opp.FCloseStatus  \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from T_CRM_Opportunity opp \n ");
                 stringBuilder.AppendLine("left join T_CRM_Activity activity on activity.FOPPID = opp.FID \n ");
