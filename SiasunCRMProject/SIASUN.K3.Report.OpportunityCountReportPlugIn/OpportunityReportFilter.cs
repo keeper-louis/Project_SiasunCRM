@@ -69,5 +69,5 @@ namespace SIASUN.K3.Report.OpportunityCountReportPlugIn
             this.View.Model.SetValue("F_xy_BillStatus", "C");
         }
     }
-}
+
 }
