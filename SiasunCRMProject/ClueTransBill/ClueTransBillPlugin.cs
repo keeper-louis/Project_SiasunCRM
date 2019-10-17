@@ -304,20 +304,20 @@ namespace ClueTransBill
                 {
                     result.AddTitle("F_QSNC_StartDate", DateTime.Now.ToShortDateString());
                 }
-                else
-                {
-                    result.AddTitle("F_QSNC_StartDate", Convert.ToString(dyFilter["F_QSNC_StartDateFilter"]));
-                }
+                //else
+                //{
+                //    result.AddTitle("F_QSNC_StartDate", Convert.ToString(dyFilter["F_QSNC_StartDateFilter"]));
+                //}
 
                 //截止日期
                 if (dyFilter["F_QSNC_EndDateFilter"] == null)
                 {
                     result.AddTitle("F_QSNC_EndDate", DateTime.Now.ToShortDateString());
                 }
-                else
-                {
-                    result.AddTitle("F_QSNC_EndDate", Convert.ToString(dyFilter["F_QSNC_EndDateFilter"]));
-                }
+                //else
+                //{
+                //    result.AddTitle("F_QSNC_EndDate", Convert.ToString(dyFilter["F_QSNC_EndDateFilter"]));
+                //}
 
                 //部门
                 if (dyFilter["F_QSNC_DepartmentFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_DepartmentFilter"]).Count > 0)
