@@ -140,7 +140,8 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 StringBuilder stringBuilder = new StringBuilder();
 
                 stringBuilder.AppendLine("select distinct   secuser.fname username ,emp.fnumber empnumber,empl.fname empname,post.fnumber postnumber,post_l.fname postname,dept.fnumber deptnumber,deptl.FNAME deptname ");
-                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus,activity.Fname activitytitle ,activity.FACTSTARTTIME \n");
+                ///stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(opp.FCREATEDATE) rtyear ,month(opp.FCREATEDATE) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus,activity.Fname activitytitle ,activity.FACTSTARTTIME \n");
+                stringBuilder.AppendFormat(", opp.FBILLNO,opp.FOPPName  ,opp.FCREATEDATE,year(activity.FACTSTARTTIME) rtyear ,month(activity.FACTSTARTTIME) rtmonth ,opp.FDOCUMENTSTATUS,activity.FBILLNO  activitybillno ,opp.FCloseStatus,activity.Fname activitytitle ,activity.FACTSTARTTIME \n");
                 stringBuilder.AppendFormat("into {0}", temTable1).AppendLine(" \n");
                 stringBuilder.AppendLine("from  T_CRM_Activity activity \n ");
                 stringBuilder.AppendLine("left join  T_CRM_Opportunity opp on activity.FOPPID=opp.FID \n ");
@@ -222,7 +223,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 stringBuilder.AppendLine("select emp.fnumber empnumber,F_PEJK_OPPQUNTA,F_PEJK_OPPTRACKQUNTA ,F_PEJK_ACTIVITYQUNTA  \n  ");
                 stringBuilder.AppendLine("from PEJK_SALERQUNTAENTRY SALERQUNTAENTRY   \n  ");
                 stringBuilder.AppendLine("left join PEJK_SALERQUNTA SALERQUNTA on SALERQUNTA.fid=SALERQUNTAENTRY.fid  \n  ");
-                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fstaffid=SALERQUNTA.F_PEJK_SALER  \n  ");
+                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fstaffid=SALERQUNTAENTRY.F_PEJK_SALER  \n  ");
                 stringBuilder.AppendLine("left join T_BD_STAFF staff on staff.FSTAFFID= salesman.fstaffid  \n  ");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID  \n  ");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID  --员工   \n  ");
