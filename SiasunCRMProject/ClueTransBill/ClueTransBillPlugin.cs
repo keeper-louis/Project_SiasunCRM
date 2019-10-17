@@ -167,13 +167,18 @@ namespace ClueTransBill
             sql1.AppendLine(" on oppexedept.FID = opp.FID ");
             DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
 
+            // 查询线索中所有执行部门id
+            //StringBuilder sql1 = new StringBuilder();
+            //sql1.AppendFormat(@"/*dialect*/ SELECT DISTINCT E.F_PEJK_EXECUTEDEPTID as exedeptid FROM PEJK_ExecuteDept E LEFT JOIN T_CRM_Clue C ON E.FID = C.FID ", tmpTable1);
+            //DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
+
             //根据商机中的执行部门，查找每个部门下销售员的 线索数量/商机数量/转化率
             StringBuilder sql2 = new StringBuilder();
             sql2.AppendFormat(@"/*dialect*/ select deptl.FDEPTID deptid, tmp.salerid salerid, cluenumber, oppnumber, convert(float,round((oppnumber * 1.00 / (cluenumber * 1.00)) * 100, 2)) as conversionrate into {0} ", tmpTable2);
             sql2.AppendLine(" from(select salerid, count(cluetmp.salerid) cluenumber, sum(cluetmp.status) oppnumber from ");
             sql2.AppendLine(" (select clue.FSALERID as salerid, ");
             sql2.AppendLine(" case when clue.FBILLNO in (select opp.FSOURCEBILLNO from T_CRM_Opportunity opp where opp.FBEMPID = clue.FSALERID) then 1 else 0 end as status ");
-            sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 ");
+            sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 and clue.FSALERID != 0 ");
 
             //判断起始日期是否有效
             if (dyFilter["f_qsnc_startdatefilter"] != null)
