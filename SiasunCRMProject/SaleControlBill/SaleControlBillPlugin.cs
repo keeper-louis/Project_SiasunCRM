@@ -125,7 +125,7 @@ namespace SaleControlBill
             sql.AppendLine(" EMPL.FNAME AS 'saler', ");                                 //负责人
             sql.AppendLine(" DEPTL.FNAME AS 'department', ");                           //部门
             sql.AppendLine(" CUST.F_PEJK_AGENT AS 'agent', ");                          //代理商
-            sql.AppendLine(" FINUSER.FNAME AS 'user', ");                               //最终用户
+            //sql.AppendLine(" FINUSER.FNAME AS 'user', ");                               //最终用户
             sql.AppendLine(" F_PEJK_SBSYDZ AS 'address', ");                            //设备使用地址
             sql.AppendLine(" F_PEJK_CRMPRONAME AS 'category', ");                       //产品类别
             sql.AppendLine(" F_PEJK_GGXH AS 'model', ");                                //产品型号
@@ -147,8 +147,8 @@ namespace SaleControlBill
             sql.AppendLine(" ON OPPPRO.FID = OPP.FID ");
             sql.AppendLine(" LEFT JOIN PEJK_PROJECTPROCESS_L PROJECTPRO	");
             sql.AppendLine(" ON PROJECTPRO.FID = OPPPRO.F_PEJK_PROPROCESS ");
-            sql.AppendLine(" LEFT JOIN PEJK_FINALU_L FINUSER ");
-            sql.AppendLine(" ON FINUSER.FID = OPPPRO.F_PEJK_FINALU ");
+            //sql.AppendLine(" LEFT JOIN PEJK_FINALU_L FINUSER ");
+            //sql.AppendLine(" ON FINUSER.FID = OPPPRO.F_PEJK_FINALU ");
             sql.AppendLine(" LEFT JOIN T_CRM_Clue CLUE ");
             sql.AppendLine(" ON OPP.FSOURCEBILLNO = CLUE.FBILLNO ");
             sql.AppendLine(" LEFT JOIN T_CRM_Clue_Cust CUST ");
@@ -207,73 +207,73 @@ namespace SaleControlBill
             //代理商
             header.AddChild("agent", new Kingdee.BOS.LocaleValue("代理商")).ColIndex = 5;
 
-            //最终用户
-            header.AddChild("user", new Kingdee.BOS.LocaleValue("最终用户")).ColIndex = 6;
+            ////最终用户
+            //header.AddChild("user", new Kingdee.BOS.LocaleValue("最终用户")).ColIndex = 6;
 
             //设备使用地址
             var address = header.AddChild("address", new Kingdee.BOS.LocaleValue("设备使用地址"));
-            address.ColIndex = 7;
+            address.ColIndex = 6;
             address.Width = 150;
 
             //产品类别
             var category = header.AddChild("category", new Kingdee.BOS.LocaleValue("产品类别"));
-            category.ColIndex = 8;
+            category.ColIndex = 7;
             category.Width = 150;
 
             //产品型号
             var model = header.AddChild("model", new Kingdee.BOS.LocaleValue("产品型号"));
-            model.ColIndex = 9;
+            model.ColIndex = 8;
             model.Width = 150;
 
             //特殊参数要求
             var special = header.AddChild("special", new Kingdee.BOS.LocaleValue("特殊参数要求"));
-            special.ColIndex = 10;
+            special.ColIndex = 9;
             special.Width = 150;
             //台数
-            header.AddChild("count", new Kingdee.BOS.LocaleValue("台数")).ColIndex = 11;
+            header.AddChild("count", new Kingdee.BOS.LocaleValue("台数")).ColIndex = 10;
 
             //单价
-            header.AddChild("price", new Kingdee.BOS.LocaleValue("单价(万元)")).ColIndex = 12;
+            header.AddChild("price", new Kingdee.BOS.LocaleValue("单价(万元)")).ColIndex = 11;
 
             //总金额
-            header.AddChild("amount", new Kingdee.BOS.LocaleValue("总金额(万元)")).ColIndex = 13;
+            header.AddChild("amount", new Kingdee.BOS.LocaleValue("总金额(万元)")).ColIndex = 12;
 
             //项目进展
             var progress = header.AddChild("progress", new Kingdee.BOS.LocaleValue("项目进展"));
-            progress.ColIndex = 14;
+            progress.ColIndex = 13;
             progress.Width = 150;
 
             //丢单原因
             var reason = header.AddChild("reason", new Kingdee.BOS.LocaleValue("丢单原因"));
-            reason.ColIndex = 15;
+            reason.ColIndex = 14;
             reason.Width = 150;
 
             //下一步计划
             var plan = header.AddChild("plan", new Kingdee.BOS.LocaleValue("下一步计划"));
-            plan.ColIndex = 16;
+            plan.ColIndex = 15;
             plan.Width = 150;
 
             //主要竞争对手
             var rival = header.AddChild("rival", new Kingdee.BOS.LocaleValue("主要竞争对手"));
-            rival.ColIndex = 17;
+            rival.ColIndex = 16;
             rival.Width = 150;
 
             //竞争对手产品型号
             var rivalModel = header.AddChild("rivalModel", new Kingdee.BOS.LocaleValue("竞争对手产品型号"));
-            rivalModel.ColIndex = 18;
+            rivalModel.ColIndex = 17;
             rivalModel.Width = 150;
 
             //竞争型号单价
-            header.AddChild("rivalPrice", new Kingdee.BOS.LocaleValue("竞争型号单价(万元)")).ColIndex = 19;
+            header.AddChild("rivalPrice", new Kingdee.BOS.LocaleValue("竞争型号单价(万元)")).ColIndex = 18;
 
             //预计下单时间
             var orderDate = header.AddChild("orderDate", new Kingdee.BOS.LocaleValue("预计下单时间"));
-            orderDate.ColIndex = 20;
+            orderDate.ColIndex = 19;
             orderDate.Width = 100;
 
             //备注
             var remark = header.AddChild("remark", new Kingdee.BOS.LocaleValue("备注"));
-            remark.ColIndex = 21;
+            remark.ColIndex = 20;
             remark.Width = 150;
 
             return header;
