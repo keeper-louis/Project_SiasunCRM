@@ -202,7 +202,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 			select con.FSALERID salerID,MONTH(con.FDATE) curmonth,count(distinct con_r.F_PEJK_SOURCEBILLNO) totalcount   ");
             s.Append(@" 			from T_CRM_CONTRACT con ");
             s.Append(@" 			inner join PEJK_GOODSDEATIL con_r on con.FID=con_r.FID  ");
-            s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO --and opp.FBEMPID=con.FSALERID  ");
+           // s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO --and opp.FBEMPID=con.FSALERID  ");
+            s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO   ");
             s.Append(@" 			where YEAR(con.FDATE)='" + year + "' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and con.FSALEDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and con.FSALERID='" + salerID + "' "); }

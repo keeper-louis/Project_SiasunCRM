@@ -93,7 +93,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             sql.Append(" 	inner join T_BD_CUSTOMER_L cust_l on opp.FCUSTOMERID=cust_l.FCUSTID ");
             if (hasEndUser)
             {
-                sql.Append(" 	inner join "+ tempTable1 +" prod on prod.FID=opp.FID ");
+                //sql.Append(" 	inner join "+ T_CRM_Clue +" prod on prod.FID=opp.FID ");
+                sql.AppendFormat(" 	inner join  T_CRM_Clue  Clue on Clue.FBillno=opp.FSOURCEBILLNO and F_PEJK_FINALUSER={0}  ", endUserID);
             }
 
             sql.Append(" 	where opp.FDOCUMENTSTATUS >='C' ");

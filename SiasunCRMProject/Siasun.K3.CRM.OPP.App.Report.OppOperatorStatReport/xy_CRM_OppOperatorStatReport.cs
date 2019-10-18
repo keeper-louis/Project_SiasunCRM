@@ -128,7 +128,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             sql.Append(" 	from ( ");
             sql.Append(" 		select opp.FBEMPID, ");
             sql.Append(" 		count(1) oppTotalCount, ");//需要确认
-            sql.Append(" 		count(1) oppRegCount, ");
+            //sql.Append(" 		count(1) oppRegCount, ");
+            sql.Append(" 		count(case when opp.FBEMPID = opp.FCREATORID then 1 else 0 end)   oppRegCount, ");
             sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='E' then 1 else 0 end) oppWinBillCount, ");
             sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='F' then 1 else 0 end) oppLostBillCount, ");
             sql.Append(" 		sum(case when opp.FDOCUMENTSTATUS='E' then opp.FESTIMATEINCOME else 0 end) oppWinBillIncome, ");
