@@ -130,7 +130,7 @@ namespace SaleControlBill
             sql.AppendLine(" CUST.F_PEJK_AGENT AS 'agent', ");                          //代理商
             sql.AppendLine(" OPP.FBILLNO AS 'billNo', ");                               //商机编号
             sql.AppendLine(" F_PEJK_SBSYDZ AS 'address', ");                            //设备使用地址
-            sql.AppendLine(" F_PEJK_CRMPRONAME AS 'category', ");                       //产品类别
+            sql.AppendLine(" F_PEJK_CRMPRONAME AS 'category', ");                       //产品名称
             sql.AppendLine(" F_PEJK_GGXH AS 'model', ");                                //产品型号
             sql.AppendLine(" F_PEJK_SPECPARAM AS 'special', ");                         //特殊参数要求
             sql.AppendLine(" CAST(F_PEJK_QTY AS INT) AS 'count', ");                    //台数(整数)
@@ -231,7 +231,7 @@ namespace SaleControlBill
             address.Width = 150;
 
             //产品类别
-            var category = header.AddChild("category", new Kingdee.BOS.LocaleValue("产品类别"));
+            var category = header.AddChild("category", new Kingdee.BOS.LocaleValue("产品名称"));
             category.ColIndex = 8;
             category.Width = 150;
 
