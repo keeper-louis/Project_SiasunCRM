@@ -84,6 +84,11 @@ namespace SaleControlBill
             String startDate = "";    //起始日期
             String endDate = "";      //截至日期
 
+            String oppBillNo = null;
+            if (customFilter["F_QSNC_OppBillNoFilter"] != null)
+            {
+                oppBillNo = Convert.ToString(customFilter["F_QSNC_OppBillNoFilter"]);
+            }
 
             //部门
             StringBuilder deptSql = new StringBuilder();
@@ -188,6 +193,10 @@ namespace SaleControlBill
             {
                 endDate = Convert.ToDateTime(customFilter["F_QSNC_EndDateFilter"]).ToString("yyyy-MM-dd 23:59:59");
                 sql.AppendFormat(" and CLUE.FCREATEDATE <= '{0}' ", endDate);
+            }
+            if (oppBillNo != null && !oppBillNo.Equals(""))
+            {
+                sql.AppendFormat(" and OPP.FBILLNO = '{0}' ", oppBillNo);
             }
 
             DBUtils.ExecuteDynamicObject(this.Context, sql.ToString());
@@ -307,6 +316,16 @@ namespace SaleControlBill
                     result = new ReportTitles();
                 }
 
+                //商机编号
+                if (customFilter["F_QSNC_OppBillNoFilter"] != null)
+                {
+                    String oppBillNo = Convert.ToString(customFilter["F_QSNC_OppBillNoFilter"]);
+                    result.AddTitle("F_QSNC_OppBillNo", oppBillNo);
+                }
+                else
+                {
+                    result.AddTitle("F_QSNC_OppBillNo", "全部");
+                }
 
                 if (customFilter["F_QSNC_StartDateFilter"] == null)
                 {

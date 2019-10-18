@@ -303,22 +303,22 @@ namespace ClueTransBill
                 }
                 //反写过滤条件
                 //起始日期
-                if (dyFilter["F_QSNC_StartDateFilter"] != null)
+                if (dyFilter["F_QSNC_StartDateFilter"] == null)
                 {
-                //    result.AddTitle("F_QSNC_StartDate", DateTime.Now.ToShortDateString());
-                //}
-                //else
-                //{
+                    result.AddTitle("F_QSNC_StartDate", "");
+                }
+                else
+                {
                     result.AddTitle("F_QSNC_StartDate", Convert.ToString(dyFilter["F_QSNC_StartDateFilter"]));
                 }
 
                 //截止日期
-                if (dyFilter["F_QSNC_EndDateFilter"] != null)
+                if (dyFilter["F_QSNC_EndDateFilter"] == null)
                 {
-                //    result.AddTitle("F_QSNC_EndDate", DateTime.Now.ToShortDateString());
-                //}
-                //else
-                //{
+                    result.AddTitle("F_QSNC_EndDate", "");
+                }
+                else
+                {
                     result.AddTitle("F_QSNC_EndDate", Convert.ToString(dyFilter["F_QSNC_EndDateFilter"]));
                 }
 
