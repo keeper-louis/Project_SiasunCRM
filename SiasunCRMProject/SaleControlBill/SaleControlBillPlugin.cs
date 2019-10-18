@@ -81,6 +81,9 @@ namespace SaleControlBill
 
 
             DynamicObject customFilter = filter.FilterParameter.CustomFilter;
+            String startDate = "";    //起始日期
+            String endDate = "";      //截至日期
+
 
             //部门
             StringBuilder deptSql = new StringBuilder();
@@ -125,7 +128,7 @@ namespace SaleControlBill
             sql.AppendLine(" EMPL.FNAME AS 'saler', ");                                 //负责人
             sql.AppendLine(" DEPTL.FNAME AS 'department', ");                           //部门
             sql.AppendLine(" CUST.F_PEJK_AGENT AS 'agent', ");                          //代理商
-            //sql.AppendLine(" FINUSER.FNAME AS 'user', ");                               //最终用户
+            sql.AppendLine(" OPP.FBILLNO AS 'billNo', ");                               //商机编号
             sql.AppendLine(" F_PEJK_SBSYDZ AS 'address', ");                            //设备使用地址
             sql.AppendLine(" F_PEJK_CRMPRONAME AS 'category', ");                       //产品类别
             sql.AppendLine(" F_PEJK_GGXH AS 'model', ");                                //产品型号
@@ -164,7 +167,7 @@ namespace SaleControlBill
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ");
             sql.AppendLine(" ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
-            sql.AppendLine(" where EMPL.FLOCALEID = 2052 AND DEPTL.FLOCALEID = 2052 AND PROJECTPRO.FLOCALEID = 2052 AND FINUSER.FLOCALEID = 2052 ");
+            sql.AppendLine(" where EMPL.FLOCALEID = 2052 AND DEPTL.FLOCALEID = 2052 AND PROJECTPRO.FLOCALEID = 2052");
             //判断销售部门条件
             if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
             {
@@ -173,6 +176,18 @@ namespace SaleControlBill
             if (flag)
             {
                 sql.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+            }
+            //判断起始日期是否有效
+            if (customFilter["f_qsnc_startdatefilter"] != null)
+            {
+                startDate = Convert.ToDateTime(customFilter["F_QSNC_StartDateFilter"]).ToString("yyyy-MM-dd 00:00:00");
+                sql.AppendFormat(" and CLUE.FCREATEDATE >= '{0}' ", startDate);
+            }
+            //判断截止日期是否有效
+            if (customFilter["f_qsnc_enddatefilter"] != null)
+            {
+                endDate = Convert.ToDateTime(customFilter["F_QSNC_EndDateFilter"]).ToString("yyyy-MM-dd 23:59:59");
+                sql.AppendFormat(" and CLUE.FCREATEDATE <= '{0}' ", endDate);
             }
 
             DBUtils.ExecuteDynamicObject(this.Context, sql.ToString());
@@ -207,73 +222,73 @@ namespace SaleControlBill
             //代理商
             header.AddChild("agent", new Kingdee.BOS.LocaleValue("代理商")).ColIndex = 5;
 
-            ////最终用户
-            //header.AddChild("user", new Kingdee.BOS.LocaleValue("最终用户")).ColIndex = 6;
+            //最终用户
+            header.AddChild("billNo", new Kingdee.BOS.LocaleValue("商机编号")).ColIndex = 6;
 
             //设备使用地址
             var address = header.AddChild("address", new Kingdee.BOS.LocaleValue("设备使用地址"));
-            address.ColIndex = 6;
+            address.ColIndex = 7;
             address.Width = 150;
 
             //产品类别
             var category = header.AddChild("category", new Kingdee.BOS.LocaleValue("产品类别"));
-            category.ColIndex = 7;
+            category.ColIndex = 8;
             category.Width = 150;
 
             //产品型号
             var model = header.AddChild("model", new Kingdee.BOS.LocaleValue("产品型号"));
-            model.ColIndex = 8;
+            model.ColIndex = 9;
             model.Width = 150;
 
             //特殊参数要求
             var special = header.AddChild("special", new Kingdee.BOS.LocaleValue("特殊参数要求"));
-            special.ColIndex = 9;
+            special.ColIndex = 10;
             special.Width = 150;
             //台数
-            header.AddChild("count", new Kingdee.BOS.LocaleValue("台数")).ColIndex = 10;
+            header.AddChild("count", new Kingdee.BOS.LocaleValue("台数")).ColIndex = 11;
 
             //单价
-            header.AddChild("price", new Kingdee.BOS.LocaleValue("单价(万元)")).ColIndex = 11;
+            header.AddChild("price", new Kingdee.BOS.LocaleValue("单价(万元)")).ColIndex = 12;
 
             //总金额
-            header.AddChild("amount", new Kingdee.BOS.LocaleValue("总金额(万元)")).ColIndex = 12;
+            header.AddChild("amount", new Kingdee.BOS.LocaleValue("总金额(万元)")).ColIndex = 13;
 
             //项目进展
             var progress = header.AddChild("progress", new Kingdee.BOS.LocaleValue("项目进展"));
-            progress.ColIndex = 13;
+            progress.ColIndex = 14;
             progress.Width = 150;
 
             //丢单原因
             var reason = header.AddChild("reason", new Kingdee.BOS.LocaleValue("丢单原因"));
-            reason.ColIndex = 14;
+            reason.ColIndex = 15;
             reason.Width = 150;
 
             //下一步计划
             var plan = header.AddChild("plan", new Kingdee.BOS.LocaleValue("下一步计划"));
-            plan.ColIndex = 15;
+            plan.ColIndex = 16;
             plan.Width = 150;
 
             //主要竞争对手
             var rival = header.AddChild("rival", new Kingdee.BOS.LocaleValue("主要竞争对手"));
-            rival.ColIndex = 16;
+            rival.ColIndex = 17;
             rival.Width = 150;
 
             //竞争对手产品型号
             var rivalModel = header.AddChild("rivalModel", new Kingdee.BOS.LocaleValue("竞争对手产品型号"));
-            rivalModel.ColIndex = 17;
+            rivalModel.ColIndex = 18;
             rivalModel.Width = 150;
 
             //竞争型号单价
-            header.AddChild("rivalPrice", new Kingdee.BOS.LocaleValue("竞争型号单价(万元)")).ColIndex = 18;
+            header.AddChild("rivalPrice", new Kingdee.BOS.LocaleValue("竞争型号单价(万元)")).ColIndex = 19;
 
             //预计下单时间
             var orderDate = header.AddChild("orderDate", new Kingdee.BOS.LocaleValue("预计下单时间"));
-            orderDate.ColIndex = 19;
+            orderDate.ColIndex = 20;
             orderDate.Width = 100;
 
             //备注
             var remark = header.AddChild("remark", new Kingdee.BOS.LocaleValue("备注"));
-            remark.ColIndex = 20;
+            remark.ColIndex = 21;
             remark.Width = 150;
 
             return header;
@@ -291,6 +306,27 @@ namespace SaleControlBill
                 {
                     result = new ReportTitles();
                 }
+
+
+                if (customFilter["F_QSNC_StartDateFilter"] == null)
+                {
+                    result.AddTitle("F_QSNC_StartDate", "");
+                }
+                else
+                {
+                    result.AddTitle("F_QSNC_StartDate", Convert.ToString(customFilter["F_QSNC_StartDateFilter"]));
+                }
+
+                //截止日期
+                if (customFilter["F_QSNC_EndDateFilter"] == null)
+                {
+                    result.AddTitle("F_QSNC_EndDate", "");
+                }
+                else
+                {
+                    result.AddTitle("F_QSNC_EndDate", Convert.ToString(customFilter["F_QSNC_EndDateFilter"]));
+                }
+
 
                 //销售部门
                 if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
