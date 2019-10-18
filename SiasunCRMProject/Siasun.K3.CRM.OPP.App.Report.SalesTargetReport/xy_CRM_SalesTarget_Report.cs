@@ -199,18 +199,18 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		SUM(CASE WHEN curmonth <=11 THEN totalcount ELSE 0 END) actual_11, ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=12 THEN totalcount ELSE 0 END) actual_12  ");
             s.Append(@" 		from( ");
-            s.Append(@" 			select con.FSALERID salerID,MONTH(con.FAPPROVEDATE) curmonth,count(distinct con_r.FSRCBILLNO) totalcount  ");
+            s.Append(@" 			select con.FSALERID salerID,MONTH(con.FDATE) curmonth,count(distinct con_r.F_PEJK_SOURCEBILLNO) totalcount   ");
             s.Append(@" 			from T_CRM_CONTRACT con ");
-            s.Append(@" 			inner join T_CRM_CONTRACTENTRY_R con_r on con.FID=con_r.FID ");
-            s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.FSRCBILLNO=opp.FBILLNO and opp.FBEMPID=con.FSALERID ");
-            s.Append(@" 			where YEAR(con.FAPPROVEDATE)='" + year + "' ");
+            s.Append(@" 			inner join PEJK_GOODSDEATIL con_r on con.FID=con_r.FID  ");
+            s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO --and opp.FBEMPID=con.FSALERID  ");
+            s.Append(@" 			where YEAR(con.FDATE)='" + year + "' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and con.FSALEDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and con.FSALERID='" + salerID + "' "); }
             if (flag)
             {
                 s.AppendLine(" and con.FSALERID ").Append(salerLimit);
             }
-            s.Append(@" 			group by con.FSALERID,MONTH(con.FAPPROVEDATE) ");
+            s.Append(@" 			group by con.FSALERID,MONTH(con.FDATE) ");
             s.Append(@" 			) t3 ");
             s.Append(@" 		group by salerID ");
             s.Append(@" 	) t4 on oper.FENTRYID=t4.salerID ");

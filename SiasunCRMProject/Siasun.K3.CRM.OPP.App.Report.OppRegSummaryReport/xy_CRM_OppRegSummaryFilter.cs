@@ -71,7 +71,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppRegSummaryReport
 
             EnumItem statusItem2 = new EnumItem();
             statusItem2.Value = "B";
-            statusItem2.Caption = new LocaleValue("提交");
+            statusItem2.Caption = new LocaleValue("审核中");
             lstBillStatusItems.Add(statusItem2);
 
             EnumItem statusItem3 = new EnumItem();

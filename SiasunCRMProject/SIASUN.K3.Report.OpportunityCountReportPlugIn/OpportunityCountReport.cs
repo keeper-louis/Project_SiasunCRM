@@ -35,7 +35,7 @@ namespace SIASUN.K3.CRM.APP.Report
 
             StringBuilder salerLimit = new StringBuilder();
             Boolean flag = false;
-
+           
             if (collection.Count > 0)
             {
                 //获取当前用户personId
@@ -99,6 +99,8 @@ namespace SIASUN.K3.CRM.APP.Report
 
                 }
             }
+           
+            StringBuilder billstatussql = new StringBuilder();
             StringBuilder salenumbersql = new StringBuilder();
             if (cutomerfiler["F_PAEZ_MulBaseSaler"] != null)
             {
@@ -117,8 +119,31 @@ namespace SIASUN.K3.CRM.APP.Report
 
                 }
             }
+            //添加单据状态过滤
+            int billstatussize = 0;
+            if (cutomerfiler["F_PAEZ_BillStatus"] != null)
+            {
+                string billstatusenum = Convert.ToString(cutomerfiler["F_PAEZ_BillStatus"]);
+                if (!string.IsNullOrEmpty(billstatusenum))
+                {
+                    String[] billstauscol = billstatusenum.Split(',');
+                    if (billstauscol.Length >= 1)
+                    {
+                        billstatussql.Append(" in (");
+                        for (int i = 0; i < billstauscol.Length; i++)
+                        {
+                            billstatussize = billstatussize + 1;
+                            if (billstatussize == billstauscol.Length)
+                                billstatussql.Append("'" + billstauscol[i] + "')");
+                            else
+                                billstatussql.Append("'" + billstauscol[i] + "',");
 
-            string temTable1 = materialRptTableNames[0];
+                        }
+                    }
+                }
+            }
+
+                string temTable1 = materialRptTableNames[0];
             string temTable2 = materialRptTableNames[1];
             // 拼接过滤条件 ： filter
             // 略
@@ -171,10 +196,16 @@ namespace SIASUN.K3.CRM.APP.Report
                 }
                 if (salenumbersql != null && salenumbersql.Length > 0)
                 {
-                    stringBuilder.AppendLine(" and  emp.fnumber ").Append(salenumbersql);
+                    stringBuilder.AppendLine(" and  staff.fnumber ").Append(salenumbersql);
                 }
+                //单据状态 
+                       
+                if (billstatussql.Length>0)
+                 {
+                    stringBuilder.AppendLine(" and  opp.FDOCUMENTSTATUS  ").Append(billstatussql);
+                 }
                 //销售员数据隔离
-                if (flag)
+                    if (flag)
                 {
                     stringBuilder.AppendLine(" and OPP.FBEMPID ").Append(salerLimit);
                 }
@@ -235,7 +266,7 @@ namespace SIASUN.K3.CRM.APP.Report
                 stringBuilder.AppendLine("select deptnumber, deptname,empnumber, empname ,  count (distinct FBILLNO)   gzzj,0  activitycount \n");
                 stringBuilder.AppendFormat("from {0} opp \n", temTable1);
                 stringBuilder.AppendLine("where opp.FDOCUMENTSTATUS is not null \n");
-                stringBuilder.AppendLine("and opp.FCloseStatus<>0 and opp.FDOCUMENTSTATUS>='C' \n");
+                stringBuilder.AppendLine("and opp.FCloseStatus='0' --- and opp.FDOCUMENTSTATUS>='C' \n");
                 stringBuilder.AppendLine("group by deptnumber, deptname,empnumber,empname  \n");
                 stringBuilder.AppendLine("\n");
                 stringBuilder.AppendLine("union all\n");
@@ -316,6 +347,12 @@ namespace SIASUN.K3.CRM.APP.Report
                     stringBuilder.AppendLine(" and  emp.fnumber ").Append(salenumbersql);
 
 
+                }
+                //单据状态 
+
+                if (billstatussql.Length > 0)
+                {
+                    stringBuilder.AppendLine(" and  opp.FDOCUMENTSTATUS  ").Append(billstatussql);
                 }
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 

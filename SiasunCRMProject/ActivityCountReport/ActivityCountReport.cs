@@ -116,7 +116,31 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
 
                 }
             }
+            //添加单据状态过滤
+            StringBuilder billstatussql = new StringBuilder();
+            int billstatussize = 0;
+            if (cutomerfiler["F_PAEZ_BillStatus"] != null)
+            {
+                string billstatusenum = Convert.ToString(cutomerfiler["F_PAEZ_BillStatus"]);
+                if (!string.IsNullOrEmpty(billstatusenum))
+                {
+                    String[] billstauscol = billstatusenum.Split(',');
 
+                    if (billstauscol.Length >= 1)
+                    {
+                        billstatussql.Append(" in (");
+                        for (int i = 0; i < billstauscol.Length; i++)
+                        {
+                            billstatussize = billstatussize + 1;
+                            if (billstatussize == billstauscol.Length)
+                                billstatussql.Append("'" + billstauscol[i] + "')");
+                            else
+                                billstatussql.Append("'" + billstauscol[i] + "',");
+
+                        }
+                    }
+                }
+            }
             string temTable1 = materialRptTableNames[0];
             string temTable2 = materialRptTableNames[1];
             // 拼接过滤条件 ： filter
@@ -146,13 +170,15 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 stringBuilder.AppendLine("from  T_CRM_Activity activity \n ");
                 stringBuilder.AppendLine("left join  T_CRM_Opportunity opp on activity.FOPPID=opp.FID \n ");
                 stringBuilder.AppendLine("left join  t_sec_user secuser          on opp.FCREATORID= secuser.FUSERID           --用户 \n");
-                stringBuilder.AppendLine("left join V_BD_SALESMAN saleman on saleman.fid = opp.FBEMPID           --销售员 \n");
+                // stringBuilder.AppendLine("left join V_BD_SALESMAN saleman on saleman.fid = opp.FBEMPID           --销售员 \n");
+                stringBuilder.AppendLine("left join V_BD_SALESMAN saleman on saleman.fid = activity.F_PEJK_Leader           --活动负责人 \n");
                 stringBuilder.AppendLine("left join T_BD_STAFF staff on staff.FSTAFFID = saleman.FSTAFFID   \n");
                 stringBuilder.AppendLine("left join  T_HR_EMPINFO emp on emp.fid=staff.FEMPINFOID   \n");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID     \n");
                 stringBuilder.AppendLine("left join T_ORG_POST post on post.FPOSTID = staff.FPOSTID  -- 岗位   \n");
                 stringBuilder.AppendLine("left join T_ORG_POST_L post_l on post_l.FPOSTID = post.FPOSTID  \n");
-                stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID = post.FDEPTID ---- - 部门   \n");
+               // stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID = post.FDEPTID ---- - 部门   \n"); 
+               stringBuilder.AppendLine("left join t_bd_department dept on dept.FDEPTID = activity.F_PEJK_LeadDept ---- -活动负责人所属部门  \n");
                 stringBuilder.AppendLine("left join  t_bd_department_L deptl on deptl.FDEPTID = dept.FDEPTID   \n");
                 stringBuilder.AppendLine("where secuser.FTYPE=1  and  empl.FLOCALEID = 2052 and deptl.FLOCALEID = 2052 ");
                 if (year != null)
@@ -171,7 +197,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 //销售员
                 if (salenumbersql != null && salenumbersql.Length > 0)
                 {
-                    stringBuilder.AppendLine(" and  emp.fnumber ").Append(salenumbersql);
+                    stringBuilder.AppendLine(" and  staff.fnumber ").Append(salenumbersql);
 
 
                 }
@@ -181,7 +207,12 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 {
                     stringBuilder.AppendLine(" and  saleman.fid ").Append(salerLimit);
                 }
+                //单据状态 
 
+                if (billstatussql.Length > 0)
+                {
+                    stringBuilder.AppendLine(" and  opp.FDOCUMENTSTATUS  ").Append(billstatussql);
+                }
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 stringBuilder = new StringBuilder();
