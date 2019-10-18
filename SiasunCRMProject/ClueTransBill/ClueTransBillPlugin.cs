@@ -184,13 +184,13 @@ namespace ClueTransBill
             if (dyFilter["f_qsnc_startdatefilter"] != null)
             {
                 startDate = Convert.ToDateTime(dyFilter["f_qsnc_startdatefilter"]).ToString("yyyy-MM-dd 00:00:00");
-                sql2.AppendFormat(" and clue.fcreatedate >= '{0}' ", startDate);
+                sql2.AppendFormat(" and clue.F_PEJK_BIZDATE >= '{0}' ", startDate);
             }
             //判断截止日期是否有效
             if (dyFilter["f_qsnc_enddatefilter"] != null)
             {
                 endDate = Convert.ToDateTime(dyFilter["f_qsnc_enddatefilter"]).ToString("yyyy-MM-dd 23:59:59");
-                sql2.AppendFormat(" and clue.fcreatedate <= '{0}' ", endDate);
+                sql2.AppendFormat(" and clue.F_PEJK_BIZDATE <= '{0}' ", endDate);
             }
 
             sql2.AppendLine(" ) cluetmp ");
