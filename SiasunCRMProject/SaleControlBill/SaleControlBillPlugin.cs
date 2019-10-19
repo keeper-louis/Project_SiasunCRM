@@ -170,7 +170,7 @@ namespace SaleControlBill
             sql.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL ");
             sql.AppendLine(" ON  EMPL.FID = EMP.FID ");
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ");
-            sql.AppendLine(" ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
+            sql.AppendLine(" ON DEPTL.FDEPTID = OPP.FSALEDEPTID ");
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
             sql.AppendLine(" where EMPL.FLOCALEID = 2052 AND DEPTL.FLOCALEID = 2052 AND PROJECTPRO.FLOCALEID = 2052");
             //判断销售部门条件
