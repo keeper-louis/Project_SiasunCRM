@@ -267,7 +267,7 @@ namespace ClueTransBill
             ReportHeader header = new ReportHeader();
 
             //部门
-            var department = header.AddChild("department", new Kingdee.BOS.LocaleValue("部门"));
+            var department = header.AddChild("department", new Kingdee.BOS.LocaleValue("线索创建人所属部门"));
             department.ColIndex = 0;
 
             //业务员
