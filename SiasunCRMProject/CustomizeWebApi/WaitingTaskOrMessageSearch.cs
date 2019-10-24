@@ -57,7 +57,7 @@ namespace Ken.K3.CRM.CustomizeWebApi.ServicesStub
 		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
 											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
 											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}'", FRECEIVERID);
+ where t_WF_Assign.FSTATUS=0 and t_WF_ProcInst.Fstatus = 2 and t_WF_Receiver.FReceiverId='{0}'", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
                     foreach (DynamicObject item in items)
                     {
