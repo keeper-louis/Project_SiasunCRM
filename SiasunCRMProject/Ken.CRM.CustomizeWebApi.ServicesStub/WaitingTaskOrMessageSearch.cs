@@ -132,7 +132,7 @@ where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}' order by T_WF_MESSAGE.FCREATETI
 		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
 											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
 											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
+ where t_WF_Assign.FSTATUS=0 and  t_WF_ProcInst.Fstatus = 2 and  t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
 
                     strSql = string.Format(@"/*dialect*/select T_BAS_WARNMERGEMESSAGE.FSTATUS,t_SEC_User.FNAME, 
