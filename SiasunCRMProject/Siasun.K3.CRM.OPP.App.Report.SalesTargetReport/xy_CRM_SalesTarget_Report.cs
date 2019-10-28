@@ -122,14 +122,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             //s.Append(@"                                        and oper.FBIZORGID='100041'  ");
             s.Append(@" 	left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID  ");
             s.Append(@" 	left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID and post_l.FLOCALEID='2052'  ");
-            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=post.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"     and dept.FDEPTID='" + saleDeptID + "' "); }
-            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
             s.Append(@" 	left join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
             s.Append(@" 	inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
             s.Append(@" 	left join (	 ");
-            s.Append(@" 		select salerID, ");
+            s.Append(@" 		select saledeptid, salerID, ");
             s.Append(@" 		SUM(CASE WHEN curmonth =1 THEN opp_count ELSE 0 END) actual_1,    ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=2 THEN opp_count ELSE 0 END) actual_2,   ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=3 THEN opp_count ELSE 0 END) actual_3,   ");
@@ -142,21 +139,27 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		SUM(CASE WHEN curmonth <=10 THEN opp_count ELSE 0 END) actual_10,   ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=11 THEN opp_count ELSE 0 END) actual_11,   ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=12 THEN opp_count ELSE 0 END) actual_12 ");
-            s.Append(@" 		from( ");
-            s.Append(@" 			select opp.FBEMPID salerID,MONTH(opp.F_PEJK_AUDITDATE) curmonth,count(1) opp_count  ");
+            s.Append(@" 		from ( ");
+            s.Append(@" 			select opp.FSALEDEPTID saledeptid, opp.FBEMPID salerID,MONTH(opp.F_PEJK_AUDITDATE) curmonth,count(1) opp_count  ");
             s.Append(@" 			from T_CRM_OPPORTUNITY opp ");
             s.Append(@" 			inner join  T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and clue.FSALERID=opp.FBEMPID  ");
-            s.Append(@" 			where YEAR(opp.F_PEJK_AUDITDATE)='" + year + "' ");
+            s.Append(@" 			where YEAR(opp.FSTARTDATE)='" + year + "' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and opp.FSALEDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and opp.FBEMPID='" + salerID + "' "); }
             if (flag)
             {
                 s.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
             }
-            s.Append(@" 			group by opp.FBEMPID,MONTH(opp.F_PEJK_AUDITDATE) ");
+            s.Append(@" 			group by opp.FSALEDEPTID,opp.FBEMPID,MONTH(opp.F_PEJK_AUDITDATE) ");
             s.Append(@" 			) t1 ");
-            s.Append(@" 		group by salerID ");
+            s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t2 on saleman.fid=t2.salerID ");
+
+            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=t2.saledeptid and dept.FDOCUMENTSTATUS='C' ");
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
+            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
+
+
             s.Append(@" 	where 1=1 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
@@ -178,14 +181,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             //s.Append(@"                                        and oper.FBIZORGID='100041'  ");
             s.Append(@" 	left join T_ORG_POST post on post.FPOSTID=staff.FPOSTID  ");
             s.Append(@" 	left join T_ORG_POST_L post_l on post_l.FPOSTID=post.FPOSTID and post_l.FLOCALEID='2052'  ");
-            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=post.FDEPTID and dept.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
-            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
-            s.Append(@" 	 join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
+            s.Append(@" 	join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"     and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
             s.Append(@" 	inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
             s.Append(@" 	left join (	 ");
-            s.Append(@" 		select salerID, ");
+            s.Append(@" 		select saledeptid,salerID, ");
             s.Append(@" 		SUM(CASE WHEN curmonth =1 THEN totalcount ELSE 0 END) actual_1,    ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=2 THEN totalcount ELSE 0 END) actual_2,   ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=3 THEN totalcount ELSE 0 END) actual_3,   ");
@@ -199,7 +199,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		SUM(CASE WHEN curmonth <=11 THEN totalcount ELSE 0 END) actual_11, ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=12 THEN totalcount ELSE 0 END) actual_12  ");
             s.Append(@" 		from( ");
-            s.Append(@" 			select con.FSALERID salerID,MONTH(con.FDATE) curmonth,count(distinct con_r.F_PEJK_SOURCEBILLNO) totalcount   ");
+            s.Append(@" 			select opp.FSALEDEPTID saledeptid,con.FSALERID salerID,MONTH(con.FDATE) curmonth,count(distinct con_r.F_PEJK_SOURCEBILLNO) totalcount   ");
             s.Append(@" 			from T_CRM_CONTRACT con ");
             s.Append(@" 			inner join PEJK_GOODSDEATIL con_r on con.FID=con_r.FID  ");
            // s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO --and opp.FBEMPID=con.FSALERID  ");
@@ -211,10 +211,14 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             {
                 s.AppendLine(" and con.FSALERID ").Append(salerLimit);
             }
-            s.Append(@" 			group by con.FSALERID,MONTH(con.FDATE) ");
+            s.Append(@" 			group by opp.FSALEDEPTID ,con.FSALERID,MONTH(con.FDATE) ");
             s.Append(@" 			) t3 ");
-            s.Append(@" 		group by salerID ");
+            s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t4 on saleman.fid=t4.salerID ");
+            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=t4.saledeptid and dept.FDOCUMENTSTATUS='C' ");
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
+            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
+
             s.Append(@" 	where 1=1 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and dept.FDEPTID='" + saleDeptID + "' "); }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }

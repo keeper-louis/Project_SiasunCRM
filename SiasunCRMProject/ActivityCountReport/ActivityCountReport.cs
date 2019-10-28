@@ -275,7 +275,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 stringBuilder.AppendFormat("insert into {0}", temTable2);
                 stringBuilder.AppendLine("\n select '','','','总计',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji,isnull(sum(hdzb),0) hdzb,isnull(sum(hdwcqk),0) hdwcqk  ");
                 stringBuilder.AppendFormat("from {0} ", temTable2);
-                stringBuilder.AppendLine(" where   1=1 ");
+                stringBuilder.AppendLine(" where   1=1 and empnumber not like '%部门小计%' ");
                 stringBuilder.AppendLine("  ");
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
