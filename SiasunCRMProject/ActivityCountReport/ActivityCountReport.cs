@@ -217,15 +217,15 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
 
                 stringBuilder = new StringBuilder();
 
-                stringBuilder.AppendLine("select    toji2.empnumber, toji2.empname,yue1,yue2,yue3,yue4,yue5,yue6,yue7,yue8,  \n  ");
+                stringBuilder.AppendLine("select    toji2.deptnumber, toji2.deptname, toji2.empnumber, toji2.empname,yue1,yue2,yue3,yue4,yue5,yue6,yue7,yue8,  \n  ");
                 stringBuilder.AppendLine("yue9,yue10,yue11,yue12,   \n  ");
                 stringBuilder.AppendLine("yue1+yue2+yue3+yue4+yue5+yue6+yue7+yue8+yue9+yue10+yue11+yue12 zoji,isnull(F_PEJK_ACTIVITYQUNTA,0) hdzb,yue1+yue2+yue3+yue4+yue5+yue6+yue7+yue8+yue9+yue10+yue11+yue12-isnull(F_PEJK_ACTIVITYQUNTA,0) hdwcqk   \n  ");
                 stringBuilder.AppendFormat("into {0}", temTable2).AppendLine(" \n");
                 stringBuilder.AppendLine("from (  \n  ");
-                stringBuilder.AppendLine("select  empnumber, empname, sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4) yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12  \n  ");
+                stringBuilder.AppendLine("select  deptnumber,deptname,empnumber, empname, sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4) yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12  \n  ");
                 stringBuilder.AppendLine("from (  \n  ");
                 stringBuilder.AppendLine("  \n  ");
-                stringBuilder.AppendLine("select  empnumber, empname,  \n  ");
+                stringBuilder.AppendLine("select  deptnumber,deptname,empnumber, empname,  \n  ");
                 stringBuilder.AppendLine("case when rtmonth=1 then oppcounts else 0 end  yue1 ,  \n  ");
                 stringBuilder.AppendLine("case when rtmonth=2 then oppcounts else 0 end  yue2,  \n  ");
                 stringBuilder.AppendLine("case when rtmonth=3 then oppcounts else 0 end  yue3,  \n  ");
@@ -239,12 +239,12 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 stringBuilder.AppendLine("case when rtmonth=11 then oppcounts else 0 end  yue11,  \n  ");
                 stringBuilder.AppendLine("case when rtmonth=12 then oppcounts else 0 end  yue12  \n  ");
                 stringBuilder.AppendLine("from (  \n  ");
-                stringBuilder.AppendLine("select  empnumber, empname,rtyear,rtmonth, count (distinct activitybillno)  oppcounts  \n  ");
+                stringBuilder.AppendLine("select  deptnumber,deptname,empnumber, empname,rtyear,rtmonth, count (distinct activitybillno)  oppcounts  \n  ");
                 stringBuilder.AppendFormat("from {0}  opp \n", temTable1);
-                stringBuilder.AppendLine("group by empnumber,empname,rtyear,rtmonth  \n  ");
+                stringBuilder.AppendLine("group by deptnumber,deptname,empnumber,empname,rtyear,rtmonth  \n  ");
                 stringBuilder.AppendLine(")  toji0  \n  ");
                 stringBuilder.AppendLine(") tojimonth  \n  ");
-                stringBuilder.AppendLine("group by  empnumber,empname  \n  ");
+                stringBuilder.AppendLine("group by  deptnumber,deptname,empnumber,empname  \n  ");
                 stringBuilder.AppendLine("  \n  ");
                 stringBuilder.AppendLine(") toji2  \n  ");
                 stringBuilder.AppendLine("  \n  ");
@@ -254,7 +254,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 stringBuilder.AppendLine("select emp.fnumber empnumber,F_PEJK_OPPQUNTA,F_PEJK_OPPTRACKQUNTA ,F_PEJK_ACTIVITYQUNTA  \n  ");
                 stringBuilder.AppendLine("from PEJK_SALERQUNTAENTRY SALERQUNTAENTRY   \n  ");
                 stringBuilder.AppendLine("left join PEJK_SALERQUNTA SALERQUNTA on SALERQUNTA.fid=SALERQUNTAENTRY.fid  \n  ");
-                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fstaffid=SALERQUNTAENTRY.F_PEJK_SALER  \n  ");
+                stringBuilder.AppendLine("left join V_BD_SALESMAN salesman on salesman.fid=SALERQUNTAENTRY.F_PEJK_SALER  \n  ");
                 stringBuilder.AppendLine("left join T_BD_STAFF staff on staff.FSTAFFID= salesman.fstaffid  \n  ");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO emp on staff.FEMPINFOID=emp.FID  \n  ");
                 stringBuilder.AppendLine("left join T_HR_EMPINFO_L empl on empl.FID=emp.FID  --员工   \n  ");
@@ -262,12 +262,18 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
 
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
-
+                //插入部门小计
+                stringBuilder = new StringBuilder();
+                stringBuilder.AppendFormat("insert into {0} ", temTable2);
+                stringBuilder.AppendLine(" select deptnumber,deptname,'部门小计','',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji,isnull(sum(hdzb),0) hdzb,isnull(sum(hdwcqk),0) hdwcqk   ");
+                stringBuilder.AppendFormat(" from {0} ", temTable2);
+                stringBuilder.AppendLine(" group by deptnumber, deptname ");
+                DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 //插入 总计
                 stringBuilder = new StringBuilder();
                 stringBuilder.AppendFormat("insert into {0}", temTable2);
-                stringBuilder.AppendLine("\n select '总计','',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji,isnull(sum(hdzb),0) hdzb,isnull(sum(hdwcqk),0) hdwcqk  ");
+                stringBuilder.AppendLine("\n select '','','','总计',sum(yue1) yue1,sum(yue2) yue2,sum(yue3) yue3,sum(yue4)yue4,sum(yue5) yue5,sum(yue6) yue6,sum(yue7) yue7,sum(yue8) yue8,sum(yue9) yue9,sum(yue10) yue10,sum(yue11) yue11,sum(yue12) yue12,sum(zoji) zoji,isnull(sum(hdzb),0) hdzb,isnull(sum(hdwcqk),0) hdwcqk  ");
                 stringBuilder.AppendFormat("from {0} ", temTable2);
                 stringBuilder.AppendLine(" where   1=1 ");
                 stringBuilder.AppendLine("  ");
@@ -275,7 +281,7 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
 
                 stringBuilder = new StringBuilder();
-                stringBuilder.AppendFormat(" select ROW_NUMBER() OVER(ORDER BY empnumber) FIDENTITYID,tmp2.* into {0}   from   {1} tmp2  order by empnumber,empname  ", tableName, temTable2);
+                stringBuilder.AppendFormat(" select ROW_NUMBER() OVER(ORDER BY deptnumber, deptname,empnumber,empname ) FIDENTITYID,tmp2.* into {0}   from   {1} tmp2  order by deptnumber, deptname,empnumber,empname  ", tableName, temTable2);
 
                 DBUtils.ExecuteDynamicObject(this.Context, stringBuilder.ToString());
             }
@@ -357,9 +363,17 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
 
                 //var deptnumber = header.AddChild("deptname", new LocaleValue("部门"));
 
+                var deptnumber = header.AddChild("deptnumber", new LocaleValue("部门编码"));
+
+                var deptname = header.AddChild("deptname", new LocaleValue("部门名称"));
+
+
                 var empnumber = header.AddChild("empnumber", new LocaleValue("员工编码"));
 
                 var empname = header.AddChild("empname", new LocaleValue("员工"));
+
+
+
 
                 var yue1 = header.AddChild("yue1", new LocaleValue("1月份"));
 
@@ -391,6 +405,9 @@ namespace SIASUN.K3.Report.ActivityCountReportPlugIn
                 var yue12 = header.AddChild("yue12", new LocaleValue("12月份"));
 
                 var zoji = header.AddChild("zoji", new LocaleValue("总计"));
+                var hdzb = header.AddChild("hdzb", new LocaleValue("活动指标"));
+                var hdwcqk = header.AddChild("hdwcqk", new LocaleValue("完成情况"));
+                
             }
 
             //var zoji = header.AddChild("gzzj", new LocaleValue("总计"));
