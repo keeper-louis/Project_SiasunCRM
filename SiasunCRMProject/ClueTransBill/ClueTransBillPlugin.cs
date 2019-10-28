@@ -160,12 +160,10 @@ namespace ClueTransBill
             }
 
             //查询出商机中所有的执行部门id -- finish
-            //StringBuilder sql1 = new StringBuilder();
-            //sql1.AppendFormat(@"/*dialect*/ select oppexedept.F_PEJK_EXECUTEDEPTID as exedeptid into {0} ", tmpTable1);
-            //sql1.AppendLine(" from PEJK_OPP_ExecuteDept oppexedept ");
-            //sql1.AppendLine(" left join T_CRM_Opportunity opp ");
-            //sql1.AppendLine(" on oppexedept.FID = opp.FID ");
-            //DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
+            StringBuilder sql1 = new StringBuilder();
+            sql1.AppendFormat(@"/*dialect*/ select opp.FSALEDEPTID as exedeptid into {0} ", tmpTable1);
+            sql1.AppendLine(" from T_CRM_Opportunity opp ");
+            DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
 
             // 查询线索中所有执行部门id
             //StringBuilder sql1 = new StringBuilder();
@@ -202,8 +200,8 @@ namespace ClueTransBill
             sql2.AppendLine(" on staff.FSTAFFID = salesman.FSTAFFID ");
             sql2.AppendLine(" left join T_BD_DEPARTMENT_L deptl ");
             sql2.AppendLine(" on deptl.FDEPTID = salesman.FDEPTID ");
-            //sql2.AppendFormat(" where deptl.FDEPTID in (select exedeptid from {0}) and deptl.FLOCALEID = 2052 ", tmpTable1);
-            sql2.AppendLine(" where deptl.FLOCALEID = 2052 ");
+            sql2.AppendFormat(" where deptl.FDEPTID in (select exedeptid from {0}) and deptl.FLOCALEID = 2052 ", tmpTable1);
+            //sql2.AppendLine(" where deptl.FLOCALEID = 2052 ");
             if (flag0)
             {
                 sql2.AppendLine(" and salesman.fid ").Append(salerLimit);
