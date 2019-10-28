@@ -119,6 +119,64 @@ namespace OppWarningBill
                 }
             }
 
+            // 商机负责人所在部门
+            StringBuilder deptSql = new StringBuilder();
+            if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
+            {
+                //获取到多选基础资料中所有选中项
+                DynamicObjectCollection cols2 = (DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"];
+                int deptNum = 0;
+
+                if (cols2.Count >= 1)
+                {
+                    deptSql.Append(" IN (");
+                }
+
+                foreach (DynamicObject dept in cols2)
+                {
+                    String deptNumber = Convert.ToString(((DynamicObject)dept["F_QSNC_DeptFilter"])["Number"]);
+                    deptNum++;
+
+                    if (cols2.Count == deptNum)
+                    {
+                        deptSql.Append("'" + deptNumber + "')");
+                    }
+                    else
+                    {
+                        deptSql.Append("'" + deptNumber + "', ");
+                    }
+                }
+            }
+
+            // 商机负责人
+            StringBuilder salerSql = new StringBuilder();
+            if (customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0)
+            {
+                //获取到多选基础资料中所有选中项
+                DynamicObjectCollection cols1 = (DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"];
+                int salerNum = 0;
+
+                if (cols1.Count >= 1)
+                {
+                    salerSql.Append(" IN (");
+                }
+
+                foreach (DynamicObject saler in cols1)
+                {
+                    String salerNumber = Convert.ToString(((DynamicObject)saler["F_QSNC_SalerFilter"])["Number"]);
+                    salerNum++;
+
+                    if (cols1.Count == salerNum)
+                    {
+                        salerSql.Append("'" + salerNumber + "')");
+                    }
+                    else
+                    {
+                        salerSql.Append("'" + salerNumber + "', ");
+                    }
+                }
+            }
+
             StringBuilder sql = new StringBuilder();
 
             sql.AppendLine(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY OPP.FBILLNO) AS FSeq, OPP.FBILLNO AS OPPBILLNO, ");
@@ -127,6 +185,7 @@ namespace OppWarningBill
             sql.AppendLine(" CUSTL.FNAME AS CUSTOMERNAME, ");
             sql.AppendLine(" OPP.FCREATEDATE AS CREATEDATE,	");
             sql.AppendLine(" EMPL.FNAME AS SALER, ");
+            sql.AppendLine(" DEPTL.FNAME AS DEPTNAME, ");
             sql.AppendLine(" OPP.FMODIFYDATE AS MODIFYDATE,	");
             sql.AppendLine(" SUSER.FNAME AS MODIFIERNAME ");
             sql.AppendFormat(" INTO {0} ", tableName);
@@ -135,6 +194,12 @@ namespace OppWarningBill
             sql.AppendLine(" LEFT JOIN T_BD_CUSTOMER CUST ON CUST.FCUSTID = CUSTL.FCUSTID ");
             sql.AppendLine(" LEFT JOIN T_SEC_user SUSER ON OPP.FMODIFIERID = SUSER.FUSERID ");
             sql.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN on SALESMAN.FID = OPP.FBEMPID	");
+
+            // ----------- 20191028 增加商机负责人所在部门
+            sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
+            sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
+            // -----------
+
             sql.AppendLine(" LEFT JOIN T_BD_STAFF STAFF on STAFF.FSTAFFID = SALESMAN.FSTAFFID ");
             sql.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL on EMPL.FID = STAFF.FEMPINFOID ");
             sql.AppendLine(" WHERE EMPL.FLOCALEID = 2052 AND CUSTL.FLOCALEID = 2052 AND OPP.FBILLNO IN ");
@@ -157,6 +222,17 @@ namespace OppWarningBill
             if (customFilter["F_QSNC_CustomerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_CustomerFilter"]).Count > 0)
             {
                 sql.Append(" and CUST.FNUMBER ").Append(customerSql);
+            }
+
+            // 商机负责人
+            if(customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0){
+                sql.AppendLine(" AND STAFF.FNUMBER ").Append(salerSql);
+            }
+
+            // 负责人所在部门
+            if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
+            {
+                sql.AppendLine(" AND DEPT.FNUMBER ").Append(deptSql);
             }
 
             //销售数据隔离
@@ -193,13 +269,16 @@ namespace OppWarningBill
             //商机负责人
             header.AddChild("saler", new Kingdee.BOS.LocaleValue("商机负责人")).ColIndex = 5;
 
+            // 负责人所属部门
+            header.AddChild("DEPTNAME", new Kingdee.BOS.LocaleValue("负责人所属部门")).ColIndex = 6;
+
             //修改时间
             var modifyDate = header.AddChild("modifydate", new Kingdee.BOS.LocaleValue("修改时间"));
-            modifyDate.ColIndex = 6;
+            modifyDate.ColIndex = 7;
             modifyDate.Width = 200;
 
             //修改人
-            header.AddChild("modifiername", new Kingdee.BOS.LocaleValue("修改人")).ColIndex = 7;
+            header.AddChild("modifiername", new Kingdee.BOS.LocaleValue("修改人")).ColIndex = 8;
 
             return header;
         }
@@ -225,6 +304,42 @@ namespace OppWarningBill
                 else
                 {
                     result.AddTitle("F_QSNC_OppBillNo", "全部");
+                }
+
+                // 商机负责人
+                if (customFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"]).Count > 0)
+                {
+                    StringBuilder salerName = new StringBuilder();
+                    DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_QSNC_SalerFilter"];
+                    foreach (DynamicObject customer in cols)
+                    {
+                        String tmpName = Convert.ToString(((DynamicObject)customer["F_QSNC_SalerFilter"])["Name"]);
+                        salerName.Append(tmpName + "; ");
+                    }
+
+                    result.AddTitle("F_QSNC_Saler", salerName.ToString());
+                }
+                else
+                {
+                    result.AddTitle("F_QSNC_Saler", "全部");
+                }
+
+                // 负责人所属部门
+                if (customFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"]).Count > 0)
+                {
+                    StringBuilder deptName = new StringBuilder();
+                    DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_QSNC_DeptFilter"];
+                    foreach (DynamicObject customer in cols)
+                    {
+                        String tmpName = Convert.ToString(((DynamicObject)customer["F_QSNC_DeptFilter"])["Name"]);
+                        deptName.Append(tmpName + "; ");
+                    }
+
+                    result.AddTitle("F_QSNC_Dept", deptName.ToString());
+                }
+                else
+                {
+                    result.AddTitle("F_QSNC_Dept", "全部");
                 }
 
                 //客户名称
