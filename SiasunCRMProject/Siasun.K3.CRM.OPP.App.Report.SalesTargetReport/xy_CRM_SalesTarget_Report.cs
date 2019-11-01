@@ -140,7 +140,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		SUM(CASE WHEN curmonth <=11 THEN opp_count ELSE 0 END) actual_11,   ");
             s.Append(@" 		SUM(CASE WHEN curmonth <=12 THEN opp_count ELSE 0 END) actual_12 ");
             s.Append(@" 		from ( ");
-            s.Append(@" 			select opp.FSALEDEPTID saledeptid, opp.FBEMPID salerID,MONTH(opp.F_PEJK_AUDITDATE) curmonth,count(1) opp_count  ");
+            s.Append(@" 			select opp.FSALEDEPTID saledeptid, opp.FBEMPID salerID,MONTH(opp.FSTARTDATE) curmonth,count(1) opp_count  ");
             s.Append(@" 			from T_CRM_OPPORTUNITY opp ");
             s.Append(@" 			inner join  T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and clue.FSALERID=opp.FBEMPID  ");
             s.Append(@" 			where YEAR(opp.FSTARTDATE)='" + year + "' ");
@@ -150,7 +150,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             {
                 s.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
             }
-            s.Append(@" 			group by opp.FSALEDEPTID,opp.FBEMPID,MONTH(opp.F_PEJK_AUDITDATE) ");
+            s.Append(@" 			group by opp.FSALEDEPTID,opp.FBEMPID,MONTH(opp.FSTARTDATE) ");
             s.Append(@" 			) t1 ");
             s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t2 on saleman.fid=t2.salerID ");
