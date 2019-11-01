@@ -42,34 +42,53 @@ namespace Ken.CRM.CustomizeWebApi.ServicesStub
 
                 if (SearchType.Equals("0"))//代办事项
                 {
-                    string strSql = string.Format(@"/*dialect*/SELECT t_WF_PiBiMap.FPROCINSTID,
- t_WF_PiBiMap.FKEYVALUE,t_WF_PiBiMap.FOBJECTTYPEID,
-   T_SEC_USER1.FNAME,t_WF_Receiver.FTITLE,
-      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME,t_WF_ApprovalItem.FDisposition   
-	    FROM t_WF_PiBiMap 
-		INNER JOIN t_WF_ProcInst ON (t_WF_ProcInst.FProcInstId = t_WF_PiBiMap.FProcInstId) 
-		INNER JOIN t_WF_ActInst on (t_WF_ActInst.FProcInstId = t_WF_ProcInst.FProcInstId) 
-		INNER JOIN t_WF_Assign on (t_WF_Assign.FActInstId = t_WF_ActInst.FActInstId) 
-		INNER JOIN t_WF_Receiver on (t_WF_Receiver.FAssignId = t_WF_Assign.FAssignId) 
-		INNER JOIN t_SEC_User ON (t_SEC_User.FUserId = t_WF_Receiver.FReceiverId) 
-		INNER JOIN t_WF_ApprovalAssign on (t_WF_Assign.FAssignId = t_WF_ApprovalAssign.FAssignId)
-		  LEFT JOIN t_WF_ApprovalItem on (t_WF_ApprovalItem.FApprovalAssignId = t_WF_ApprovalAssign.FApprovalAssignId 
-		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
-											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
-											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_ProcInst.Fstatus = 2 and t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
+                    //                   string strSql = string.Format(@"/*dialect*/SELECT t_WF_PiBiMap.FPROCINSTID,
+                    //t_WF_PiBiMap.FKEYVALUE,t_WF_PiBiMap.FOBJECTTYPEID,
+                    //  T_SEC_USER1.FNAME,t_WF_Receiver.FTITLE,
+                    //     t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME,t_WF_ApprovalItem.FDisposition   
+                    //    FROM t_WF_PiBiMap 
+                    //	INNER JOIN t_WF_ProcInst ON (t_WF_ProcInst.FProcInstId = t_WF_PiBiMap.FProcInstId) 
+                    //	INNER JOIN t_WF_ActInst on (t_WF_ActInst.FProcInstId = t_WF_ProcInst.FProcInstId) 
+                    //	INNER JOIN t_WF_Assign on (t_WF_Assign.FActInstId = t_WF_ActInst.FActInstId) 
+                    //	INNER JOIN t_WF_Receiver on (t_WF_Receiver.FAssignId = t_WF_Assign.FAssignId) 
+                    //	INNER JOIN t_SEC_User ON (t_SEC_User.FUserId = t_WF_Receiver.FReceiverId) 
+                    //	INNER JOIN t_WF_ApprovalAssign on (t_WF_Assign.FAssignId = t_WF_ApprovalAssign.FAssignId)
+                    //	  LEFT JOIN t_WF_ApprovalItem on (t_WF_ApprovalItem.FApprovalAssignId = t_WF_ApprovalAssign.FApprovalAssignId 
+                    //	                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
+                    //										left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
+                    //										left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
+                    //where t_WF_Assign.FSTATUS=0 and  t_WF_ProcInst.Fstatus = 2 and t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
+                    string strSql = string.Format(@"/*dialect*/SELECT *
+  FROM (SELECT t0.FSENDERID fsenderid_id,
+               t0.FTITLE ftitle,
+               t0.FCREATETIME fcreatetime,
+               t0_L.FPRERESULTNAME fpreresultname,
+               t0.FPREDISPOSITION fpredisposition,
+               t0.FBILLNUMBER fbillnumber,
+               t0.FPROCDEFID fprocdefid_id,
+               t0.FREADSTATUS freadstatus,
+               t0.FASSIGNID fassignid,
+               t0.FOBJECTTYPEID,
+               U.FNAME,
+               ROW_NUMBER() OVER(ORDER BY t0.FCREATETIME DESC, t0.FREADSTATUS ASC) fidentityid
+          FROM V_WF_ASSIGN t0
+          LEFT OUTER JOIN V_WF_ASSIGN_L t0_L
+            ON (t0.FASSIGNID = t0_L.FASSIGNID AND t0_L.FLocaleId = 2052)
+         INNER JOIN T_SEC_USER U
+            ON t0.FSENDERID = U.FUSERID
+         WHERE (t0.FRECEIVERID = '{0}' AND t0.FSTATUS = 0)
+         and t0.FOBJECTTYPEID in ('CRM_OPP_Clue','CRM_OPP_Opportunity','CRM_ACTIVITY','CRM_Contract')) tlist
+", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
                     foreach (DynamicObject item in items)
                     {
                         basedata = new JObject();
-                        basedata.Add("FPROCINSTID", Convert.ToString(item["FPROCINSTID"]));
-                        basedata.Add("FKEYVALUE", Convert.ToString(item["FKEYVALUE"]));
+                        basedata.Add("FKEYVALUE", Convert.ToString(item["fbillnumber"]));
                         basedata.Add("FOBJECTTYPEID", Convert.ToString(item["FOBJECTTYPEID"]));
                         basedata.Add("FNAME", Convert.ToString(item["FNAME"]));
-                        basedata.Add("FTITLE", Convert.ToString(item["FTITLE"]));
-                        basedata.Add("FDEALTIME", Convert.ToString(item["FDEALTIME"]));
-                        basedata.Add("FDISPLAYNAME", Convert.ToString(item["FDISPLAYNAME"]));
-                        basedata.Add("FDisposition", Convert.ToString(item["FDisposition"]));
+                        basedata.Add("FTITLE", Convert.ToString(item["ftitle"]));
+                        basedata.Add("FDEALTIME", Convert.ToString(item["fcreatetime"]));
+                        basedata.Add("FDisposition", Convert.ToString(item["fpredisposition"]));
                         entrys.Add(basedata);
                     }
                     jsonRoot.Add("Result", entrys);
@@ -117,22 +136,27 @@ where T_WF_MESSAGE.FTYPE=0 and FRECEIVERID='{0}' order by T_WF_MESSAGE.FCREATETI
                 }
                 if (SearchType.Equals("3"))//总数
                 {
-                    string strSql = string.Format(@"/*dialect*/SELECT t_WF_PiBiMap.FPROCINSTID,
- t_WF_PiBiMap.FKEYVALUE,t_WF_PiBiMap.FOBJECTTYPEID,
-   T_SEC_USER1.FNAME,t_WF_Receiver.FTITLE,
-      t_WF_ApprovalAssign.FDEALTIME,T_WF_PROCDEF_L.FDISPLAYNAME  
-	    FROM t_WF_PiBiMap 
-		INNER JOIN t_WF_ProcInst ON (t_WF_ProcInst.FProcInstId = t_WF_PiBiMap.FProcInstId) 
-		INNER JOIN t_WF_ActInst on (t_WF_ActInst.FProcInstId = t_WF_ProcInst.FProcInstId) 
-		INNER JOIN t_WF_Assign on (t_WF_Assign.FActInstId = t_WF_ActInst.FActInstId) 
-		INNER JOIN t_WF_Receiver on (t_WF_Receiver.FAssignId = t_WF_Assign.FAssignId) 
-		INNER JOIN t_SEC_User ON (t_SEC_User.FUserId = t_WF_Receiver.FReceiverId) 
-		INNER JOIN t_WF_ApprovalAssign on (t_WF_Assign.FAssignId = t_WF_ApprovalAssign.FAssignId)
-		  LEFT JOIN t_WF_ApprovalItem on (t_WF_ApprovalItem.FApprovalAssignId = t_WF_ApprovalAssign.FApprovalAssignId 
-		                                    AND t_WF_ApprovalItem.FReceiverId = t_WF_Receiver.FReceiverId) 
-											left join T_SEC_USER T_SEC_USER1 on T_SEC_USER1.FUSERID=t_WF_ProcInst.FORIGINATORID 
-											left join T_WF_PROCDEF_L on T_WF_PROCDEF_L.FPROCDEFID=t_WF_ProcInst.FPROCDEFID
- where t_WF_Assign.FSTATUS=0 and  t_WF_ProcInst.Fstatus = 2 and  t_WF_Receiver.FReceiverId='{0}' order by t_WF_ApprovalAssign.FDEALTIME desc", FRECEIVERID);
+                    string strSql = string.Format(@"/*dialect*/SELECT *
+  FROM (SELECT t0.FSENDERID fsenderid_id,
+               t0.FTITLE ftitle,
+               t0.FCREATETIME fcreatetime,
+               t0_L.FPRERESULTNAME fpreresultname,
+               t0.FPREDISPOSITION fpredisposition,
+               t0.FBILLNUMBER fbillnumber,
+               t0.FPROCDEFID fprocdefid_id,
+               t0.FREADSTATUS freadstatus,
+               t0.FASSIGNID fassignid,
+               t0.FOBJECTTYPEID,
+               U.FNAME,
+               ROW_NUMBER() OVER(ORDER BY t0.FCREATETIME DESC, t0.FREADSTATUS ASC) fidentityid
+          FROM V_WF_ASSIGN t0
+          LEFT OUTER JOIN V_WF_ASSIGN_L t0_L
+            ON (t0.FASSIGNID = t0_L.FASSIGNID AND t0_L.FLocaleId = 2052)
+         INNER JOIN T_SEC_USER U
+            ON t0.FSENDERID = U.FUSERID
+         WHERE (t0.FRECEIVERID = '{0}' AND t0.FSTATUS = 0)
+         and t0.FOBJECTTYPEID in ('CRM_OPP_Clue','CRM_OPP_Opportunity','CRM_ACTIVITY','CRM_Contract')) tlist
+", FRECEIVERID);
                     DynamicObjectCollection items = DBUtils.ExecuteDynamicObject(ctx, strSql);
 
                     strSql = string.Format(@"/*dialect*/select T_BAS_WARNMERGEMESSAGE.FSTATUS,t_SEC_User.FNAME, 
