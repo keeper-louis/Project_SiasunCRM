@@ -28,6 +28,7 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
         string F_PEJK_ReqDeptId = "";//需求部门
         string FContactName = "";//联系人名称
         string FPhone = ""; //移动电话
+        string BumpResult = "";//撞单结果
         public BumpWebApiService(KDServiceContext context) : base(context)
         {
 
@@ -47,12 +48,13 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
             JArray entrys = new JArray();//单个model中存储多行分录体集合，存储mBentry
             string value = HttpContext.Current.Request.Form["Data"];//获取前端传递过来的单据必要信息
             JObject jObject = (JObject)JsonConvert.DeserializeObject(value);//反序列化成JObject对象
-            F_PEJK_ClueName = jObject["F_PEJK_ClueName"]!=null&& !jObject["F_PEJK_ClueName"].Equals("")? jObject["F_PEJK_ClueName"].ToString():"";
-            FRemarks = jObject["FRemarks"] != null && !jObject["FRemarks"].Equals("") ? jObject["FRemarks"].ToString() : "";
-            FCustomerName = jObject["FCustomerName"] != null && !jObject["FCustomerName"].Equals("") ? jObject["FCustomerName"].ToString() : "";
-            F_PEJK_ReqDeptId = jObject["F_PEJK_ReqDeptId"] != null && !jObject["F_PEJK_ReqDeptId"].Equals("") ? jObject["F_PEJK_ReqDeptId"].ToString() : "";
-            FContactName = jObject["FContactName"] != null && !jObject["FContactName"].Equals("") ? jObject["FContactName"].ToString() : ""; 
-            FPhone = jObject["FPhone"] != null && !jObject["FPhone"].Equals("") ? jObject["FPhone"].ToString() : ""; 
+            //F_PEJK_ClueName = jObject["F_PEJK_ClueName"]!=null&& !jObject["F_PEJK_ClueName"].Equals("")? jObject["F_PEJK_ClueName"].ToString():"";
+            //FRemarks = jObject["FRemarks"] != null && !jObject["FRemarks"].Equals("") ? jObject["FRemarks"].ToString() : "";
+            //FCustomerName = jObject["FCustomerName"] != null && !jObject["FCustomerName"].Equals("") ? jObject["FCustomerName"].ToString() : "";
+            //F_PEJK_ReqDeptId = jObject["F_PEJK_ReqDeptId"] != null && !jObject["F_PEJK_ReqDeptId"].Equals("") ? jObject["F_PEJK_ReqDeptId"].ToString() : "";
+            //FContactName = jObject["FContactName"] != null && !jObject["FContactName"].Equals("") ? jObject["FContactName"].ToString() : ""; 
+            //FPhone = jObject["FPhone"] != null && !jObject["FPhone"].Equals("") ? jObject["FPhone"].ToString() : "";
+            BumpResult = jObject["BumpResult"].ToString();
             Action<IDynamicFormViewService> fillBillPropertys = new Action<IDynamicFormViewService>(fillPropertys);
             IBillModel BillNodel = CRMServiceHelper.installBumpBillData(Ctx, "CRM_OPP_Clue", fillBillPropertys);
             IKEEPERBumpAnalysisCommon bumpCommon = KEEPERBumpAnalysisFactory.CreateBumpAnalysis(Ctx, BillNodel, BillNodel.BusinessInfo.GetForm().Id);
@@ -81,18 +83,21 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
         //填充线索的字段内容
         private void fillPropertys(IDynamicFormViewService dynamicFormView)
         {
-            //线索主题ZT001
-            dynamicFormView.UpdateValue("F_PEJK_ClueName", 0, F_PEJK_ClueName);
-            //需求内容new clue
-            dynamicFormView.UpdateValue("FRemarks", 0, FRemarks);
-            //客户名称东方集团
-            dynamicFormView.UpdateValue("FCustomerName", 0, FCustomerName);
-            //需求部门1
-            dynamicFormView.UpdateValue("F_PEJK_ReqDeptId", 0, F_PEJK_ReqDeptId);
-            //联系人名称KEEPER
-            dynamicFormView.UpdateValue("FContactName", 0, FContactName);
-            //电话1024-666669
-            dynamicFormView.UpdateValue("FPhone", 0, FPhone);
+            ////线索主题ZT001
+            //dynamicFormView.UpdateValue("F_PEJK_ClueName", 0, F_PEJK_ClueName);
+            ////需求内容new clue
+            //dynamicFormView.UpdateValue("FRemarks", 0, FRemarks);
+            ////客户名称东方集团
+            //dynamicFormView.UpdateValue("FCustomerName", 0, FCustomerName);
+            ////需求部门1
+            //dynamicFormView.UpdateValue("F_PEJK_ReqDeptId", 0, F_PEJK_ReqDeptId);
+            ////联系人名称KEEPER
+            //dynamicFormView.UpdateValue("FContactName", 0, FContactName);
+            ////电话1024-666669
+            //dynamicFormView.UpdateValue("FPhone", 0, FPhone);
+
+            //撞单结果
+            dynamicFormView.UpdateValue("F_PEJK_BoundResultStr", 0, BumpResult);
 
             
 
