@@ -111,7 +111,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	actual_12,CASE WHEN salesQuota>0 THEN round((actual_12/salesQuota),2)*100 ELSE 0 END percent_12  ");
             s.Append(@" into " + tableName);
             s.Append(@" from ( ");
-            s.Append(@" 	select case when saledept.fnumber  is null then case when dept.FDEPTH=3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO,case when saledeptl.FNAME is null then case when  dept.FDEPTH=3 then deptl.fname else dept_3.fname end  else saledeptl.FNAME end deptName ,empl.fname empName,	'1' rowType,N'线索转商机' rowTypeText,isnull(quota_entry.F_PEJK_OPPQUNTA,0) salesQuota, ");
+            s.Append(@" 	select case when saledept.fnumber  is null then case when dept.FDEPTH=3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO,case when saledeptl.FNAME is null then case when  dept.FDEPTH=3 then deptl.fname else deptl_3.fname end  else saledeptl.FNAME end deptName ,empl.fname empName,	'1' rowType,N'线索转商机' rowTypeText,isnull(quota_entry.F_PEJK_OPPQUNTA,0) salesQuota, ");
             s.Append(@" 	ISNULL(actual_1,0) actual_1,ISNULL(actual_2,0) actual_2,ISNULL(actual_3,0) actual_3,ISNULL(actual_4,0) actual_4, ");
             s.Append(@" 	ISNULL(actual_5,0) actual_5,ISNULL(actual_6,0) actual_6,ISNULL(actual_7,0) actual_7,ISNULL(actual_8,0) actual_8, ");
             s.Append(@" 	ISNULL(actual_9,0) actual_9,ISNULL(actual_10,0) actual_10,ISNULL(actual_11,0) actual_11,ISNULL(actual_12,0) actual_12 ");
@@ -178,7 +178,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@"  ");
             s.Append(@" 	union all  ");
             s.Append(@"  ");
-            s.Append(@" 	select case when saledept.fnumber  is null then case when dept.FDEPTH=3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO,case when saledeptl.FNAME is null then case when  dept.FDEPTH=3 then deptl.fname else dept_3.fname end  else saledeptl.FNAME end deptName,empl.fname empName,	'2' rowType,N'商机转合同' rowTypeText,isnull(quota_entry.F_PEJK_CONTRACTQUNTA,0) salesQuota, ");
+            s.Append(@" 	select case when saledept.fnumber  is null then case when dept.FDEPTH=3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO,case when saledeptl.FNAME is null then case when  dept.FDEPTH=3 then deptl.fname else deptl_3.fname end  else saledeptl.FNAME end deptName,empl.fname empName,	'2' rowType,N'商机转合同' rowTypeText,isnull(quota_entry.F_PEJK_CONTRACTQUNTA,0) salesQuota, ");
             s.Append(@" 	ISNULL(actual_1,0) actual_1,ISNULL(actual_2,0) actual_2,ISNULL(actual_3,0) actual_3,ISNULL(actual_4,0) actual_4, ");
             s.Append(@" 	ISNULL(actual_5,0) actual_5,ISNULL(actual_6,0) actual_6,ISNULL(actual_7,0) actual_7,ISNULL(actual_8,0) actual_8, ");
             s.Append(@" 	ISNULL(actual_9,0) actual_9,ISNULL(actual_10,0) actual_10,ISNULL(actual_11,0) actual_11,ISNULL(actual_12,0) actual_12 ");
