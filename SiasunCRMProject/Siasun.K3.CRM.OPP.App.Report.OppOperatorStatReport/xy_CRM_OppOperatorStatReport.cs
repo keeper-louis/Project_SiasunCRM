@@ -107,6 +107,50 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             Boolean hasSaler = !String.IsNullOrEmpty(salerID);
             Boolean hasBillStatus = !String.IsNullOrEmpty(billStatus);
 
+
+            StringBuilder deptnumbersql = new StringBuilder();
+
+            if (customFilter["F_PAEZ_DEPT"] != null)
+            {
+
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_DEPT"];
+                int deptsize = 0;
+                if (cols.Count >= 1)
+                    deptnumbersql.Append("in (");
+                foreach (DynamicObject dept in cols)
+                {
+                    String deptnumber = Convert.ToString(((DynamicObject)dept["F_PAEZ_DEPT"])["Id"]);
+                    deptsize = deptsize + 1;
+                    if (deptsize == cols.Count)
+                        deptnumbersql.Append("'" + deptnumber + "')");
+                    else
+                        deptnumbersql.Append("'" + deptnumber + "',");
+
+
+                }
+            }
+
+            StringBuilder billstatussql = new StringBuilder();
+            StringBuilder salenumbersql = new StringBuilder();
+            if (customFilter["F_PAEZ_MulBaseSaler"] != null)
+            {
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_MulBaseSaler"];
+                int salesize = 0;
+                if (cols.Count >= 1)
+                    salenumbersql.Append("in (");
+                foreach (DynamicObject onesale in cols)
+                {
+                    String salenumber = Convert.ToString(((DynamicObject)onesale["F_PAEZ_MulBaseSaler"])["Id"]);
+                    salesize = salesize + 1;
+                    if (salesize == cols.Count)
+                        salenumbersql.Append("'" + salenumber + "')");
+                    else
+                        salenumbersql.Append("'" + salenumber + "',");
+
+                }
+            }
+
+
             StringBuilder sql = new StringBuilder();
             sql.Append(" select ROW_NUMBER() OVER(ORDER BY deptNO,empName) FIDENTITYID, ");
             sql.Append("	deptName,empName, ");
@@ -152,6 +196,24 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             {
                 sql.Append(" 		and opp.FBEMPID='" + salerID + "' ");
             }
+
+
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                sql.Append(" and    opp.FSALEDEPTID ").Append(deptnumbersql);
+
+
+            }
+            //销售员
+            if (salenumbersql != null && salenumbersql.Length > 0)
+            {
+                sql.Append(" and  opp.FBEMPID ").Append(salenumbersql);
+
+
+            }
+
+
             //销售数据隔离
             if (flag)
             {
@@ -174,6 +236,20 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             if (hasSaler)
             {
                 sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' ");
+            }
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                sql.Append(" and    quota.F_PEJK_SALEDEPT ").Append(deptnumbersql);
+
+
+            }
+            //销售员
+            if (salenumbersql != null && salenumbersql.Length > 0)
+            {
+                sql.Append(" and  quota_entry.F_PEJK_SALER ").Append(salenumbersql);
+
+
             }
             //销售数据隔离
             if (flag)
@@ -205,6 +281,22 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             {
                 sql.Append("    and saler.fid='" + salerID + "' ");
             }
+
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                sql.Append(" and     and saler.FDEPTID ").Append(deptnumbersql);
+
+
+            }
+            //销售员
+            if (salenumbersql != null && salenumbersql.Length > 0)
+            {
+                sql.Append(" and  saler.fid ").Append(salenumbersql);
+
+
+            }
+
             //销售数据隔离
             if (flag)
             {
