@@ -99,8 +99,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
 
             if (customFilter["F_xy_FromDate"] != null) fromDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_FromDate"]);
             if (customFilter["F_xy_ToDate"] != null) toDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_ToDate"]);
-            if (customFilter["F_xy_Dept"] != null) deptID = customFilter["F_xy_Dept_Id"].ToString();
-            if (customFilter["F_xy_Saler"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
+            //if (customFilter["F_xy_Dept"] != null) deptID = customFilter["F_xy_Dept_Id"].ToString();
+            //if (customFilter["F_xy_Saler"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
             if (customFilter["F_xy_BillStatus"] != null) billStatus = customFilter["F_xy_BillStatus"].ToString();
 
             Boolean hasDept = !String.IsNullOrEmpty(deptID);
@@ -229,21 +229,21 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             sql.Append(" 		select quota_entry.F_PEJK_SALER,quota_entry.F_PEJK_OPPQUNTA from PEJK_SALERQUNTA quota  ");
             sql.Append(" 		inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID ");
             sql.Append(" 		where quota.FDOCUMENTSTATUS='C' ");
-            if (hasDept)
-            {
-                sql.Append(" 		and quota.F_PEJK_SALEDEPT='" + deptID + "' ");
-            }
+            //if (hasDept)
+            //{
+            //    sql.Append(" 		and quota.F_PEJK_SALEDEPT='" + deptID + "' ");
+            //}
             if (hasSaler)
             {
                 sql.Append(" 		and quota_entry.F_PEJK_SALER='" + salerID + "' ");
             }
             //部门
-            if (deptnumbersql != null && deptnumbersql.Length > 0)
-            {
-                sql.Append(" and    quota.F_PEJK_SALEDEPT ").Append(deptnumbersql);
+            //if (deptnumbersql != null && deptnumbersql.Length > 0)
+            //{
+            //    sql.Append(" and    quota.F_PEJK_SALEDEPT ").Append(deptnumbersql);
 
 
-            }
+            //}
             //销售员
             if (salenumbersql != null && salenumbersql.Length > 0)
             {
@@ -275,7 +275,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             //sql.Append(" 		and saler.FBIZORGID='100041' "); //需要确认
             if (hasDept)
             {
-                sql.Append("    and saler.FDEPTID='" + deptID + "' ");
+                sql.Append("    and opp.FSALEDEPTID='" + deptID + "' ");
             }
             if (hasSaler)
             {
@@ -285,7 +285,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppOperatorStatReport
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
-                sql.Append(" and     and saler.FDEPTID ").Append(deptnumbersql);
+                sql.Append(" and  opp.FSALEDEPTID ").Append(deptnumbersql);
 
 
             }

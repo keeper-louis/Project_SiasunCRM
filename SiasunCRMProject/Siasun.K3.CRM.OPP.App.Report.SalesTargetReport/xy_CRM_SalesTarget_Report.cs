@@ -214,11 +214,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
 
             s.Append(@" 	where 1=1 ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
-                s.Append(" and dept.fnumber " + deptnumbersql + "' ");
+                s.Append(" and saledept.fnumber " + deptnumbersql + " ");
             }
             //销售员
             if (salenumbersql != null && salenumbersql.Length > 0)
@@ -293,12 +293,12 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
             s.Append(@" 	where 1=1 ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and dept.FDEPTID='" + saleDeptID + "' "); }
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and saledept.FDEPTID='" + saleDeptID + "' "); }
 
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
-                s.Append(" and dept.fnumber " + deptnumbersql + "' ");
+                s.Append(" and saledept.fnumber " + deptnumbersql + " ");
             }
             //销售员
             if (salenumbersql != null && salenumbersql.Length > 0)
