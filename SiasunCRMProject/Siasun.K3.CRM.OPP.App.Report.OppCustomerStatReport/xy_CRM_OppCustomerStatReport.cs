@@ -64,6 +64,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             if (customFilter["F_xy_FromDate"] != null) fromDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_FromDate"]);
             if (customFilter["F_xy_ToDate"] != null) toDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_ToDate"]);
 
+
+
+
+
             Boolean hasCustomerIndustry = !String.IsNullOrEmpty(customerIndustryID);
             Boolean hasCustomerRelationship = !String.IsNullOrEmpty(customerRelationshipID);
             Boolean hasEndUser = !String.IsNullOrEmpty(endUserID);
