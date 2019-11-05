@@ -111,7 +111,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	actual_12,CASE WHEN salesQuota>0 THEN round((actual_12/salesQuota),2)*100 ELSE 0 END percent_12  ");
             s.Append(@" into " + tableName);
             s.Append(@" from ( ");
-            s.Append(@" 	select dept.fnumber deptNO,deptl.FNAME deptName,empl.fname empName,	'1' rowType,N'线索转商机' rowTypeText,isnull(quota_entry.F_PEJK_OPPQUNTA,0) salesQuota, ");
+            s.Append(@" 	select saledept.fnumber deptNO,saledeptl.FNAME deptName,empl.fname empName,	'1' rowType,N'线索转商机' rowTypeText,isnull(quota_entry.F_PEJK_OPPQUNTA,0) salesQuota, ");
             s.Append(@" 	ISNULL(actual_1,0) actual_1,ISNULL(actual_2,0) actual_2,ISNULL(actual_3,0) actual_3,ISNULL(actual_4,0) actual_4, ");
             s.Append(@" 	ISNULL(actual_5,0) actual_5,ISNULL(actual_6,0) actual_6,ISNULL(actual_7,0) actual_7,ISNULL(actual_8,0) actual_8, ");
             s.Append(@" 	ISNULL(actual_9,0) actual_9,ISNULL(actual_10,0) actual_10,ISNULL(actual_11,0) actual_11,ISNULL(actual_12,0) actual_12 ");
@@ -155,9 +155,9 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t2 on saleman.fid=t2.salerID ");
 
-            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=t2.saledeptid and dept.FDOCUMENTSTATUS='C' ");
+            s.Append(@" 	left join t_bd_department saledept on saledept.FDEPTID=t2.saledeptid and saledept.FDOCUMENTSTATUS='C' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
-            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
+            s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
 
             s.Append(@" 	where 1=1 ");
@@ -170,7 +170,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@"  ");
             s.Append(@" 	union all  ");
             s.Append(@"  ");
-            s.Append(@" 	select dept.fnumber deptNO,deptl.FNAME deptName,empl.fname empName,	'2' rowType,N'商机转合同' rowTypeText,isnull(quota_entry.F_PEJK_CONTRACTQUNTA,0) salesQuota, ");
+            s.Append(@" 	select saledept.fnumber deptNO,saledeptl.FNAME deptName,empl.fname empName,	'2' rowType,N'商机转合同' rowTypeText,isnull(quota_entry.F_PEJK_CONTRACTQUNTA,0) salesQuota, ");
             s.Append(@" 	ISNULL(actual_1,0) actual_1,ISNULL(actual_2,0) actual_2,ISNULL(actual_3,0) actual_3,ISNULL(actual_4,0) actual_4, ");
             s.Append(@" 	ISNULL(actual_5,0) actual_5,ISNULL(actual_6,0) actual_6,ISNULL(actual_7,0) actual_7,ISNULL(actual_8,0) actual_8, ");
             s.Append(@" 	ISNULL(actual_9,0) actual_9,ISNULL(actual_10,0) actual_10,ISNULL(actual_11,0) actual_11,ISNULL(actual_12,0) actual_12 ");
@@ -215,9 +215,9 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 			) t3 ");
             s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t4 on saleman.fid=t4.salerID ");
-            s.Append(@" 	left join t_bd_department dept on dept.FDEPTID=t4.saledeptid and dept.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
-            s.Append(@" 	left join t_bd_department_L deptl on deptl.FDEPTID=dept.FDEPTID and deptl.FLOCALEID='2052'  ");
+            s.Append(@" 	left join t_bd_department saledept on saledept.FDEPTID=t4.saledeptid and saledept.FDOCUMENTSTATUS='C' ");
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
+            s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
             s.Append(@" 	where 1=1 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and dept.FDEPTID='" + saleDeptID + "' "); }
