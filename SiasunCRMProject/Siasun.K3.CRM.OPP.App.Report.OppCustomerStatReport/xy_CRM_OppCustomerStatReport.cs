@@ -65,7 +65,29 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             if (customFilter["F_xy_ToDate"] != null) toDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_ToDate"]);
 
 
+            StringBuilder deptnumbersql = new StringBuilder();
 
+            if (customFilter["F_PAEZ_DEPT"] != null)
+            {
+
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_DEPT"];
+                int deptsize = 0;
+                if (cols.Count >= 1)
+                    deptnumbersql.Append("in (");
+                foreach (DynamicObject dept in cols)
+                {
+                    String deptnumber = Convert.ToString(((DynamicObject)dept["F_PAEZ_DEPT"])["Id"]);
+                    deptsize = deptsize + 1;
+                    if (deptsize == cols.Count)
+                        deptnumbersql.Append("'" + deptnumber + "')");
+                    else
+                        deptnumbersql.Append("'" + deptnumber + "',");
+
+
+                }
+            }
+
+  
 
 
             Boolean hasCustomerIndustry = !String.IsNullOrEmpty(customerIndustryID);
@@ -117,6 +139,15 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
                 sql.Append(" 	and opp.FSALEDEPTID='"+ salesDeptID +"' ");
             }
 
+
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                sql.Append(" and    opp.FSALEDEPTID ").Append(deptnumbersql);
+
+
+            }
+  
             sql.Append(" 	group by cust.FNUMBER,cust_l.FNAME ");
             sql.Append(" ) tt ");
  
