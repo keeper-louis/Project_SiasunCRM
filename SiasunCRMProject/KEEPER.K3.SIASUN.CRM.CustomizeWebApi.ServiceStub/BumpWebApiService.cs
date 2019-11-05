@@ -46,15 +46,16 @@ namespace KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub
             JObject jsonRoot = new JObject();//根节点
             JObject mBEntry = new JObject();//model中单据体，存储普通变量，baseData
             JArray entrys = new JArray();//单个model中存储多行分录体集合，存储mBentry
-            string value = HttpContext.Current.Request.Form["Data"];//获取前端传递过来的单据必要信息
-            JObject jObject = (JObject)JsonConvert.DeserializeObject(value);//反序列化成JObject对象
+            //string value = HttpContext.Current.Request.Form["Data"];//获取前端传递过来的单据必要信息
+            //JObject jObject = (JObject)JsonConvert.DeserializeObject(value);//反序列化成JObject对象
             //F_PEJK_ClueName = jObject["F_PEJK_ClueName"]!=null&& !jObject["F_PEJK_ClueName"].Equals("")? jObject["F_PEJK_ClueName"].ToString():"";
             //FRemarks = jObject["FRemarks"] != null && !jObject["FRemarks"].Equals("") ? jObject["FRemarks"].ToString() : "";
             //FCustomerName = jObject["FCustomerName"] != null && !jObject["FCustomerName"].Equals("") ? jObject["FCustomerName"].ToString() : "";
             //F_PEJK_ReqDeptId = jObject["F_PEJK_ReqDeptId"] != null && !jObject["F_PEJK_ReqDeptId"].Equals("") ? jObject["F_PEJK_ReqDeptId"].ToString() : "";
             //FContactName = jObject["FContactName"] != null && !jObject["FContactName"].Equals("") ? jObject["FContactName"].ToString() : ""; 
             //FPhone = jObject["FPhone"] != null && !jObject["FPhone"].Equals("") ? jObject["FPhone"].ToString() : "";
-            BumpResult = jObject["BumpResult"].ToString();
+            //BumpResult = jObject["BumpResult"].ToString();
+            BumpResult = "立体仓库沈阳新松小高";
             Action<IDynamicFormViewService> fillBillPropertys = new Action<IDynamicFormViewService>(fillPropertys);
             IBillModel BillNodel = CRMServiceHelper.installBumpBillData(Ctx, "CRM_OPP_Clue", fillBillPropertys);
             IKEEPERBumpAnalysisCommon bumpCommon = KEEPERBumpAnalysisFactory.CreateBumpAnalysis(Ctx, BillNodel, BillNodel.BusinessInfo.GetForm().Id);

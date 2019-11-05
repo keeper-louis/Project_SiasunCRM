@@ -32,7 +32,7 @@ namespace UnitTestProject
             if (bLogin)
             {
                 //var aa = client.Execute<string>("KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub.GetApprovalStatus.getStatus,KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub", null);
-                var bb = client.Execute<string>("KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub.GetApprovalItems.getItems,KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub", null);
+                var bb = client.Execute<string>("KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub.BumpWebApiService.bumpAnalyse,KEEPER.K3.SIASUN.CRM.CustomizeWebApi.ServiceStub", null);
                 int i = 1;
             }
 
