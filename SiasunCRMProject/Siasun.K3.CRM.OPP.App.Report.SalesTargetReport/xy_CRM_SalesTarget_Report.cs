@@ -89,11 +89,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
             DynamicObject customFilter = filter.FilterParameter.CustomFilter;
             String year = string.Empty;
-            String saleDeptID = string.Empty;
-            String salerID = string.Empty;
+            //String saleDeptID = string.Empty;
+            //String salerID = string.Empty;
             if (customFilter["F_xy_Year"] != null) year = string.Format("{0:yyyy}", customFilter["F_xy_Year"]);
-            if (customFilter["F_xy_Dept"] !=null && customFilter["F_xy_Dept_Id"] != null) saleDeptID = customFilter["F_xy_Dept_Id"].ToString();
-            if (customFilter["F_xy_Saler"] != null && customFilter["F_xy_Saler_Id"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
+            //if (customFilter["F_xy_Dept"] !=null && customFilter["F_xy_Dept_Id"] != null) saleDeptID = customFilter["F_xy_Dept_Id"].ToString();
+            //if (customFilter["F_xy_Saler"] != null && customFilter["F_xy_Saler_Id"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
 
 
 
@@ -175,7 +175,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
         left join  t_bd_department_L deptl_3 on deptl_3.FDEPTID = dept_3.FDEPTID ");
             s.Append(@" 	left join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
 
             s.Append(@"    inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
             s.Append(@" 	left join (	 ");
@@ -197,8 +197,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 			from T_CRM_OPPORTUNITY opp ");
             s.Append(@" 			inner join  T_CRM_CLUE clue on opp.FSOURCEBILLNO=clue.FBILLNO and clue.FSALERID=opp.FBEMPID  ");
             s.Append(@" 			where YEAR(opp.FSTARTDATE)='" + year + "' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and opp.FSALEDEPTID='" + saleDeptID + "' "); }
-            if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and opp.FBEMPID='" + salerID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and opp.FSALEDEPTID='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and opp.FBEMPID='" + salerID + "' "); }
             if (flag)
             {
                 s.AppendLine(" and opp.FBEMPID ").Append(salerLimit);
@@ -209,12 +209,12 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	) t2 on saleman.fid=t2.salerID ");
 
             s.Append(@" 	left join t_bd_department saledept on saledept.FDEPTID=t2.saledeptid and saledept.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
 
-            s.Append(@" 	where 1=1 and t2.actual_12 != 0  ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
+            s.Append(@" 	where 1=1 and t2.actual_12 > 0  ");
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
@@ -227,7 +227,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
 
             }
-            if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
+            //if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
             if (flag)
             {
                 s.AppendLine(" and saleman.fid ").Append(salerLimit);
@@ -255,7 +255,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
         left join  t_bd_department_L deptl_3 on deptl_3.FDEPTID = dept_3.FDEPTID ");
             s.Append(@" 	join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"     and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"     and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
             s.Append(@" 	inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
             s.Append(@" 	left join (	 ");
             s.Append(@" 		select saledeptid,salerID, ");
@@ -278,8 +278,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
            // s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO --and opp.FBEMPID=con.FSALERID  ");
             s.Append(@" 			inner join T_CRM_OPPORTUNITY opp on con_r.F_PEJK_SOURCEBILLNO=opp.FBILLNO   ");
             s.Append(@" 			where YEAR(con.FDATE)='" + year + "' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and con.FSALEDEPTID='" + saleDeptID + "' "); }
-            if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and con.FSALERID='" + salerID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" 			and con.FSALEDEPTID='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(salerID)) { s.Append(@" 			and con.FSALERID='" + salerID + "' "); }
             if (flag)
             {
                 s.AppendLine(" and con.FSALERID ").Append(salerLimit);
@@ -289,11 +289,11 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 		group by saledeptid,salerID ");
             s.Append(@" 	) t4 on saleman.fid=t4.salerID ");
             s.Append(@" 	left join t_bd_department saledept on saledept.FDEPTID=t4.saledeptid and saledept.FDOCUMENTSTATUS='C' ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
-            s.Append(@" 	where 1=1 and t4.actual_12 != 0 ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and saledept.FDEPTID='" + saleDeptID + "' "); }
+            s.Append(@" 	where 1=1 and t4.actual_12 > 0 ");
+            //if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and saledept.FDEPTID='" + saleDeptID + "' "); }
 
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
@@ -307,7 +307,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
 
             }
-            if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
+            //if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
             if (flag)
             {
                 s.AppendLine(" and saleman.fid ").Append(salerLimit);
