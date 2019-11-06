@@ -218,7 +218,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
-                s.Append(" and ((saledept.fnumber " + deptnumbersql + ") OR (case when saledept.fnumber is null then case when dept.FDEPTH = 3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO " + deptnumbersql + ")) ");
+                s.Append(" and ((saledept.fnumber " + deptnumbersql + ") OR (case when saledept.fnumber is null then case when dept.FDEPTH = 3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end " + deptnumbersql + ")) ");
             }
             //销售员
             if (salenumbersql != null && salenumbersql.Length > 0)
@@ -298,7 +298,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
             {
-                s.Append(" and ((saledept.fnumber " + deptnumbersql + ") OR (case when saledept.fnumber is null then case when dept.FDEPTH = 3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO " + deptnumbersql + ")) ");
+                s.Append(" and ((saledept.fnumber " + deptnumbersql + ") OR (case when saledept.fnumber is null then case when dept.FDEPTH = 3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end " + deptnumbersql + ")) ");
             }
             //销售员
             if (salenumbersql != null && salenumbersql.Length > 0)
