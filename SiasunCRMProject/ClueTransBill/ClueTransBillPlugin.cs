@@ -173,7 +173,7 @@ namespace ClueTransBill
             //根据商机中的执行部门，查找每个部门下销售员的 线索数量/商机数量/转化率
             StringBuilder sql2 = new StringBuilder();
             sql2.AppendFormat(@"/*dialect*/ select deptl.FDEPTID deptid, salesman.fid salerid, cluenumber, oppnumber, convert(float,round((oppnumber * 1.00 / (cluenumber * 1.00)) * 100, 2)) as conversionrate into {0} ", tmpTable2);
-            sql2.AppendLine(" from(select FCREATORID, count(cluetmp.FCREATORID) cluenumber, sum(cluetmp.status) oppnumber from ");
+            sql2.AppendLine(" from(select FCREATORID, count(cluetmp.FCREATORID) cluenumber, sum(cluetmp.status) oppnumber, cluetmp.FSALEDEPTID from ");
             sql2.AppendLine(" (select clue.FCREATORID, clue.FSALEDEPTID, ");
             sql2.AppendLine(" case when clue.FBILLNO in (select opp.FSOURCEBILLNO from T_CRM_Opportunity opp left join V_BD_SALESMAN salesman on salesman.fid = opp.FBEMPID left join T_BD_STAFF staff on staff.FSTAFFID = salesman.FSTAFFID inner join T_HR_EMPINFO emp on staff.FEMPINFOID = emp.FID LEFT JOIN T_SEC_USER U ON U.FLINKOBJECT = EMP.FPERSONID where U.FUSERID = clue.FCREATORID) then 1 else 0 end as status ");
             sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 and clue.FCREATORID != 0 ");
