@@ -95,6 +95,50 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             if (customFilter["F_xy_Dept"] !=null && customFilter["F_xy_Dept_Id"] != null) saleDeptID = customFilter["F_xy_Dept_Id"].ToString();
             if (customFilter["F_xy_Saler"] != null && customFilter["F_xy_Saler_Id"] != null) salerID = customFilter["F_xy_Saler_Id"].ToString();
 
+
+
+            StringBuilder deptnumbersql = new StringBuilder();
+
+            if (customFilter["F_PAEZ_DEPT"] != null)
+            {
+
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_DEPT"];
+                int deptsize = 0;
+                if (cols.Count >= 1)
+                    deptnumbersql.Append("in (");
+                foreach (DynamicObject dept in cols)
+                {
+                    String deptnumber = Convert.ToString(((DynamicObject)dept["F_PAEZ_DEPT"])["Number"]);
+                    deptsize = deptsize + 1;
+                    if (deptsize == cols.Count)
+                        deptnumbersql.Append("'" + deptnumber + "')");
+                    else
+                        deptnumbersql.Append("'" + deptnumber + "',");
+
+
+                }
+            }
+
+            StringBuilder billstatussql = new StringBuilder();
+            StringBuilder salenumbersql = new StringBuilder();
+            if (customFilter["F_PAEZ_MulBaseSaler"] != null)
+            {
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_MulBaseSaler"];
+                int salesize = 0;
+                if (cols.Count >= 1)
+                    salenumbersql.Append("in (");
+                foreach (DynamicObject onesale in cols)
+                {
+                    String salenumber = Convert.ToString(((DynamicObject)onesale["F_PAEZ_MulBaseSaler"])["Number"]);
+                    salesize = salesize + 1;
+                    if (salesize == cols.Count)
+                        salenumbersql.Append("'" + salenumber + "')");
+                    else
+                        salenumbersql.Append("'" + salenumber + "',");
+
+                }
+            }
+
             StringBuilder s = new StringBuilder();
             s.Append(@" select ROW_NUMBER() OVER(ORDER BY deptNO,empName,rowType) FIDENTITYID,deptName,empName,rowType,rowTypeText,salesQuota, ");
             s.Append(@" 	actual_1,CASE WHEN salesQuota>0 THEN round((actual_1/salesQuota),2)*100 ELSE 0 END percent_1, ");
@@ -132,7 +176,8 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
         left join  t_bd_department_L deptl_3 on deptl_3.FDEPTID = dept_3.FDEPTID ");
             s.Append(@" 	left join PEJK_SALERQUNTA quota on Year(quota.F_PEJK_YEAR)='" + year + "' and quota.FDOCUMENTSTATUS='C' ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@" and quota.F_PEJK_SALEDEPT='" + saleDeptID + "' "); }
-            s.Append(@" 	inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
+
+            s.Append(@"    inner join PEJK_SALERQUNTAENTRY quota_entry on quota.FID=quota_entry.FID and saleman.fid=quota_entry.F_PEJK_SALER ");
             s.Append(@" 	left join (	 ");
             s.Append(@" 		select saledeptid, salerID, ");
             s.Append(@" 		SUM(CASE WHEN curmonth =1 THEN opp_count ELSE 0 END) actual_1,    ");
@@ -169,7 +214,19 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
 
 
             s.Append(@" 	where 1=1 ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and dept.FDEPTID='" + saleDeptID + "' "); }
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                s.Append(" and saledept.fnumber " + deptnumbersql + " ");
+            }
+            //销售员
+            if (salenumbersql != null && salenumbersql.Length > 0)
+            {
+                s.Append(" and  staff.fnumber ").Append(salenumbersql);
+
+
+            }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
             if (flag)
             {
@@ -236,7 +293,20 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
             s.Append(@" 	where 1=1 ");
-            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and dept.FDEPTID='" + saleDeptID + "' "); }
+            if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and saledept.FDEPTID='" + saleDeptID + "' "); }
+
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                s.Append(" and saledept.fnumber " + deptnumbersql + " ");
+            }
+            //销售员
+            if (salenumbersql != null && salenumbersql.Length > 0)
+            {
+                s.Append(" and  staff.fnumber ").Append(salenumbersql);
+
+
+            }
             if (!string.IsNullOrEmpty(salerID)) { s.Append(@"           and saleman.fid='" + salerID + "'"); }
             if (flag)
             {

@@ -60,12 +60,34 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             if (customFilter["F_xy_CustomerIndustry"] != null) customerIndustryID = customFilter["F_xy_CustomerIndustry_Id"].ToString();
             if (customFilter["F_xy_CustomerRelationship"] != null) customerRelationshipID = customFilter["F_xy_CustomerRelationship_Id"].ToString();
             if (customFilter["F_xy_EndUser"] != null) endUserID = customFilter["F_xy_EndUser_Id"].ToString();
-            if (customFilter["F_xy_SalesDept"] != null) salesDeptID = customFilter["F_xy_SalesDept_Id"].ToString();
+            //if (customFilter["F_xy_SalesDept"] != null) salesDeptID = customFilter["F_xy_SalesDept_Id"].ToString();
             if (customFilter["F_xy_FromDate"] != null) fromDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_FromDate"]);
             if (customFilter["F_xy_ToDate"] != null) toDate = string.Format("{0:yyyy-MM-dd}", customFilter["F_xy_ToDate"]);
 
 
+            StringBuilder deptnumbersql = new StringBuilder();
 
+            if (customFilter["F_PAEZ_DEPT"] != null)
+            {
+
+                DynamicObjectCollection cols = (DynamicObjectCollection)customFilter["F_PAEZ_DEPT"];
+                int deptsize = 0;
+                if (cols.Count >= 1)
+                    deptnumbersql.Append("in (");
+                foreach (DynamicObject dept in cols)
+                {
+                    String deptnumber = Convert.ToString(((DynamicObject)dept["F_PAEZ_DEPT"])["Id"]);
+                    deptsize = deptsize + 1;
+                    if (deptsize == cols.Count)
+                        deptnumbersql.Append("'" + deptnumber + "')");
+                    else
+                        deptnumbersql.Append("'" + deptnumber + "',");
+
+
+                }
+            }
+
+  
 
 
             Boolean hasCustomerIndustry = !String.IsNullOrEmpty(customerIndustryID);
@@ -112,11 +134,20 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
             {
                 sql.Append(" 	and opp.F_PEJK_CUSTSHIP='"+ customerRelationshipID +"' ");
             }
-            if (hasSaleDept)
-            {
-                sql.Append(" 	and opp.FSALEDEPTID='"+ salesDeptID +"' ");
-            }
+            //if (hasSaleDept)
+            //{
+            //    sql.Append(" 	and opp.FSALEDEPTID='"+ salesDeptID +"' ");
+            //}
 
+
+            //部门
+            if (deptnumbersql != null && deptnumbersql.Length > 0)
+            {
+                sql.Append(" and    opp.FSALEDEPTID ").Append(deptnumbersql);
+
+
+            }
+  
             sql.Append(" 	group by cust.FNUMBER,cust_l.FNAME ");
             sql.Append(" ) tt ");
  
@@ -151,10 +182,10 @@ namespace Siasun.K3.CRM.OPP.App.Report.OppCustomerStatReport
                 {
                     result = new ReportTitles();
                 }
-                if (customFilter["F_xy_SalesDept"] != null)
-                {
-                    result.AddTitle("F_xy_titleSalesDept", ((DynamicObject)customFilter["F_xy_SalesDept"])["Name"].ToString());
-                }
+                //if (customFilter["F_xy_SalesDept"] != null)
+                //{
+                //    result.AddTitle("F_xy_titleSalesDept", ((DynamicObject)customFilter["F_xy_SalesDept"])["Name"].ToString());
+                //}
                 if (customFilter["F_xy_FromDate"] !=null && customFilter["F_xy_ToDate"]!=null)
                 {
                     result.AddTitle("F_xy_titleDate", string.Format(@"{0:yyyy/MM/dd}", customFilter["F_xy_FromDate"]) + " - " + string.Format(@"{0:yyyy/MM/dd}", customFilter["F_xy_ToDate"]));
