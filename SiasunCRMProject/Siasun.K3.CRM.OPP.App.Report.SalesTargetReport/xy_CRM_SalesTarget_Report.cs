@@ -213,7 +213,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
 
-            s.Append(@" 	where 1=1 ");
+            s.Append(@" 	where 1=1 and t2.actual_12 != 0  ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
             //部门
             if (deptnumbersql != null && deptnumbersql.Length > 0)
@@ -292,7 +292,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(" and saledept.FDEPTID='" + saleDeptID + "' "); }
             s.Append(@" 	left join t_bd_department_L saledeptl on saledeptl.FDEPTID=saledept.FDEPTID and saledeptl.FLOCALEID='2052'  ");
 
-            s.Append(@" 	where 1=1 ");
+            s.Append(@" 	where 1=1 and t4.actual_12 != 0 ");
             if (!string.IsNullOrEmpty(saleDeptID)) { s.Append(@"           and saledept.FDEPTID='" + saleDeptID + "' "); }
 
             //部门
