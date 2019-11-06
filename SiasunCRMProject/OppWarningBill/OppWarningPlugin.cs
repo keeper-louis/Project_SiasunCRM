@@ -196,7 +196,7 @@ namespace OppWarningBill
             sql.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN on SALESMAN.FID = OPP.FBEMPID	");
 
             // ----------- 20191028 增加商机负责人所在部门
-            sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
+            sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = OPP.FSALEDEPTID ");
             sql.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
             // -----------
 
