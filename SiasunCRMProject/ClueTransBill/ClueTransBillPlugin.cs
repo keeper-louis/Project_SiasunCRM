@@ -237,9 +237,9 @@ namespace ClueTransBill
 
             DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
 
-            //查询出所有部门小计
+                        //查询出所有部门小计
             StringBuilder sql3 = new StringBuilder();
-            sql3.AppendFormat(@"/*dialect*/ select deptid, sum(cluenumber) as totalclue, sum(oppnumber) as totalopp into {0} from {1} group by deptid ", tmpTable4, tmpTable2);
+            sql3.AppendFormat(@"/*dialect*/ select deptid, sum(cluenumber) as totalclue, sum(oppnumber) as totalopp into {0} from {1} group by deptid ", tmpTable3, tmpTable4);
             DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
 
             if (!flag)
