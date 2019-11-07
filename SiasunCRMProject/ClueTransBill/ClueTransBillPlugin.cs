@@ -176,7 +176,7 @@ namespace ClueTransBill
             sql2.AppendLine(" from(select FCREATORID, count(cluetmp.FCREATORID) cluenumber, sum(cluetmp.status) oppnumber, cluetmp.FSALEDEPTID from ");
             sql2.AppendLine(" (select clue.FCREATORID, clue.FSALEDEPTID, ");
             sql2.AppendLine(" case when clue.FBILLNO in (select opp.FSOURCEBILLNO from T_CRM_Opportunity opp left join V_BD_SALESMAN salesman on salesman.fid = opp.FBEMPID left join T_BD_STAFF staff on staff.FSTAFFID = salesman.FSTAFFID inner join T_HR_EMPINFO emp on staff.FEMPINFOID = emp.FID LEFT JOIN T_SEC_USER U ON U.FLINKOBJECT = EMP.FPERSONID where U.FUSERID = clue.FCREATORID) then 1 else 0 end as status ");
-            sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 and clue.FCREATORID != 0 ");
+            sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 and clue.FCREATORID != 0 and  clue.FSALEDEPTID != 0 ");
 
             //判断起始日期是否有效
             if (dyFilter["f_qsnc_startdatefilter"] != null)
@@ -204,7 +204,7 @@ namespace ClueTransBill
             // 线索转化中线索相关联关系   商机负责人 == 线索创建人
             // 线索转化分析表中部门
             //sql2.AppendLine(" on deptl.FDEPTID = tmp.FSALEDEPTID "); // FSALEDEPTID
-            sql2.AppendFormat(" where tmp.FSALEDEPTID in (select exedeptid from {0}) ", tmpTable1);
+            sql2.AppendFormat(" where tmp.FSALEDEPTID in (select exedeptid from {0}) AND salesman.fid != 0 ", tmpTable1);
             //sql2.AppendLine(" where deptl.FLOCALEID = 2052 ");
             if (flag0)
             {
@@ -213,6 +213,11 @@ namespace ClueTransBill
 
             DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
 
+
+            //查询出所有部门小计
+            StringBuilder sql3 = new StringBuilder();
+            sql3.AppendFormat(@"/*dialect*/ select deptid, sum(cluenumber) as totalclue, sum(oppnumber) as totalopp into {0} from {1} group by deptid ", tmpTable3, tmpTable2);
+            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
 
 
             //将销售员名称进行连表查询
@@ -236,11 +241,6 @@ namespace ClueTransBill
             }
 
             DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
-
-                        //查询出所有部门小计
-            StringBuilder sql3 = new StringBuilder();
-            sql3.AppendFormat(@"/*dialect*/ select deptid, sum(cluenumber) as totalclue, sum(oppnumber) as totalopp into {0} from {1} group by deptid ", tmpTable3, tmpTable4);
-            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
 
             if (!flag)
             {
