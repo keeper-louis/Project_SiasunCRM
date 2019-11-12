@@ -333,7 +333,7 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             header.AddChild("empName", new LocaleValue("销售员"));
             header.AddChild("rowTypeText", new LocaleValue("类型"));
             header.AddChild("salesQuota", new LocaleValue("目标"), SqlStorageType.SqlInt);
-            header.AddChild("rowTypeText", new LocaleValue("合计"));
+            header.AddChild("total", new LocaleValue("合计"),SqlStorageType.SqlInt);
             ListHeader month_1 = header.AddChild();
             month_1.Caption = new LocaleValue("1月");
             month_1.AddChild("actual_1", new LocaleValue("实际"), SqlStorageType.SqlInt);
