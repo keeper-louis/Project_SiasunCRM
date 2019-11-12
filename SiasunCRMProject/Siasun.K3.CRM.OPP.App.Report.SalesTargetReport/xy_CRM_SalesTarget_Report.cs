@@ -142,18 +142,18 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             StringBuilder s = new StringBuilder(); // 
             s.AppendLine(@" select ROW_NUMBER() OVER(ORDER BY deptNO,empName,rowType) FIDENTITYID,deptName,empName,rowType,rowTypeText,salesQuota,  ");
             s.AppendLine(@" actual_1+ actual_2+actual_3+actual_4+actual_5+actual_6+actual_7+actual_8+actual_9+actual_10+actual_11+actual_12 total ,");// add 添加合计列
-            s.AppendLine(@" 	actual_1,CASE WHEN (salesQuota>0 and actual_1 <> 0) THEN round((actual_1/salesQuota),2)*100 ELSE 0 END percent_1, ");
-            s.AppendLine(@" 	actual_2,CASE WHEN (salesQuota>0 and actual_2 <> 0) THEN round(((actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_2, ");
-            s.AppendLine(@" 	actual_3,CASE WHEN (salesQuota>0 and actual_3 <> 0) THEN round(((actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_3, ");
-            s.AppendLine(@" 	actual_4,CASE WHEN (salesQuota>0 and actual_4 <> 0) THEN round(((actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_4, ");
-            s.AppendLine(@" 	actual_5,CASE WHEN (salesQuota>0 and actual_5 <> 0) THEN round(((actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_5, ");
-            s.AppendLine(@" 	actual_6,CASE WHEN (salesQuota>0 and actual_6 <> 0) THEN round(((actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_6, ");
-            s.AppendLine(@" 	actual_7,CASE WHEN (salesQuota>0 and actual_7 <> 0) THEN round(((actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_7, ");
-            s.AppendLine(@" 	actual_8,CASE WHEN (salesQuota>0 and actual_8 <> 0) THEN round(((actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_8, ");
-            s.AppendLine(@" 	actual_9,CASE WHEN (salesQuota>0 and actual_9 <> 0) THEN round(((actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_9, ");
-            s.AppendLine(@" 	actual_10,CASE WHEN (salesQuota>0 and actual_10 <> 0) THEN round(((actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_10, ");
-            s.AppendLine(@" 	actual_11,CASE WHEN (salesQuota>0 and actual_11 <> 0) THEN round(((actual_11 + actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_11, ");
-            s.AppendLine(@" 	actual_12,CASE WHEN (salesQuota>0 and actual_12 <> 0) THEN round(((actual_12 + actual_11 + actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100 ELSE 0 END percent_12  ");
+            s.AppendLine(@" 	actual_1,CASE WHEN (salesQuota>0 and actual_1 <> 0) THEN convert(varchar(6),round((actual_1/salesQuota),2)*100)+'%' ELSE 0 END percent_1, ");
+            s.AppendLine(@" 	actual_2,CASE WHEN (salesQuota>0 and actual_2 <> 0) THEN convert(varchar(6),round(((actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_2, ");
+            s.AppendLine(@" 	actual_3,CASE WHEN (salesQuota>0 and actual_3 <> 0) THEN convert(varchar(6),round(((actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_3, ");
+            s.AppendLine(@" 	actual_4,CASE WHEN (salesQuota>0 and actual_4 <> 0) THEN convert(varchar(6),round(((actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_4, ");
+            s.AppendLine(@" 	actual_5,CASE WHEN (salesQuota>0 and actual_5 <> 0) THEN convert(varchar(6),round(((actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_5, ");
+            s.AppendLine(@" 	actual_6,CASE WHEN (salesQuota>0 and actual_6 <> 0) THEN convert(varchar(6),round(((actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_6, ");
+            s.AppendLine(@" 	actual_7,CASE WHEN (salesQuota>0 and actual_7 <> 0) THEN convert(varchar(6),round(((actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_7, ");
+            s.AppendLine(@" 	actual_8,CASE WHEN (salesQuota>0 and actual_8 <> 0) THEN convert(varchar(6),round(((actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'% ELSE '0%' END percent_8, ");
+            s.AppendLine(@" 	actual_9,CASE WHEN (salesQuota>0 and actual_9 <> 0) THEN convert(varchar(6),round(((actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_9, ");
+            s.AppendLine(@" 	actual_10,CASE WHEN (salesQuota>0 and actual_10 <> 0) THEN convert(varchar(6),round(((actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_10, ");
+            s.AppendLine(@" 	actual_11,CASE WHEN (salesQuota>0 and actual_11 <> 0) THEN convert(varchar(6),round(((actual_11 + actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_11, ");
+            s.AppendLine(@" 	actual_12,CASE WHEN (salesQuota>0 and actual_12 <> 0) THEN convert(varchar(6),round(((actual_12 + actual_11 + actual_10 + actual_9 + actual_8 + actual_7 + actual_6 + actual_5 + actual_4 + actual_3 + actual_2 + actual_1)/salesQuota),2)*100)+'%' ELSE '0%' END percent_12  ");
             s.AppendLine(@" into " + tableName);
             s.AppendLine(@" from ( ");
             s.AppendLine(@" 	select case when saledept.fnumber  is null then case when dept.FDEPTH=3 then dept.fnumber else dept_3.fnumber end else saledept.fnumber end deptNO,case when saledeptl.FNAME is null then case when  dept.FDEPTH=3 then deptl.fname else deptl_3.fname end  else saledeptl.FNAME end deptName ,empl.fname empName,	'1' rowType,N'线索转商机' rowTypeText,isnull(quota_entry.F_PEJK_OPPQUNTA,0) salesQuota, ");
@@ -337,62 +337,62 @@ namespace Siasun.K3.CRM.OPP.App.Report.SalesTargetReport
             ListHeader month_1 = header.AddChild();
             month_1.Caption = new LocaleValue("1月");
             month_1.AddChild("actual_1", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_1.AddChild("percent_1", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_1.AddChild("percent_1", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_2 = header.AddChild();
             month_2.Caption = new LocaleValue("2月");
             month_2.AddChild("actual_2", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_2.AddChild("percent_2", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_2.AddChild("percent_2", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_3 = header.AddChild();
             month_3.Caption = new LocaleValue("3月");
             month_3.AddChild("actual_3", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_3.AddChild("percent_3", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_3.AddChild("percent_3", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_4 = header.AddChild();
             month_4.Caption = new LocaleValue("4月");
             month_4.AddChild("actual_4", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_4.AddChild("percent_4", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_4.AddChild("percent_4", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_5 = header.AddChild();
             month_5.Caption = new LocaleValue("5月");
             month_5.AddChild("actual_5", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_5.AddChild("percent_5", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_5.AddChild("percent_5", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_6 = header.AddChild();
             month_6.Caption = new LocaleValue("6月");
             month_6.AddChild("actual_6", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_6.AddChild("percent_6", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_6.AddChild("percent_6", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_7 = header.AddChild();
             month_7.Caption = new LocaleValue("7月");
             month_7.AddChild("actual_7", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_7.AddChild("percent_7", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_7.AddChild("percent_7", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_8 = header.AddChild();
             month_8.Caption = new LocaleValue("8月");
             month_8.AddChild("actual_8", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_8.AddChild("percent_8", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_8.AddChild("percent_8", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_9 = header.AddChild();
             month_9.Caption = new LocaleValue("9月");
             month_9.AddChild("actual_9", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_9.AddChild("percent_9", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_9.AddChild("percent_9", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_10 = header.AddChild();
             month_10.Caption = new LocaleValue("10月");
             month_10.AddChild("actual_10", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_10.AddChild("percent_10", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_10.AddChild("percent_10", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_11 = header.AddChild();
             month_11.Caption = new LocaleValue("11月");
             month_11.AddChild("actual_11", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_11.AddChild("percent_11", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_11.AddChild("percent_11", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             ListHeader month_12 = header.AddChild();
             month_12.Caption = new LocaleValue("12月");
             month_12.AddChild("actual_12", new LocaleValue("实际"), SqlStorageType.SqlInt);
-            month_12.AddChild("percent_12", new LocaleValue("完成百分比"), SqlStorageType.SqlInt);
+            month_12.AddChild("percent_12", new LocaleValue("完成百分比"), SqlStorageType.Sqlchar);
 
             return header;
         }
