@@ -207,21 +207,21 @@ namespace ClueTransBill
             // --------------------------------------------------------------------------------------------------------------------
             // 计算每一名销售员的转化率
             StringBuilder tmpSQL3 = new StringBuilder();
-            tmpSQL3.AppendFormat(@"/*dialect*/ SELECT DEPTL.FNAME DEPTNAME, 
+            tmpSQL3.AppendFormat(@"/*dialect*/ SELECT DISTINCT DEPTL.FNAME DEPTNAME, 
                                                       EMPL.FNAME SALERNAME, 
                                                       CLUENUMBER, 
-                                                      OPPNUMBERM, 
-                                                      CONVERT(FLOAT,ROUND((OPPNUMBERM * 1.00 / (CLUENUMBER * 1.00)) * 100, 2)) RATE 
+                                                      OPPNUMBER, 
+                                                      CONVERT(FLOAT,ROUND((OPPNUMBER * 1.00 / (CLUENUMBER * 1.00)) * 100, 2)) RATE 
                                                INTO {0} 
                                                FROM {1} TMP
                                                INNER JOIN T_SEC_USER U ON U.FUSERID = TMP.FCREATORID
                                                INNER JOIN T_HR_EMPINFO EMP ON U.FLINKOBJECT = EMP.FPERSONID
                                                INNER JOIN T_BD_STAFF STAFF on STAFF.FEMPINFOID = EMP.FID
-                                               INNER JOIN V_BD_SALESMAN SALESMAN ON STAFF.FSTAFFID = V_BD_SALESMAN.FSTAFFID
+                                               INNER JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FSTAFFID = STAFF.FSTAFFID
                                                INNER JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = EMP.FID
                                                INNER JOIN t_bd_department_L DEPTL ON DEPTL.FDEPTID = FSALEDEPTID
                                                INNER JOIN t_bd_department DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID 
-                                               WHERE 1=1
+                                               WHERE TMP.FCREATORID <> 0 
                                                ", tmpTable3, tmpTable2);
             // 进行销售员数据隔离
             if (flag0)
@@ -248,21 +248,21 @@ namespace ClueTransBill
             // ---------------------------------------------------------------------------------------------------------------------
             // 获取到部门小计
             StringBuilder tmpSQL4 = new StringBuilder();
-            tmpSQL4.AppendFormat(@"/*dialect*/ SELECT DEPTNAME, SUM(CLUENUMBER) TOTALCLUE, SUM(OPPNUMBERM) TOTALOPP INTO {0} FROM {1} GROUP BY DEPTNAME ", tmpTable4, tmpTable3);
+            tmpSQL4.AppendFormat(@"/*dialect*/ SELECT DEPTNAME, SUM(CLUENUMBER) TOTALCLUE, SUM(OPPNUMBER) TOTALOPP INTO {0} FROM {1} GROUP BY DEPTNAME ", tmpTable4, tmpTable3);
             DBUtils.ExecuteDynamicObject(this.Context, tmpSQL4.ToString());
 
 
             // 将部门小计斤系插入明细表
             // ----------------------------------------------------------------------------------------------------------------------
             StringBuilder tmpSQL5 = new StringBuilder();
-            tmpSQL5.AppendFormat(@"/*dialect*/ INSERT INTO {0} SELECT DEPTNAME || '小计', '', TOTALCLUE, TOTALOPP, CONVERT(FLOAT,ROUND((TOTALOPP * 1.00 / (TOTALCLUE * 1.00)) * 100, 2)) TOTALRATE FROM {1} ", tmpTable3, tmpTable4);
+            tmpSQL5.AppendFormat(@"/*dialect*/ INSERT INTO {0} SELECT DEPTNAME + ' - 小计', '', TOTALCLUE, TOTALOPP, CONVERT(FLOAT,ROUND((TOTALOPP * 1.00 / (TOTALCLUE * 1.00)) * 100, 2)) TOTALRATE FROM {1} ", tmpTable3, tmpTable4);
             DBUtils.ExecuteDynamicObject(this.Context, tmpSQL5.ToString());
 
             // ------------------------------------------------------------------------------------------------------------------------
             // 将总体结果进行插入系统提供的tablename中
             StringBuilder tmpSQl6 = new StringBuilder();
-            tmpSQl6.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME, SALERNAME) AS FSeq, DEPTNAME, SALERNAME, CLUENUMBER, OPPNUMBERM, RATE INTO {0} FROM {1} ORDER BY DEPTNAME, SALERNAME ", tableName, tmpTable3);
-
+            tmpSQl6.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME, SALERNAME) AS FSeq, DEPTNAME, SALERNAME, CLUENUMBER, OPPNUMBER, CONVERT(varchar(60), RATE)+'%' RATE1 INTO {0} FROM {1} ORDER BY DEPTNAME, SALERNAME ", tableName, tmpTable3);
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQl6.ToString());
         }
 
         //构建报表列
@@ -273,6 +273,7 @@ namespace ClueTransBill
             //部门
             var department = header.AddChild("DEPTNAME", new Kingdee.BOS.LocaleValue("部门"));
             department.ColIndex = 0;
+            department.Width = 200;
 
             //业务员
             var salesman = header.AddChild("SALERNAME", new Kingdee.BOS.LocaleValue("业务员"));
@@ -283,11 +284,11 @@ namespace ClueTransBill
             clueNumber.ColIndex = 2;
 
             //转化商机数量
-            var oppNumber = header.AddChild("OPPNUMBERM", new Kingdee.BOS.LocaleValue("转化商机数量"));
+            var oppNumber = header.AddChild("OPPNUMBER", new Kingdee.BOS.LocaleValue("转化商机数量"));
             oppNumber.ColIndex = 3;
 
             //转化率
-            var conversionRate = header.AddChild("RATE", new Kingdee.BOS.LocaleValue("转化率"));
+            var conversionRate = header.AddChild("RATE1", new Kingdee.BOS.LocaleValue("转化率"));
             conversionRate.ColIndex = 4;
 
             return header;
