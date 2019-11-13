@@ -49,6 +49,7 @@ namespace ClueTransBill
             sql0.AppendFormat(@"/*dialect*/ SELECT FLINKOBJECT FROM T_SEC_USER WHERE FUSERID = {0} ", this.Context.UserId);
             DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
 
+            // 计算当前登录用户销售员可见范围
             StringBuilder salerLimit = new StringBuilder();
             Boolean flag0 = false;
 
@@ -85,10 +86,11 @@ namespace ClueTransBill
                 }
             }
 
+            // -----------------------------------------------------------------------------------------------------------------------------------------------
 
             //生成中间临时表
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
-            materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 4);
+            materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 10);
             string tmpTable1 = materialRptTableNames[0];
             string tmpTable2 = materialRptTableNames[1];
             string tmpTable3 = materialRptTableNames[2];
@@ -116,16 +118,16 @@ namespace ClueTransBill
 
                 foreach (DynamicObject saler in cols1)
                 {
-                    String salerNumber = Convert.ToString(((DynamicObject)saler["F_QSNC_SalesmanFilter"])["Number"]);
+                    String salerNumber = Convert.ToString(((DynamicObject)saler["F_QSNC_SalesmanFilter"])["Id"]);
                     salerNum++;
 
                     if (cols1.Count == salerNum)
                     {
-                        salerSql.Append("'" + salerNumber + "')");
+                        salerSql.Append(salerNumber + ")");
                     }
                     else
                     {
-                        salerSql.Append("'" + salerNumber + "', ");
+                        salerSql.Append(salerNumber + ", ");
                     }
                 }
             }
@@ -159,111 +161,108 @@ namespace ClueTransBill
                 }
             }
 
-            //查询出商机中所有商机中的销售部门
-            StringBuilder sql1 = new StringBuilder();
-            sql1.AppendFormat(@"/*dialect*/ select opp.FSALEDEPTID as exedeptid into {0} ", tmpTable1);
-            sql1.AppendLine(" from T_CRM_Opportunity opp ");
-            DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
 
-            // 查询线索中所有执行部门id
-            //StringBuilder sql1 = new StringBuilder();
-            //sql1.AppendFormat(@"/*dialect*/ SELECT DISTINCT E.F_PEJK_EXECUTEDEPTID as exedeptid FROM PEJK_ExecuteDept E LEFT JOIN T_CRM_Clue C ON E.FID = C.FID ", tmpTable1);
-            //DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
 
-            //根据商机中的执行部门，查找每个部门下销售员的 线索数量/商机数量/转化率
-            StringBuilder sql2 = new StringBuilder();
-            sql2.AppendFormat(@"/*dialect*/ select tmp.FSALEDEPTID deptid, salesman.fid salerid, cluenumber, oppnumber, convert(float,round((oppnumber * 1.00 / (cluenumber * 1.00)) * 100, 2)) as conversionrate into {0} ", tmpTable2);
-            sql2.AppendLine(" from(select FCREATORID, count(cluetmp.FCREATORID) cluenumber, sum(cluetmp.status) oppnumber, cluetmp.FSALEDEPTID from ");
-            sql2.AppendLine(" (select clue.FCREATORID, clue.FSALEDEPTID, ");
-            sql2.AppendLine(" case when clue.FBILLNO in (select opp.FSOURCEBILLNO from T_CRM_Opportunity opp left join V_BD_SALESMAN salesman on salesman.fid = opp.FBEMPID left join T_BD_STAFF staff on staff.FSTAFFID = salesman.FSTAFFID inner join T_HR_EMPINFO emp on staff.FEMPINFOID = emp.FID LEFT JOIN T_SEC_USER U ON U.FLINKOBJECT = EMP.FPERSONID where U.FUSERID = clue.FCREATORID) then 1 else 0 end as status ");
-            sql2.AppendLine(" from T_CRM_Clue clue where 1 = 1 and clue.FCREATORID != 0 and  clue.FSALEDEPTID != 0 ");
 
+
+            // ---------------------------------------------------------------------------------------------------------------
+            // tmpTable1 存放的是线索中的部门、线索的创建人、线索是否转化为商机（1：是；0：否）
+            StringBuilder tmpSQL1 = new StringBuilder();
+            tmpSQL1.AppendFormat(@"/*dialect*/ select clue.FCREATORID, 
+                                                       clue.FSALEDEPTID, 
+	                                                   case when clue.FBILLNO in (select opp.FSOURCEBILLNO 
+								                                                  from T_CRM_Opportunity opp 
+								                                                  inner join V_BD_SALESMAN saler on saler.fid = opp.FBEMPID 
+								                                                  inner join T_BD_STAFF staff on staff.FSTAFFID = saler.FSTAFFID 
+								                                                  inner join T_HR_EMPINFO emp on staff.FEMPINFOID = emp.FID 
+								                                                  inner JOIN T_SEC_USER U ON U.FLINKOBJECT = EMP.FPERSONID 
+								                                                  where U.FUSERID = clue.FCREATORID) then 1 else 0 end as status
+                                    into {0}
+                                    from T_CRM_Clue clue 
+                                    where clue.FCREATORID != 0 
+                                    and clue.FSALEDEPTID != 0 ", tmpTable1);
             //判断起始日期是否有效
             if (dyFilter["f_qsnc_startdatefilter"] != null)
             {
                 startDate = Convert.ToDateTime(dyFilter["f_qsnc_startdatefilter"]).ToString("yyyy-MM-dd 00:00:00");
-                sql2.AppendFormat(" and clue.F_PEJK_BIZDATE >= '{0}' ", startDate);
+                tmpSQL1.AppendFormat(" and clue.F_PEJK_BIZDATE >= '{0}' ", startDate);
             }
             //判断截止日期是否有效
             if (dyFilter["f_qsnc_enddatefilter"] != null)
             {
                 endDate = Convert.ToDateTime(dyFilter["f_qsnc_enddatefilter"]).ToString("yyyy-MM-dd 23:59:59");
-                sql2.AppendFormat(" and clue.F_PEJK_BIZDATE <= '{0}' ", endDate);
+                tmpSQL1.AppendFormat(" and clue.F_PEJK_BIZDATE <= '{0}' ", endDate);
             }
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQL1.ToString());
 
-            sql2.AppendLine(" ) cluetmp ");
-            sql2.AppendLine(" group by cluetmp.FCREATORID, cluetmp.FSALEDEPTID) tmp ");
-            sql2.AppendLine(" LEFT JOIN T_SEC_USER U ON U.FUSERID = tmp.FCREATORID ");
-            sql2.AppendLine(" LEFT JOIN T_HR_EMPINFO EMP ON U.FLINKOBJECT = EMP.FPERSONID ");
-            sql2.AppendLine(" left join T_BD_STAFF staff on staff.FEMPINFOID = emp.FID ");
-            sql2.AppendLine(" left join V_BD_SALESMAN salesman ");
-            sql2.AppendLine(" on staff.FSTAFFID = salesman.FSTAFFID "); 
-            //sql2.AppendLine(" left join T_BD_DEPARTMENT_L deptl ");
+            // --------------------------------------------------------------------------------------------------------------------
+            // 统计每一个销售员的线索数量、商机数量
+            StringBuilder tmpSQL2 = new StringBuilder();
+            tmpSQL2.AppendFormat(@"/*dialect*/ SELECT FCREATORID, FSALEDEPTID, COUNT(FCREATORID) CLUENUMBER, SUM(status) OPPNUMBER
+                                                INTO {0}
+                                                FROM {1}
+                                                GROUP BY FCREATORID, FSALEDEPTID ", tmpTable2, tmpTable1);
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQL2.ToString());
 
-
-            // 线索转化中线索相关联关系   商机负责人 == 线索创建人
-            // 线索转化分析表中部门
-            //sql2.AppendLine(" on deptl.FDEPTID = tmp.FSALEDEPTID "); // FSALEDEPTID
-            sql2.AppendFormat(" where tmp.FSALEDEPTID in (select exedeptid from {0}) AND salesman.fid != 0 ", tmpTable1);
-            //sql2.AppendLine(" where deptl.FLOCALEID = 2052 ");
+            // --------------------------------------------------------------------------------------------------------------------
+            // 计算每一名销售员的转化率
+            StringBuilder tmpSQL3 = new StringBuilder();
+            tmpSQL3.AppendFormat(@"/*dialect*/ SELECT DEPTL.FNAME DEPTNAME, 
+                                                      EMPL.FNAME SALERNAME, 
+                                                      CLUENUMBER, 
+                                                      OPPNUMBERM, 
+                                                      CONVERT(FLOAT,ROUND((OPPNUMBERM * 1.00 / (CLUENUMBER * 1.00)) * 100, 2)) RATE 
+                                               INTO {0} 
+                                               FROM {1} TMP
+                                               INNER JOIN T_SEC_USER U ON U.FUSERID = TMP.FCREATORID
+                                               INNER JOIN T_HR_EMPINFO EMP ON U.FLINKOBJECT = EMP.FPERSONID
+                                               INNER JOIN T_BD_STAFF STAFF on STAFF.FEMPINFOID = EMP.FID
+                                               INNER JOIN V_BD_SALESMAN SALESMAN ON STAFF.FSTAFFID = V_BD_SALESMAN.FSTAFFID
+                                               INNER JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = EMP.FID
+                                               INNER JOIN t_bd_department_L DEPTL ON DEPTL.FDEPTID = FSALEDEPTID
+                                               INNER JOIN t_bd_department DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID 
+                                               WHERE 1=1
+                                               ", tmpTable3, tmpTable2);
+            // 进行销售员数据隔离
             if (flag0)
             {
-                sql2.AppendLine(" and salesman.fid ").Append(salerLimit);
+                tmpSQL3.AppendLine(" AND SALESMAN.FID ").Append(salerLimit);
             }
 
-            DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
-
-
-            //查询出所有部门小计
-            StringBuilder sql3 = new StringBuilder();
-            sql3.AppendFormat(@"/*dialect*/ select deptid, sum(cluenumber) as totalclue, sum(oppnumber) as totalopp into {0} from {1} group by deptid ", tmpTable3, tmpTable2);
-            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
-
-
-            //将销售员名称进行连表查询
-            StringBuilder sql4 = new StringBuilder();
-            sql4.AppendFormat(@"/*dialect*/ select deptid, empl.FNAME as saler, cluenumber, oppnumber, conversionrate into {0} ", tmpTable4);
-            sql4.AppendFormat(" from {0} ", tmpTable2);
-            sql4.AppendLine(" left join V_BD_SALESMAN salesman on salesman.fid = salerid ");
-            sql4.AppendLine(" left join T_BD_STAFF staff on staff.FSTAFFID = salesman.FSTAFFID ");
-            sql4.AppendLine(" inner join T_HR_EMPINFO emp on staff.FEMPINFOID = emp.FID ");
-            sql4.AppendLine(" left join T_HR_EMPINFO_L empl on empl.FID = emp.FID ");
-            sql4.AppendLine(" where empl.FLOCALEID = 2052 ");
-            //判断业务员条件是否有效
+            // 进行销售员过滤条件过滤
             if (dyFilter["F_QSNC_SalesmanFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_SalesmanFilter"]).Count > 0)
             {
-                sql4.AppendLine(" and staff.FNUMBER").Append(salerSql);
-                flag = true;
-            }
-            if (flag0)
-            {
-                sql4.AppendLine(" and salesman.fid ").Append(salerLimit);
+                tmpSQL3.AppendLine(" and SALESMAN.FID ").Append(salerSql);
             }
 
-            DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
-
-            if (!flag)
-            {
-                //将部门小计插入总表中
-                StringBuilder sql5 = new StringBuilder();
-                sql5.AppendFormat(@"/*dialect*/ insert into {0} select deptid, '小计', totalclue, totalopp, convert(float,round((totalopp * 1.00 / (totalclue * 1.00)) * 100, 2)) as conversionrate from {1} ", tmpTable4, tmpTable3);
-                DBUtils.ExecuteDynamicObject(this.Context, sql5.ToString());
-            }
-
-            //显示部门
-            StringBuilder sql6 = new StringBuilder();
-            sql6.AppendFormat(@"/*dialect*/ select row_number() over (order by deptl.FNAME) as FSeq, deptl.FNAME as department, saler, cluenumber, oppnumber, cast(conversionrate as varchar)+' %' as rate into {0} from {1} ", tableName, tmpTable4);
-            sql6.AppendLine(" left join t_bd_department_L deptl ");
-            sql6.AppendLine(" on deptl.FDEPTID = deptid ");
-            sql6.AppendLine(" left join t_bd_department dept ");
-            sql6.AppendLine(" on deptl.FDEPTID = dept.FDEPTID ");
-            sql6.AppendLine(" where deptl.FLOCALEID = 2052 ");
+            // 进行部门条件过滤
             //判断部门条件是否有效
             if (dyFilter["F_QSNC_DepartmentFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_DepartmentFilter"]).Count > 0)
             {
-                sql6.AppendLine(" and dept.FNUMBER").Append(deptSql);
+                tmpSQL3.AppendLine(" AND DEPT.FNUMBER ").Append(deptSql);
             }
-            DBUtils.ExecuteDynamicObject(this.Context, sql6.ToString());
+
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQL3.ToString());
+
+            // 根据部门进行线索及商机的汇总
+            // ---------------------------------------------------------------------------------------------------------------------
+            // 获取到部门小计
+            StringBuilder tmpSQL4 = new StringBuilder();
+            tmpSQL4.AppendFormat(@"/*dialect*/ SELECT DEPTNAME, SUM(CLUENUMBER) TOTALCLUE, SUM(OPPNUMBERM) TOTALOPP INTO {0} FROM {1} GROUP BY DEPTNAME ", tmpTable4, tmpTable3);
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQL4.ToString());
+
+
+            // 将部门小计斤系插入明细表
+            // ----------------------------------------------------------------------------------------------------------------------
+            StringBuilder tmpSQL5 = new StringBuilder();
+            tmpSQL5.AppendFormat(@"/*dialect*/ INSERT INTO {0} SELECT DEPTNAME || '小计', '', TOTALCLUE, TOTALOPP, CONVERT(FLOAT,ROUND((TOTALOPP * 1.00 / (TOTALCLUE * 1.00)) * 100, 2)) TOTALRATE FROM {1} ", tmpTable3, tmpTable4);
+            DBUtils.ExecuteDynamicObject(this.Context, tmpSQL5.ToString());
+
+            // ------------------------------------------------------------------------------------------------------------------------
+            // 将总体结果进行插入系统提供的tablename中
+            StringBuilder tmpSQl6 = new StringBuilder();
+            tmpSQl6.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME, SALERNAME) AS FSeq, DEPTNAME, SALERNAME, CLUENUMBER, OPPNUMBERM, RATE INTO {0} FROM {1} ORDER BY DEPTNAME, SALERNAME ", tableName, tmpTable3);
+
         }
 
         //构建报表列
@@ -272,23 +271,23 @@ namespace ClueTransBill
             ReportHeader header = new ReportHeader();
 
             //部门
-            var department = header.AddChild("department", new Kingdee.BOS.LocaleValue("部门"));
+            var department = header.AddChild("DEPTNAME", new Kingdee.BOS.LocaleValue("部门"));
             department.ColIndex = 0;
 
             //业务员
-            var salesman = header.AddChild("saler", new Kingdee.BOS.LocaleValue("业务员"));
+            var salesman = header.AddChild("SALERNAME", new Kingdee.BOS.LocaleValue("业务员"));
             salesman.ColIndex = 1;
 
             //线索数量
-            var clueNumber = header.AddChild("cluenumber", new Kingdee.BOS.LocaleValue("线索数量"));
+            var clueNumber = header.AddChild("CLUENUMBER", new Kingdee.BOS.LocaleValue("线索数量"));
             clueNumber.ColIndex = 2;
 
             //转化商机数量
-            var oppNumber = header.AddChild("oppnumber", new Kingdee.BOS.LocaleValue("转化商机数量"));
+            var oppNumber = header.AddChild("OPPNUMBERM", new Kingdee.BOS.LocaleValue("转化商机数量"));
             oppNumber.ColIndex = 3;
 
             //转化率
-            var conversionRate = header.AddChild("rate", new Kingdee.BOS.LocaleValue("转化率"));
+            var conversionRate = header.AddChild("RATE", new Kingdee.BOS.LocaleValue("转化率"));
             conversionRate.ColIndex = 4;
 
             return header;
