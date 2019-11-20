@@ -38,7 +38,7 @@
     </Reference>
     <Reference Include="Kingdee.BOS.App, Version=7.1.703.7, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.App.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\Bin\Kingdee.BOS.App.dll</HintPath>
     </Reference>
     <Reference Include="Kingdee.BOS.ApprovalFlow">
       <HintPath>C:\Program Files (x86)\Kingdee\K3Cloud\WebSite\bin\Kingdee.BOS.ApprovalFlow.dll</HintPath>
