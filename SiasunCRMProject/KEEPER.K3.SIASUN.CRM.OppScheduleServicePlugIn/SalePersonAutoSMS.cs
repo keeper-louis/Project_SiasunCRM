@@ -74,7 +74,7 @@ inner join t_sec_userrolemap c on c.FENTITYID = b.FENTITYID
 inner join t_SEC_role d on d.FROLEID = c.FROLEID
 inner join t_SEC_role_l dl on dl.FROLEID = d.FROLEID
 where 
-( d.FNUMBER in ('administrator') or dl.FNAME like '%administrator%'  or dl.FDESCRIPTION like '%admin%') 
+( d.FNUMBER in ('administrator') or dl.FNAME like '%administrator%'  or dl.FDESCRIPTION like '%ADMIN%') 
 and a.fname not in ('user') 
 ");
                 DynamicObjectCollection col2 = DBUtils.ExecuteDynamicObject(ctx, rolesql);
