@@ -169,7 +169,7 @@ inner join t_sec_userorg b on a.FUSERID = b.FUSERID
 inner join t_sec_userrolemap c on c.FENTITYID = b.FENTITYID
 inner join t_SEC_role d on d.FROLEID = c.FROLEID
 inner join t_SEC_role_l dl on dl.FROLEID = d.FROLEID
-where a.FNAME = '{0}'  and 
+where ( a.FNAME = '{0}' or a.FUSERACCOUNT='{0}' ) and 
 ( d.FNUMBER in ('CRM_BB','CRM_admin','CRM全职角色','CRM全职角色（私有）','CRM_HD','CRM_SJ','CRM_XS','CRM-XSCJ','CRM_XSHT','CRM_XSHTFJ') or dl.FDESCRIPTION like '%CRM%'  ) ", name);
             DynamicObjectCollection col = DBUtils.ExecuteDynamicObject(ctx, sql);
             if (col == null || col.Count<=0)
