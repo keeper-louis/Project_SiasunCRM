@@ -50,7 +50,7 @@ namespace SalerBillByTotal
             DynamicObjectCollection collection = DBUtils.ExecuteDynamicObject(this.Context, sql0.ToString());
             StringBuilder salerLimit = new StringBuilder();
             Boolean flag = false;
-            if(collection.Count > 0)
+            if (collection.Count > 0)
             {
                 //获取当前用户personId
                 DynamicObject personIdObj = (DynamicObject)collection[0];
@@ -72,7 +72,7 @@ namespace SalerBillByTotal
                     foreach (long salerId in salerList)
                     {
                         len++;
-                        if(len == salerList.Count)
+                        if (len == salerList.Count)
                         {
                             salerLimit.Append(" " + salerId + " ) ");
                         }
@@ -83,12 +83,17 @@ namespace SalerBillByTotal
                     }
                 }
             }
-          
+
 
             //生成中间临时表
             IDBService dbservice = ServiceHelper.GetService<IDBService>();
-            materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 1);
-            String tmpTable1 = materialRptTableNames[0];
+            materialRptTableNames = dbservice.CreateTemporaryTableName(this.Context, 10);
+            string tmpTable1 = materialRptTableNames[0];
+            string tmpTable2 = materialRptTableNames[1];
+            string tmpTable3 = materialRptTableNames[2];
+            string tmpTable4 = materialRptTableNames[3];
+            string tmpTable5 = materialRptTableNames[4];
+            string tmpTable6 = materialRptTableNames[5];
 
             //过滤条件：起始日期/截至日期/部门/业务员
             DynamicObject dyFilter = filter.FilterParameter.CustomFilter;
@@ -110,16 +115,16 @@ namespace SalerBillByTotal
 
                 foreach (DynamicObject saler in cols1)
                 {
-                    String salerNumber = Convert.ToString(((DynamicObject)saler["F_QSNC_SalerFilter"])["Number"]);
+                    String salerNumber = Convert.ToString(((DynamicObject)saler["F_QSNC_SalerFilter"])["Id"]);
                     salerNum++;
 
                     if (cols1.Count == salerNum)
                     {
-                        salerSql.Append("'" + salerNumber + "') ");
+                        salerSql.Append(salerNumber + ") ");
                     }
                     else
                     {
-                        salerSql.Append("'" + salerNumber + "', ");
+                        salerSql.Append(salerNumber + ", ");
                     }
                 }
             }
@@ -139,83 +144,115 @@ namespace SalerBillByTotal
 
                 foreach (DynamicObject dept in cols2)
                 {
-                    String deptNumber = Convert.ToString(((DynamicObject)dept["F_QSNC_DeptFilter"])["Number"]);
+                    String deptNumber = Convert.ToString(((DynamicObject)dept["F_QSNC_DeptFilter"])["Id"]);
                     deptNum++;
 
                     if (cols2.Count == deptNum)
                     {
-                        deptSql.Append("'" + deptNumber + "') ");
+                        deptSql.Append(deptNumber + ") ");
                     }
                     else
                     {
-                        deptSql.Append("'" + deptNumber + "', ");
+                        deptSql.Append(deptNumber + ", ");
                     }
                 }
             }
 
             //报表sql
+
+            String yearFilter = "(";
+            if (dyFilter["F_QSNC_StartDateFilter"] != null)
+            {
+                String year1 = Convert.ToDateTime(dyFilter["F_QSNC_StartDateFilter"]).Year.ToString();
+                yearFilter += "'" + year1 + "',";
+            }
+            if (dyFilter["F_QSNC_EndDateFilter"] != null)
+            {
+                String year2 = Convert.ToDateTime(dyFilter["F_QSNC_EndDateFilter"]).Year.ToString();
+                yearFilter += "'" + year2 + "',";
+            }
+            if (dyFilter["F_QSNC_StartDateFilter"] != null || dyFilter["F_QSNC_EndDateFilter"] != null)
+            {
+                yearFilter = yearFilter.TrimEnd(',');
+            }
+            yearFilter += ")";
+
+            // ---------------------------------------------------------------------------------
+            // tmpTable1中存放所有进行合同指标规划的 销售部门、销售员、合同指标
             StringBuilder sql1 = new StringBuilder();
-            sql1.AppendLine(@"/*dialect*/ SELECT DEPTNAME, SALERNAME, QUOTA, COMPLETEAMOUNT, ");
-            sql1.AppendFormat(" CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar)+' %' AS COMPLETERATE INTO {0} ", tmpTable1);
-            sql1.AppendLine(" FROM ");
-            sql1.AppendLine(" (SELECT DEPTL.FNAME AS DEPTNAME, ");
-            sql1.AppendLine(" EMPL.FNAME AS SALERNAME, ");
-            sql1.AppendLine(" (SELECT E.F_PEJK_CONTRACTQUNTA FROM PEJK_SALERQUNTAENTRY E LEFT JOIN PEJK_SALERQUNTA H ON E.FID = H.FID WHERE E.F_PEJK_SALER = RESOLVESALER.F_PEJK_SALER AND H.FDOCUMENTSTATUS = 'C') AS QUOTA, ");
-            sql1.AppendLine(" SUM(F_PEJK_DETAILLAMOUNT) AS COMPLETEAMOUNT ");
-            sql1.AppendLine(" FROM PEJK_SALECONTRACTENTRY RESOLVESALER ");
-            sql1.AppendLine(" LEFT JOIN PEJK_SALECONTRACTS RESOLVEBASIC ON RESOLVESALER.FID = RESOLVEBASIC.FID ");
-            sql1.AppendLine(" LEFT JOIN V_BD_SALESMAN SALESMAN ON SALESMAN.FID = RESOLVESALER.F_PEJK_SALER ");
-            sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = SALESMAN.FDEPTID ");
-            sql1.AppendLine(" LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID ");
-            sql1.AppendLine(" LEFT JOIN T_BD_STAFF STAFF ON STAFF.FSTAFFID = SALESMAN.FSTAFFID ");
-            sql1.AppendLine(" LEFT JOIN T_HR_EMPINFO_L EMPL ON EMPL.FID = STAFF.FEMPINFOID ");
-            sql1.AppendLine(" WHERE DEPTL.FLOCALEID = 2052 AND EMPL.FLOCALEID = 2052 AND RESOLVEBASIC.FDOCUMENTSTATUS = 'C' ");
-            //判断起始日期是否有效
+            sql1.AppendFormat(@"/*dialect*/ SELECT  F_PEJK_SALEDEPT, SQE.F_PEJK_SALER, SUM(F_PEJK_CONTRACTQUNTA) YEARQUOTA INTO {0} FROM PEJK_SALERQUNTAENTRY SQE LEFT JOIN PEJK_SALERQUNTA SQH ON SQE.FID = SQH.FID WHERE SQH.FDOCUMENTSTATUS = 'C' AND SQH.F_PEJK_SALEDEPT != 0 ", tmpTable1);
+
+            if (dyFilter["F_QSNC_StartDateFilter"] != null || dyFilter["F_QSNC_EndDateFilter"] != null)
+            {
+                sql1.AppendFormat(" AND datepart(yyyy,F_PEJK_YEAR) IN {0} ", yearFilter);
+            }
+
+            sql1.AppendLine(" GROUP BY F_PEJK_SALEDEPT, SQE.F_PEJK_SALER ");
+
+            DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
+
+            // ---------------------------------------------------------------------------------
+            // tmpTable2存放所有进行销售合同分解的中销售员、合同分解金额
+            StringBuilder sql2 = new StringBuilder();
+            sql2.AppendFormat(@"/*dialect*/ SELECT F_PEJK_SALER, SUM(F_PEJK_DETAILLAMOUNT) FINISHAMOUNT INTO {0} FROM PEJK_SALECONTRACTENTRY E LEFT JOIN PEJK_SALECONTRACTS H ON E.FID = H.FID WHERE F_PEJK_SALER != 0 AND FDOCUMENTSTATUS = 'C' GROUP BY F_PEJK_SALER ", tmpTable2);
+
+
             if (dyFilter["F_QSNC_StartDateFilter"] != null)
             {
                 startDate = Convert.ToDateTime(dyFilter["F_QSNC_StartDateFilter"]).ToString("yyyy-MM-dd 00:00:00");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_PEJK_DATE >= '{0}' ", startDate);
+                sql1.AppendFormat(" AND H.F_PEJK_DATE >= '{0}' ", startDate);
             }
-            //判断截止日期是否有效
             if (dyFilter["F_QSNC_EndDateFilter"] != null)
             {
                 endDate = Convert.ToDateTime(dyFilter["F_QSNC_EndDateFilter"]).ToString("yyyy-MM-dd 23:59:59");
-                sql1.AppendFormat(" AND RESOLVEBASIC.F_PEJK_DATE <= '{0}' ", endDate);
+                sql1.AppendFormat(" AND H.F_PEJK_DATE <= '{0}' ", endDate);
             }
+            DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
+
+            // ---------------------------------------------------------------------------------
+            // tmpTable3 
+            StringBuilder sql3 = new StringBuilder();
+            sql3.AppendFormat(@"/*dialect*/ SELECT TMP1.F_PEJK_SALEDEPT, TMP1.F_PEJK_SALER, TMP1.YEARQUOTA QUOTA, ISNULL(TMP2.FINISHAMOUNT, 0) COMPLETEAMOUNT INTO {0} FROM {1} TMP1 LEFT JOIN {2} TMP2 ON TMP1.F_PEJK_SALER = TMP2.F_PEJK_SALER ", tmpTable3, tmpTable1, tmpTable2);
+            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
+
+            // ---------------------------------------------------------------------------------
+            // tmpTable4 
+            StringBuilder sql4 = new StringBuilder();
+            sql4.AppendFormat(@"/*dialect*/ SELECT DEPTL.FNAME DEPTNAME, SALESMANL.FNAME SALERNAME, QUOTA, COMPLETEAMOUNT, CASE WHEN QUOTA = 0 THEN '0 %' ELSE CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar)+' %' END AS COMPLETERATE INTO {0} FROM {1} TMP1
+                                            LEFT JOIN V_BD_SALESMAN_L SALESMANL ON SALESMANL.FID = TMP1.F_PEJK_SALER
+                                            LEFT JOIN T_BD_DEPARTMENT_L DEPTL ON DEPTL.FDEPTID = TMP1.F_PEJK_SALEDEPT
+                                            LEFT JOIN T_BD_DEPARTMENT DEPT ON DEPTL.FDEPTID = DEPT.FDEPTID WHERE SALESMANL.FNAME IS NOT NULL ", tmpTable4, tmpTable3);
 
             //判断销售员条件
             if (dyFilter["F_QSNC_SalerFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_SalerFilter"]).Count > 0)
             {
-                sql1.AppendLine(" and STAFF.FNUMBER").Append(salerSql);
+                sql1.AppendLine(" AND TMP1.F_PEJK_SALER ").Append(salerSql);
             }
 
             //销售员数据隔离
             if (flag)
             {
-                sql1.AppendLine(" and SALESMAN.FID ").Append(salerLimit);
+                sql1.AppendLine(" AND TMP1.F_PEJK_SALER ").Append(salerLimit);
             }
 
             //判断销售部门条件
             if (dyFilter["F_QSNC_DeptFilter"] != null && ((DynamicObjectCollection)dyFilter["F_QSNC_DeptFilter"]).Count > 0)
             {
-                sql1.AppendLine(" AND DEPT.FNUMBER").Append(deptSql);
+                sql1.AppendLine(" AND TMP1.F_PEJK_SALEDEPT ").Append(deptSql);
             }
-            sql1.AppendLine(" GROUP BY F_PEJK_SALER, EMPL.FNAME, DEPTL.FNAME) TMP ");
+            DBUtils.ExecuteDynamicObject(this.Context, sql4.ToString());
 
-            DBUtils.ExecuteDynamicObject(this.Context, sql1.ToString());
-            // tmpTable1 : DEPTNAME  SALERNAME  QUOTA  COMPLETEAMOUNT  COMPLETERATE
 
-            StringBuilder sql2 = new StringBuilder();
-            sql2.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '合计' , '', QUOTA, COMPLETEAMOUNT, ", tmpTable1);
-            sql2.AppendLine(" CAST(CONVERT(FLOAT, ROUND((COMPLETEAMOUNT * 1.00 / (QUOTA * 1.00)) * 100, 3)) as varchar) + ' %' AS COMPLETERATE ");
-            sql2.AppendLine(" FROM ");
-            sql2.AppendFormat(" (SELECT SUM(QUOTA) AS QUOTA, SUM(COMPLETEAMOUNT) AS COMPLETEAMOUNT FROM {0}) TMP ", tmpTable1);
-            DBUtils.ExecuteDynamicObject(this.Context, sql2.ToString());
+            StringBuilder sql5 = new StringBuilder();
+            sql5.AppendFormat(@"/*dialect*/INSERT INTO {0} SELECT '最终合计' DEPTNAME, '' SALERNAME, ISNULL(TOTALQUOTA, 0) TOTALQUOTA1, ISNULL(TOTALCOMPLETEAMOUNT, 0) TOTALCOMPLETEAMOUNT1, CASE WHEN TOTALQUOTA IS NULL THEN '0 %' ELSE CAST(CONVERT(FLOAT, ROUND((TOTALCOMPLETEAMOUNT * 1.00 / (TOTALQUOTA * 1.00)) * 100, 3)) as varchar) + ' %' END AS COMPLETERATE
+            FROM 
+            (SELECT SUM(QUOTA) TOTALQUOTA, SUM(COMPLETEAMOUNT) TOTALCOMPLETEAMOUNT FROM {1}) TMP  ", tmpTable4, tmpTable4);
+            DBUtils.ExecuteDynamicObject(this.Context, sql5.ToString());
 
-            StringBuilder sql3 = new StringBuilder();
-            sql3.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME) AS FSeq, DEPTNAME, SALERNAME, CONVERT(FLOAT, ROUND(QUOTA, 2)) AS TOTALQUOTA, CONVERT(FLOAT, ROUND(COMPLETEAMOUNT, 2)) AS TOTALAMOUNT, COMPLETERATE INTO {0} ", tableName);
-            sql3.AppendFormat(" FROM {0} ", tmpTable1);
-            DBUtils.ExecuteDynamicObject(this.Context, sql3.ToString());
+            StringBuilder sql6 = new StringBuilder();
+            sql6.AppendFormat(@"/*dialect*/ SELECT ROW_NUMBER() OVER (ORDER BY DEPTNAME) AS FSeq, DEPTNAME, SALERNAME, CONVERT(FLOAT, ROUND(QUOTA, 2)) AS TOTALQUOTA, CONVERT(FLOAT, ROUND(COMPLETEAMOUNT, 2)) AS TOTALAMOUNT, COMPLETERATE INTO {0} ", tableName);
+            sql6.AppendFormat(" FROM {0}  ", tmpTable4);
+            DBUtils.ExecuteDynamicObject(this.Context, sql6.ToString());
         }
 
         //构建报表列
@@ -226,22 +263,27 @@ namespace SalerBillByTotal
             //销售部门
             var department = header.AddChild("DEPTNAME", new Kingdee.BOS.LocaleValue("销售部门"));
             department.ColIndex = 0;
+            department.Width = 150;
 
             //销售员
             var salesman = header.AddChild("SALERNAME", new Kingdee.BOS.LocaleValue("销售员"));
             salesman.ColIndex = 1;
+            salesman.Width = 120;
 
             //指标
             var quota = header.AddChild("TOTALQUOTA", new Kingdee.BOS.LocaleValue("指标"));
             quota.ColIndex = 2;
+            quota.Width = 150;
 
             //完成金额
             var amount = header.AddChild("TOTALAMOUNT", new Kingdee.BOS.LocaleValue("完成金额"));
             amount.ColIndex = 3;
+            amount.Width = 150;
 
             //完成占比
             var rate = header.AddChild("COMPLETERATE", new Kingdee.BOS.LocaleValue("完成占比"));
             rate.ColIndex = 4;
+            rate.Width = 150;
 
             return header;
         }
@@ -315,7 +357,7 @@ namespace SalerBillByTotal
                     result.AddTitle("F_QSNC_Saler", "全部");
                 }
             }
-            
+
             return result;
         }
     }

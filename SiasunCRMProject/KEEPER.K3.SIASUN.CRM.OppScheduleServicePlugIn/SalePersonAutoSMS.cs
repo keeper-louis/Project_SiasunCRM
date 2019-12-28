@@ -23,12 +23,12 @@ namespace KEEPER.K3.SIASUN.CRM.OppScheduleServicePlugIn
             DateTime dateTime = DateTime.Now;
             string nowdate = string.Format("{0:yyyy-MM-dd}", dateTime);
             //获得 销售岗位被禁用的 人员列表
-            string sql = string.Format(@" SELECT THR.FNUMBER     PERSONNUMBER,
+            string sql = string.Format(@" SELECT distinct THR.FNUMBER     PERSONNUMBER,
        THRL.FNAME      PERSONNAME,
        TOP2.FNUMBER     POSITIONNUMBER,
        TOPL.FNAME      POSITIONNAME,
-       STA.FFORBIDDATE,
-    saleman.fnumber
+       STA.FAUDITDATE
+   
   FROM 
   T_BD_STAFF STA
   LEFT JOIN T_ORG_POST TOP2
@@ -39,13 +39,13 @@ namespace KEEPER.K3.SIASUN.CRM.OppScheduleServicePlugIn
     ON STA.FEMPINFOID = THR.FID
   LEFT JOIN T_HR_EMPINFO_L THRL
     ON THR.FID = THRL.FID
+  inner join T_BD_OPERATORENTRY  B ON B.FSTAFFID = STA.FSTAFFID 
+ inner JOIN T_BD_OPERATOR A ON A.FOPERATORID = B.FOPERATORID 
+   WHERE B.FOPERATORTYPE = 'XSY' and STA.FFORBIDSTATUS = 'B' 
+and   STA.FAUDITDATE >='{0}' 
+  
 
-inner join   V_BD_SALESMAN saleman 
- on saleman.fnumber=STA.FNUMBER
- 
-
- WHERE STA.FFORBIDSTATUS = 'B'  and  STA.FFORBIDDATE is not null and to_char(STA.FFORBIDDATE,'yyyy-MM-dd') >='{0}'
- order by FFORBIDDATE desc ", nowdate);
+  ", nowdate);
 
             DynamicObjectCollection col = DBUtils.ExecuteDynamicObject(ctx, sql);
 
